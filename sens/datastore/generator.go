@@ -1,4 +1,4 @@
-package sens
+package main
 
 import (
 	"encoding/json"
@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/senslabs/alpha/sens/types"
 
 	_ "github.com/lib/pq"
 )
@@ -76,7 +77,8 @@ func GetTableFields(db *sqlx.DB, schema string, mi ModelInfo) []FieldInfo {
 	return fields
 }
 
-func GenerateStruct(db *sqlx.DB, schema string, mi ModelInfo) string {
+//Generate and return struct for one table
+func GenerateModel(db *sqlx.DB, schema string, mi ModelInfo) string {
 	fields := GetTableFields(db, schema, mi)
 	members := []string{}
 	fieldMap := map[string]string{}
@@ -100,12 +102,12 @@ func GenerateStruct(db *sqlx.DB, schema string, mi ModelInfo) string {
 		`, mi.Model, fm)
 }
 
+//Generate for all tables
 func GenerateModels(db *sqlx.DB, schema string, models []ModelInfo) {
-	sts := []string{}
+	ms := []string{}
 	for _, mi := range models {
-		st := GenerateStruct(db, schema, mi)
-		sts = append(sts, st)
-		GenerateFunctions(schema, mi)
+		m := GenerateModel(db, schema, mi)
+		ms = append(ms, m)
 	}
 	os.Mkdir("models", 0777)
 	content := []byte(`package models
@@ -115,7 +117,7 @@ func GenerateModels(db *sqlx.DB, schema string, models []ModelInfo) {
 
 	var t time.Time
 	
-	` + strings.Join(sts, "\n\n"))
+	` + strings.Join(ms, "\n\n"))
 
 	content, err := format.Source(content)
 	if err != nil {
@@ -124,16 +126,74 @@ func GenerateModels(db *sqlx.DB, schema string, models []ModelInfo) {
 	ioutil.WriteFile("models/models.go", []byte(content), 0666)
 }
 
-func GenerateFunctions(schema string, mi ModelInfo) {
-	t, err := template.ParseFiles("models/fn/fn.go.tpl")
+//Generate functions for one table
+func GenerateFunction(schema string, mi ModelInfo) {
+	t, err := template.ParseFiles("templates/fn.go.tpl")
 	if err != nil {
 		log.Fatal(err)
 	}
-	f, err := os.Create(fmt.Sprintf("models/fn/%s.go", mi.Table))
+	f, err := os.Create(fmt.Sprintf("generates/models/fn/%s.go", mi.Table))
 	if err != nil {
 		log.Fatal(err)
 	}
 	err = t.Execute(f, mi)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+//Generate all functions
+func GenerateFunctions(db *sqlx.DB, schema string, models []ModelInfo) {
+	for _, mi := range models {
+		GenerateFunction(schema, mi)
+	}
+}
+
+func GenerateDb(object string, model string) {
+	t, err := template.ParseFiles("templates/db.tpl")
+	if err != nil {
+		log.Fatal(err)
+	}
+	f, err := os.Create(fmt.Sprintf("generated/api/db/%s.go", object))
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = t.Execute(f, types.Map{"Model": model})
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func GenerateRest(object string, model string) {
+	t, err := template.ParseFiles("templates/rest.tpl")
+	if err != nil {
+		log.Fatal(err)
+	}
+	f, err := os.Create(fmt.Sprintf("generated/api/rest/main/%s.go", object))
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = t.Execute(f, types.Map{
+		"Object": object,
+		"Model":  model,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func GenerateMain() {
+	t, err := template.ParseFiles("api/templates/main.tpl")
+	if err != nil {
+		log.Fatal(err)
+	}
+	f, err := os.Create("api/rest/main/main.go")
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = t.Execute(f, types.Map{
+		"Models": []string{"Sleep", "Device"},
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -146,4 +206,11 @@ func Generate(schema string) {
 
 	models := GetModels(db, schema)
 	GenerateModels(db, schema, models)
+	GenerateFunctions(db, schema, models)
+
+	// for _, m := range models {
+	// 	// GenerateDb(m.Model, m.Model)
+	// 	GenerateRest(om[0], om[1])
+	// }
+	// GenerateMain()
 }

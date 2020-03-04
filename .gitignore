@@ -1,0 +1,3 @@
+go.sum
+sens/datastore/api_generator.go.obs
+sens/datastore/templates/rest.tpl.obs

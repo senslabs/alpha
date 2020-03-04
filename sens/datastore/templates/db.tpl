@@ -16,47 +16,47 @@ import (
 )
 
 func create{{.Model}}Model(input interface{}) (models.{{.Model}}, *errors.SensError) {
-	var {{.Object}} models.{{.Model}}
+	var m models.{{.Model}}
 	kind := reflect.TypeOf(input).String()
 	switch kind {
 	case "[]uint":
-		if err := types.JsonUnmarshal(input.([]byte), &{{.Object}}); err != nil {
-			return {{.Object}}, err
+		if err := types.JsonUnmarshal(input.([]byte), &m); err != nil {
+			return m, err
 		} else {
-			return {{.Object}}, nil
+			return m, nil
 		}
 	case "models.{{.Model}}":
 		return input.(models.{{.Model}}), nil
 	}
-	return {{.Object}}, errors.New(errors.USER_ERROR, "The input seems to be wrong")
+	return m, errors.New(errors.USER_ERROR, "The input seems to be wrong")
 }
 
 func Create{{.Model}}FromObject(input interface{}) (string, *errors.SensError) {
-	{{.Object}}, err := create{{.Model}}Model(input)
+	m, err := create{{.Model}}Model(input)
 	if err != nil {
 		return "", err
 	}
-	return Create{{.Model}}({{.Object}})
+	return Create{{.Model}}(m)
 }
 
-func Create{{.Model}}({{.Object}} models.{{.Model}}) (string, *errors.SensError) {
+func Create{{.Model}}(m models.{{.Model}}) (string, *errors.SensError) {
 	conn := GetConnection()
-	err := {{.Object}}.Insert(context.Background(), conn, boil.Infer())
+	err := m.Insert(context.Background(), conn, boil.Infer())
 	if err != nil {
 		logger.Error(err)
 		return "", errors.New(errors.DB_ERROR, err.Error())
 	} else {
-		logger.Debug({{.Object}}.ID)
-		return {{.Object}}.ID, nil
+		logger.Debug(m.ID)
+		return m.ID, nil
 	}
 }
 
 func Update{{.Model}}FromObject(id string, input []byte) *errors.SensError {
-	{{.Object}}, err := create{{.Model}}Model(input)
+	m, err := create{{.Model}}Model(input)
 	if err != nil {
 		return err
 	}
-	return Update{{.Model}}(id, {{.Object}})
+	return Update{{.Model}}(id, m)
 }
 
 func Update{{.Model}}(id string, input models.{{.Model}}) *errors.SensError {
@@ -70,11 +70,11 @@ func Update{{.Model}}(id string, input models.{{.Model}}) *errors.SensError {
 }
 
 func Get{{.Model}}ById(id string) (*models.{{.Model}}, *errors.SensError) {
-	if {{.Object}}, err := models.Find{{.Model}}(context.Background(), GetConnection(), id); err != nil {
+	if m, err := models.Find{{.Model}}(context.Background(), GetConnection(), id); err != nil {
 		logger.Error(err)
-		return {{.Object}}, errors.FromError(errors.DB_ERROR, err)
+		return m, errors.FromError(errors.DB_ERROR, err)
 	} else {
-		return {{.Object}}, nil
+		return m, nil
 	}
 }
 
@@ -100,10 +100,10 @@ func Find{{.Model}}(params types.Map, batch []string, limit string) (models.{{.M
 		qms = append(qms, qm.And(fmt.Sprintf("%s = ?", column), value))
 	}
 
-	if {{.Object}}s, err := models.{{.Model}}s(qms...).All(context.Background(), GetConnection()); err != nil {
+	if ms, err := models.{{.Model}}s(qms...).All(context.Background(), GetConnection()); err != nil {
 		logger.Error(err)
 		return []*models.{{.Model}}{&models.{{.Model}}{}}, errors.New(errors.DB_ERROR, err.Error())
 	} else {
-		return {{.Object}}s, nil
+		return ms, nil
 	}
 }

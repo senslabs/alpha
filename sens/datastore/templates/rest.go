@@ -11,34 +11,35 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func SleepMain(r *mux.Router) {
-	r.HandleFunc("/api/sleeps/create", CreateSleep)
-	r.HandleFunc("/api/sleeps/update", UpdateSleep)
-	r.HandleFunc("/api/sleeps/get/{id}", GetSleep)
-	r.HandleFunc("/api/sleeps/find", FindSleep)
+func AuthMain(r *mux.Router) {
+	r.HandleFunc("/api/auths/create", CreateAuth)
+	r.HandleFunc("/api/auths/update", UpdateAuth)
+	r.HandleFunc("/api/auths/get/{id}", GetAuth)
+	r.HandleFunc("/api/auths/find", FindAuth)
 }
 
-func CreateSleep(w http.ResponseWriter, r *http.Request) {
-	var sleep models.Sleep
-	if err := types.JsonUnmarshelFromReader(r.Body, &sleep); err != nil {
+func CreateAuth(w http.ResponseWriter, r *http.Request) {
+	var auth models.Auth
+	if err := types.JsonUnmarshelFromReader(r.Body, &auth); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := db.CreateSleep(sleep); err != nil {
+	} else if id, err := db.CreateAuth(auth); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
 		fmt.Fprintln(w, id)
 	}
+
 }
 
-func UpdateSleep(w http.ResponseWriter, r *http.Request) {
+func UpdateAuth(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	var sleep models.Sleep
-	if err := types.JsonUnmarshelFromReader(r.Body, &sleep); err != nil {
+	var auth models.Auth
+	if err := types.JsonUnmarshelFromReader(r.Body, &auth); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := db.UpdateSleep(id, sleep); err != nil {
+	} else if err := db.UpdateAuth(id, auth); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -46,19 +47,19 @@ func UpdateSleep(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetSleep(w http.ResponseWriter, r *http.Request) {
+func GetAuth(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	if sleep, err := db.GetSleepById(id); err != nil {
+	if auth, err := db.GetAuthById(id); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWrite(w, *sleep); err != nil {
+	} else if err := types.JsonMarshalToWrite(w, *auth); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
-func FindSleep(w http.ResponseWriter, r *http.Request) {
+func FindAuth(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	batch := values["batch"]
 	limit := values.Get("limit")
@@ -74,10 +75,10 @@ func FindSleep(w http.ResponseWriter, r *http.Request) {
 		limit = "10"
 	}
 
-	if sleeps, err := db.FindSleep(m, batch, limit); err != nil {
+	if auths, err := db.FindAuth(m, batch, limit); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWrite(w, sleeps); err != nil {
+	} else if err := types.JsonMarshalToWrite(w, auths); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
