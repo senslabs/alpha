@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"go/format"
-	"html/template"
 	"io/ioutil"
 	"log"
 	"os"
 	"strings"
+	"text/template"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/senslabs/alpha/sens/types"
@@ -29,9 +29,9 @@ type ModelInfo struct {
 	Model string
 }
 
-func GetModels(db *sqlx.DB, schema string) []ModelInfo {
+func GetModelInfo(db *sqlx.DB, schema string) []ModelInfo {
 	models := []ModelInfo{}
-	query := `SELECT table_name AS table, replace(initcap(replace(table_name, '_', ' ')), ' ', '') As model FROM information_schema.tables where table_schema = 'public';`
+	query := fmt.Sprintf(`SELECT table_name AS table, replace(initcap(replace(table_name, '_', ' ')), ' ', '') As model FROM information_schema.tables where table_schema = '%s';`, schema)
 	err := db.Select(&models, query)
 	if err != nil {
 		log.Fatal(err)
@@ -51,16 +51,18 @@ type FieldInfo struct {
 
 func GetFieldType(field FieldInfo) string {
 	switch field.Type {
+	case "UUID", "STRING":
+		if field.IsNullable == "YES" {
+			return "NullString"
+		}
+		return "string"
 	case "TIMESTAMP":
 		if field.IsNullable == "YES" {
 			return "NullTime"
 		}
 		return "time.Time"
 	default:
-		if field.IsNullable == "YES" {
-			return "NullString"
-		}
-		return "string"
+		return "RawMessage"
 	}
 }
 
@@ -103,13 +105,13 @@ func GenerateModel(db *sqlx.DB, schema string, mi ModelInfo) string {
 }
 
 //Generate for all tables
-func GenerateModels(db *sqlx.DB, schema string, models []ModelInfo) {
+func GenerateModels(db *sqlx.DB, schema string, mis []ModelInfo) {
 	ms := []string{}
-	for _, mi := range models {
+	for _, mi := range mis {
 		m := GenerateModel(db, schema, mi)
 		ms = append(ms, m)
 	}
-	os.Mkdir("models", 0777)
+	os.Mkdir("generated/models", 0777)
 	content := []byte(`package models
 	import (
 		"time"
@@ -123,16 +125,16 @@ func GenerateModels(db *sqlx.DB, schema string, models []ModelInfo) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	ioutil.WriteFile("models/models.go", []byte(content), 0666)
+	ioutil.WriteFile("generated/models/models.go", []byte(content), 0666)
 }
 
 //Generate functions for one table
 func GenerateFunction(schema string, mi ModelInfo) {
-	t, err := template.ParseFiles("templates/fn.go.tpl")
+	t, err := template.ParseFiles("templates/fn.tpl")
 	if err != nil {
 		log.Fatal(err)
 	}
-	f, err := os.Create(fmt.Sprintf("generates/models/fn/%s.go", mi.Table))
+	f, err := os.Create(fmt.Sprintf("generated/models/fn/%s.go", mi.Table))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -143,8 +145,8 @@ func GenerateFunction(schema string, mi ModelInfo) {
 }
 
 //Generate all functions
-func GenerateFunctions(db *sqlx.DB, schema string, models []ModelInfo) {
-	for _, mi := range models {
+func GenerateFunctions(db *sqlx.DB, schema string, mis []ModelInfo) {
+	for _, mi := range mis {
 		GenerateFunction(schema, mi)
 	}
 }
@@ -164,35 +166,36 @@ func GenerateDb(object string, model string) {
 	}
 }
 
-func GenerateRest(object string, model string) {
+func GenerateRest(table string, model string) {
 	t, err := template.ParseFiles("templates/rest.tpl")
 	if err != nil {
 		log.Fatal(err)
 	}
-	f, err := os.Create(fmt.Sprintf("generated/api/rest/main/%s.go", object))
+	f, err := os.Create(fmt.Sprintf("generated/api/rest/main/%s.go", table))
 	if err != nil {
 		log.Fatal(err)
 	}
+	path := strings.ReplaceAll(table, "_", "-")
 	err = t.Execute(f, types.Map{
-		"Object": object,
-		"Model":  model,
+		"Path":  path,
+		"Model": model,
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func GenerateMain() {
-	t, err := template.ParseFiles("api/templates/main.tpl")
+func GenerateMain(models []string) {
+	t, err := template.ParseFiles("templates/main.tpl")
 	if err != nil {
 		log.Fatal(err)
 	}
-	f, err := os.Create("api/rest/main/main.go")
+	f, err := os.Create("generated/api/rest/main/main.go")
 	if err != nil {
 		log.Fatal(err)
 	}
 	err = t.Execute(f, types.Map{
-		"Models": []string{"Sleep", "Device"},
+		"Models": models,
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -204,13 +207,20 @@ func Generate(schema string) {
 	db := sqlx.MustConnect("postgres", connString)
 	defer db.Close()
 
-	models := GetModels(db, schema)
-	GenerateModels(db, schema, models)
-	GenerateFunctions(db, schema, models)
+	mis := GetModelInfo(db, schema)
+	GenerateModels(db, schema, mis)
+	GenerateFunctions(db, schema, mis)
 
-	// for _, m := range models {
-	// 	// GenerateDb(m.Model, m.Model)
-	// 	GenerateRest(om[0], om[1])
-	// }
-	// GenerateMain()
+	var ms []string
+	for _, mi := range mis {
+		// GenerateDb(m.Model, m.Model)
+		GenerateRest(mi.Table, mi.Model)
+		ms = append(ms, mi.Model)
+	}
+	GenerateMain(ms)
+}
+
+func main() {
+	schema := os.Args[1]
+	Generate(schema)
 }

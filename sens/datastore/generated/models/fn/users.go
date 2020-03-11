@@ -6,20 +6,20 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/senslabs/modelgen/sens/models"
+	"github.com/senslabs/alpha/sens/datastore/generated/models"
+	"github.com/senslabs/alpha/sens/errors"
+	"github.com/senslabs/alpha/sens/logger"
 )
 
 func InsertUser(data []byte) (string, error) {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
-		// logger.Error(err)
-		log.Println(err)
+		logger.Error(err)
 		return "", nil
 	}
 	var m models.User
 	if err := json.Unmarshal(data, &m); err != nil {
-		// logger.Error(err)
-		log.Println(err)
+		logger.Error(err)
 		return "", nil
 	}
 
@@ -40,14 +40,12 @@ func InsertUser(data []byte) (string, error) {
 	fmt.Println(insert.String())
 	stmt, err := db.PrepareNamed(insert.String())
 	if err != nil {
-		// logger.Error(err)
-		log.Println(err)
+		logger.Error(err)
 		return "", nil
 	}
 	var id string
 	if err := stmt.Get(&id, m); err != nil {
-		// logger.Error(err)
-		log.Println(err)
+		logger.Error(err)
 		return "", nil
 	} else {
 		return id, nil
@@ -57,15 +55,13 @@ func InsertUser(data []byte) (string, error) {
 func UpdateUser(id string, data []byte) error {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
-		// logger.Error(err)
-		log.Println(err)
-		return err
+		logger.Error(err)
+		return errors.FromError(errors.GO_ERROR, err)
 	}
 	var m models.User
 	if err := json.Unmarshal(data, &m); err != nil {
-		// logger.Error(err)
-		log.Println(err)
-		return err
+		logger.Error(err)
+		return errors.FromError(errors.GO_ERROR, err)
 	}
 
 	comma := ""
@@ -81,30 +77,28 @@ func UpdateUser(id string, data []byte) error {
 	fmt.Println(update)
 	stmt, err := db.PrepareNamed(update.String())
 	if err != nil {
-		// logger.Error(err)
-		log.Println(err)
-		return err
+		logger.Error(err)
+		return errors.FromError(errors.GO_ERROR, err)
 	}
 	_, err = stmt.Exec(m)
 	if err != nil {
-		// logger.Error(err)
-		log.Println(err)
-		return err
+		logger.Error(err)
+		return errors.FromError(errors.GO_ERROR, err)
 	}
 	return nil
 }
 
-func SelectUser(id string) models.User {
+func SelectUser(id string) (models.User, *errors.SensError) {
 	db := models.GetConnection()
 	m := models.User{}
-	err := db.Get(&m, "SELECT * FROM users WHERE id = $1", id)
-	if err != nil {
-		log.Println(err)
+	if err := db.Get(&m, "SELECT * FROM auths WHERE id = $1", id); err != nil {
+		logger.Error(err)
+		return m, errors.FromError(errors.DB_ERROR, err)
 	}
-	return m
+	return m, nil
 }
 
-func FindUser(or []string, and []string, span []string) []models.User {
+func FindUser(or []string, and []string, span []string, limit string, column string, order string) ([]models.User, *errors.SensError) {
 	ors := models.ParseOrParams(or)
 	ands := models.ParseAndParams(and)
 	spans := models.ParseSpanParams(span)
@@ -127,24 +121,29 @@ func FindUser(or []string, and []string, span []string) []models.User {
 	}
 	for _, s := range spans {
 		if f, ok := fieldMap[s.Column]; ok {
-			fmt.Fprint(query, fmt.Sprintf("%s >= :from_%s AND %s &lt;= :to_%s AND ", f, f, f, f))
+			fmt.Fprint(query, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
 			values["from_"+f] = s.From
 			values["to_"+f] = s.To
 		}
 	}
 	fmt.Fprint(query, "1 = 1)")
-	fmt.Println(query, values)
+	if column != "" {
+		if order == "" {
+			order = "DESC"
+		}
+		fmt.Fprint(query, " ORDER BY ", column, " ", order)
+	}
+	fmt.Fprint(query, " LIMIT ", limit)
+	
 	m := []models.User{}
 	db := models.GetConnection()
-	stmt, err := db.PrepareNamed(query.String())
-	if err != nil {
-		// logger.Error(err)
-		log.Println(err)
-		return m
+	if stmt, err := db.PrepareNamed(query.String()); err != nil {
+		logger.Error(err.Error())
+		log.Printf("%v", err)
+		return m, errors.New(errors.DB_ERROR, err.Error())
+	} else if err := stmt.Select(&m, values); err != nil {
+		logger.Error(err)
+		return m, errors.New(errors.DB_ERROR, err.Error())
 	}
-	if err := stmt.Select(&m, values); err != nil {
-		// logger.Error(err)
-		log.Println(err)
-	}
-	return m
+	return m, nil
 }

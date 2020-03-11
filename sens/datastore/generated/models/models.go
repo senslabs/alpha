@@ -146,16 +146,17 @@ func GetEndpointGroupFieldMap() map[string]string {
 }
 
 type Auth struct {
-	Id        string     `db:"id"`
-	Email     string     `db:"email"`
-	Mobile    string     `db:"mobile"`
-	Social    string     `db:"social"`
-	FirstName NullString `db:"first_name"`
-	LastName  NullString `db:"last_name"`
-	CreatedAt NullTime   `db:"created_at"`
-	UpdatedAt NullTime   `db:"updated_at"`
+	Id         string     `db:"id"`
+	Email      string     `db:"email"`
+	Mobile     string     `db:"mobile"`
+	Social     string     `db:"social"`
+	FirstName  NullString `db:"first_name"`
+	LastName   NullString `db:"last_name"`
+	CreatedAt  NullTime   `db:"created_at"`
+	UpdatedAt  NullTime   `db:"updated_at"`
+	Properties RawMessage `db:"properties"`
 }
 
 func GetAuthFieldMap() map[string]string {
-	return map[string]string{"CreatedAt": "created_at", "Email": "email", "FirstName": "first_name", "Id": "id", "LastName": "last_name", "Mobile": "mobile", "Social": "social", "UpdatedAt": "updated_at"}
+	return map[string]string{"CreatedAt": "created_at", "Email": "email", "FirstName": "first_name", "Id": "id", "LastName": "last_name", "Mobile": "mobile", "Properties": "properties", "Social": "social", "UpdatedAt": "updated_at"}
 }

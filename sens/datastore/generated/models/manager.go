@@ -20,7 +20,6 @@ type Connection struct {
 
 func getNextConnection() *sqlx.DB {
 	n := r.Len()
-	// pgurl := "postgresql://root@localhost:26257/postgres?ssl=false&sslmode=disable"
 	for i := 0; i < n; i++ {
 		r = r.Next()
 		conn := r.Next().Value.(Connection)

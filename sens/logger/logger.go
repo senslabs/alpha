@@ -3,6 +3,7 @@ package logger
 import (
 	"log"
 	"os"
+	"runtime"
 )
 
 type logger struct{}
@@ -27,6 +28,10 @@ func InitLogger() {
 }
 
 func Error(v ...interface{}) {
+	pc, file, line, ok := runtime.Caller(1)
+	if ok {
+		log.Printf("Error: %s:%d in func: %v", file, line, runtime.FuncForPC(pc).Name())
+	}
 	log.Println(v...)
 }
 
