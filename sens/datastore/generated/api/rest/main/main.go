@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/senslabs/alpha/sens/logger"
 )
 
 func main() {
@@ -23,6 +24,8 @@ func main() {
 	OrgEndpointMain(r)
 	OpEndpointMain(r)
 	UserEndpointMain(r)
-	
+
+	logger.InitFileLogger("datastore")
 	http.Handle("/", r)
+	http.ListenAndServe(":9804", r)
 }
