@@ -1,4 +1,8 @@
 FROM golang:1.14.0-alpine3.11
+
+RUN echo $(ls -l && pwd)
+RUN echo $WORKDIR
+
 WORKDIR /workspace
 
 RUN echo $(ls -l && pwd)
