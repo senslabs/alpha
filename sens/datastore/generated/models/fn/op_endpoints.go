@@ -16,13 +16,15 @@ func InsertOpEndpoint(data []byte) (string, error) {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
-		return "", nil
+		return "", errors.FromError(errors.GO_ERROR, err)
 	}
 	var m models.OpEndpoint
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
-		return "", nil
+		return "", errors.FromError(errors.GO_ERROR, err)
 	}
+
+	logger.Debug(m)
 
 	comma := ""
 	fieldMap := models.GetOpEndpointFieldMap()
@@ -38,16 +40,18 @@ func InsertOpEndpoint(data []byte) (string, error) {
 	fmt.Fprint(insert, ") ")
 	fmt.Fprint(insert, values, ") returning id")
 	db := models.GetConnection()
-	fmt.Println(insert.String())
+
+	logger.Debug(insert.String())
+	
 	stmt, err := db.PrepareNamed(insert.String())
 	if err != nil {
 		logger.Error(err)
-		return "", nil
+		return "", errors.FromError(errors.DB_ERROR, err)
 	}
 	var id string
 	if err := stmt.Get(&id, m); err != nil {
 		logger.Error(err)
-		return "", nil
+		return "", errors.FromError(errors.DB_ERROR, err)
 	} else {
 		return id, nil
 	}
@@ -88,7 +92,7 @@ func BatchInsertOpEndpoint(data []byte) ([]string, error) {
 
 	fmt.Fprint(insert, strings.TrimRight(ph.String(), ", ("), " returning id")
 
-	fmt.Println(insert.String())
+	logger.Debug(insert.String())
 
 	db := models.GetConnection()
 	_, err := db.Exec(insert.String(), values...)
@@ -111,6 +115,8 @@ func UpdateOpEndpoint(id string, data []byte) error {
 		return errors.FromError(errors.GO_ERROR, err)
 	}
 
+	logger.Debug(m)
+
 	comma := ""
 	fieldMap := models.GetOpEndpointFieldMap()
 	update := bytes.NewBufferString("UPDATE op_endpoints SET ")
@@ -121,6 +127,9 @@ func UpdateOpEndpoint(id string, data []byte) error {
 		}
 	}
 	fmt.Fprint(update, " WHERE id = :id")
+
+	logger.Debug(update.String())
+
 	db := models.GetConnection()
 	stmt, err := db.PrepareNamed(update.String())
 	if err != nil {
@@ -182,6 +191,8 @@ func FindOpEndpoint(or []string, and []string, span []string, limit string, colu
 		fmt.Fprint(query, " ORDER BY ", column, " ", order)
 	}
 	fmt.Fprint(query, " LIMIT ", limit)
+
+	logger.Debug(query.String())
 	
 	m := []models.OpEndpoint{}
 	db := models.GetConnection()

@@ -1,6 +1,4 @@
 FROM alpine
-COPY datastore /datastore
-
-EXPOSE 9804
+ADD datastore /datastore
 
 ENTRYPOINT [ "/datastore" ]

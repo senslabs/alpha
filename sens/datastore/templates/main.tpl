@@ -4,11 +4,12 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/senslabs/alpha/sens/logger"
 )
 
 func main() {
 	r := mux.NewRouter()
-	logger.InitFileLogger("datastore")
+	logger.InitLogger("datastore")
 
 	{{range .Models}}{{.}}Main(r)
 	{{end}}

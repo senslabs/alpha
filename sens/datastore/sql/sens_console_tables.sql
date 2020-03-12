@@ -1,5 +1,5 @@
 CREATE TABLE "auths" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "email" text UNIQUE NOT NULL,
   "mobile" text UNIQUE NOT NULL,
   "social" text UNIQUE NOT NULL,
@@ -10,29 +10,29 @@ CREATE TABLE "auths" (
 );
 
 CREATE TABLE "orgs" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "name" text UNIQUE,
   "created_at" timestamp,
   "updated_at" timestamp
 );
 
 CREATE TABLE "ops" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "created_at" timestamp,
   "updated_at" timestamp
 );
 
 CREATE TABLE "users" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "created_at" timestamp,
   "updated_at" timestamp
 );
 
 CREATE TABLE "endpoints" (
-  "id" uuid PRIMARY KEY,
-  "group" text,
+  "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
+  "category" text,
   "path" text,
-  "secure" boolean,
+  "secure" boolean DEFAULT true,
   "next_endpoint" text
 );
 
@@ -126,4 +126,4 @@ ALTER TABLE "user_endpoints" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id
 
 ALTER TABLE "user_endpoints" ADD FOREIGN KEY ("endpoint_id") REFERENCES "endpoints" ("id");
 
-CREATE UNIQUE INDEX ON "endpoints" ("group", "path");
+CREATE UNIQUE INDEX ON "endpoints" ("category", "path");

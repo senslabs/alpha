@@ -62,6 +62,8 @@ func GetFieldType(field FieldInfo) string {
 			return "NullTime"
 		}
 		return "time.Time"
+	case "BOOL":
+		return "bool"
 	default:
 		return "RawMessage"
 	}
@@ -86,7 +88,6 @@ func GenerateModel(db *sqlx.DB, schema string, mi *ModelInfo) string {
 	members := []string{}
 	fieldMap := map[string]string{}
 	for _, f := range fields {
-		fmt.Println(mi)
 		mi.HasId = mi.HasId || f.TableField == "id"
 		member := fmt.Sprintf("%s %s `db:\"%s\"`", f.ModelField, f.Type, f.TableField)
 		members = append(members, member)

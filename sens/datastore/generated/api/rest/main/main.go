@@ -9,6 +9,7 @@ import (
 
 func main() {
 	r := mux.NewRouter()
+	logger.InitLogger("datastore")
 
 	AuthMain(r)
 	OrgMain(r)
@@ -24,8 +25,7 @@ func main() {
 	OrgEndpointMain(r)
 	OpEndpointMain(r)
 	UserEndpointMain(r)
-
-	logger.InitFileLogger("datastore")
+	
 	http.Handle("/", r)
 	http.ListenAndServe(":9804", r)
 }

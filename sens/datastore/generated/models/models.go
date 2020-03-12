@@ -55,14 +55,14 @@ func GetUserFieldMap() map[string]string {
 
 type Endpoint struct {
 	Id           string     `db:"id"`
-	Group        NullString `db:"group"`
+	Category     NullString `db:"category"`
 	Path         NullString `db:"path"`
-	Secure       RawMessage `db:"secure"`
+	Secure       bool       `db:"secure"`
 	NextEndpoint NullString `db:"next_endpoint"`
 }
 
 func GetEndpointFieldMap() map[string]string {
-	return map[string]string{"Group": "group", "Id": "id", "NextEndpoint": "next_endpoint", "Path": "path", "Secure": "secure"}
+	return map[string]string{"Category": "category", "Id": "id", "NextEndpoint": "next_endpoint", "Path": "path", "Secure": "secure"}
 }
 
 type OrgAuth struct {
