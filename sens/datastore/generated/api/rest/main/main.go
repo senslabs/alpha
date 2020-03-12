@@ -9,11 +9,11 @@ import (
 func main() {
 	r := mux.NewRouter()
 
+	AuthMain(r)
 	OrgMain(r)
 	OpMain(r)
 	UserMain(r)
 	EndpointMain(r)
-	GroupMain(r)
 	OrgAuthMain(r)
 	OpAuthMain(r)
 	UserAuthMain(r)
@@ -23,8 +23,6 @@ func main() {
 	OrgEndpointMain(r)
 	OpEndpointMain(r)
 	UserEndpointMain(r)
-	EndpointGroupMain(r)
-	AuthMain(r)
 	
 	http.Handle("/", r)
 }

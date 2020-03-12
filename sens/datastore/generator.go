@@ -27,10 +27,11 @@ const (
 type ModelInfo struct {
 	Table string
 	Model string
+	HasId bool
 }
 
-func GetModelInfo(db *sqlx.DB, schema string) []ModelInfo {
-	models := []ModelInfo{}
+func GetModelInfo(db *sqlx.DB, schema string) []*ModelInfo {
+	models := []*ModelInfo{}
 	query := fmt.Sprintf(`SELECT table_name AS table, replace(initcap(replace(table_name, '_', ' ')), ' ', '') As model FROM information_schema.tables where table_schema = '%s';`, schema)
 	err := db.Select(&models, query)
 	if err != nil {
@@ -80,11 +81,13 @@ func GetTableFields(db *sqlx.DB, schema string, mi ModelInfo) []FieldInfo {
 }
 
 //Generate and return struct for one table
-func GenerateModel(db *sqlx.DB, schema string, mi ModelInfo) string {
-	fields := GetTableFields(db, schema, mi)
+func GenerateModel(db *sqlx.DB, schema string, mi *ModelInfo) string {
+	fields := GetTableFields(db, schema, *mi)
 	members := []string{}
 	fieldMap := map[string]string{}
 	for _, f := range fields {
+		fmt.Println(mi)
+		mi.HasId = mi.HasId || f.TableField == "id"
 		member := fmt.Sprintf("%s %s `db:\"%s\"`", f.ModelField, f.Type, f.TableField)
 		members = append(members, member)
 		fieldMap[f.ModelField] = f.TableField
@@ -105,7 +108,7 @@ func GenerateModel(db *sqlx.DB, schema string, mi ModelInfo) string {
 }
 
 //Generate for all tables
-func GenerateModels(db *sqlx.DB, schema string, mis []ModelInfo) {
+func GenerateModels(db *sqlx.DB, schema string, mis []*ModelInfo) {
 	ms := []string{}
 	for _, mi := range mis {
 		m := GenerateModel(db, schema, mi)
@@ -129,7 +132,7 @@ func GenerateModels(db *sqlx.DB, schema string, mis []ModelInfo) {
 }
 
 //Generate functions for one table
-func GenerateFunction(schema string, mi ModelInfo) {
+func GenerateFunction(schema string, mi *ModelInfo) {
 	t, err := template.ParseFiles("templates/fn.tpl")
 	if err != nil {
 		log.Fatal(err)
@@ -138,14 +141,23 @@ func GenerateFunction(schema string, mi ModelInfo) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = t.Execute(f, mi)
+
+	id := ""
+	if mi.HasId {
+		id = "m.Id = id"
+	}
+	err = t.Execute(f, types.Map{
+		"Table": mi.Table,
+		"Model": mi.Model,
+		"Id":    id,
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
 //Generate all functions
-func GenerateFunctions(db *sqlx.DB, schema string, mis []ModelInfo) {
+func GenerateFunctions(db *sqlx.DB, schema string, mis []*ModelInfo) {
 	for _, mi := range mis {
 		GenerateFunction(schema, mi)
 	}

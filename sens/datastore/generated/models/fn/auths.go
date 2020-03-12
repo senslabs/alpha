@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
 	"github.com/senslabs/alpha/sens/errors"
@@ -52,6 +53,52 @@ func InsertAuth(data []byte) (string, error) {
 	}
 }
 
+func BatchInsertAuth(data []byte) ([]string, error) {
+	var j []map[string]interface{}
+	if err := json.Unmarshal(data, &j); err != nil {
+		logger.Error(err)
+		return nil, errors.FromError(errors.GO_ERROR, err)
+	}
+
+	comma := ""
+	var keys []string
+	fieldMap := models.GetAuthFieldMap()
+	insert := bytes.NewBufferString("INSERT INTO auths(")
+	for k, _ := range j[0] {
+		if f, ok := fieldMap[k]; ok {
+			fmt.Fprint(insert, comma, f)
+			keys = append(keys, k)
+			comma = ", "
+		}
+	}
+
+	ph := bytes.NewBufferString(") VALUES (")
+	phidx := 1
+	var values []interface{}
+	for _, v := range j {
+		comma = ""
+		for _, k := range keys {
+			fmt.Fprint(ph, comma, "$", phidx)
+			phidx++
+			values = append(values, v[k])
+			comma = ", "
+		}
+		fmt.Fprint(ph, "), (")
+	}
+
+	fmt.Fprint(insert, strings.TrimRight(ph.String(), ", ("), " returning id")
+
+	fmt.Println(insert.String())
+
+	db := models.GetConnection()
+	_, err := db.Exec(insert.String(), values...)
+	if err != nil {
+		logger.Error(err)
+		return nil, errors.FromError(errors.DB_ERROR, err)
+	}
+	return nil, nil
+}
+
 func UpdateAuth(id string, data []byte) error {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
@@ -73,13 +120,14 @@ func UpdateAuth(id string, data []byte) error {
 			comma = ", "
 		}
 	}
+	fmt.Fprint(update, " WHERE id = :id")
 	db := models.GetConnection()
-	fmt.Println(update)
 	stmt, err := db.PrepareNamed(update.String())
 	if err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
 	}
+	m.Id = id
 	_, err = stmt.Exec(m)
 	if err != nil {
 		logger.Error(err)

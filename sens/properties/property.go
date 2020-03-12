@@ -51,13 +51,12 @@ func GetServiceName() string {
 	svcname := os.Getenv("SVCNAME")
 	if svcname == "" {
 		svcname = strings.ToLower(filepath.Base(os.Args[0]))
-
 	}
 	return svcname
 }
 
 func SetServiceName(svcname string) {
-	os.Setenv("svcname", svcname)
+	os.Setenv("SVCNAME", svcname)
 }
 
 func (this *properties) GetValue(keys ...string) interface{} {

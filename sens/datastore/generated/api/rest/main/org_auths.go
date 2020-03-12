@@ -13,6 +13,7 @@ import (
 
 func OrgAuthMain(r *mux.Router) {
 	r.HandleFunc("/api/org-auths/create", CreateOrgAuth)
+	r.HandleFunc("/api/org-auths/batch/create", BatchCreateOrgAuth)
 	r.HandleFunc("/api/org-auths/update", UpdateOrgAuth)
 	r.HandleFunc("/api/org-auths/get/{id}", GetOrgAuth)
 	r.HandleFunc("/api/org-auths/find", FindOrgAuth)
@@ -23,6 +24,18 @@ func CreateOrgAuth(w http.ResponseWriter, r *http.Request) {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if id, err := fn.InsertOrgAuth(data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		fmt.Fprintln(w, id)
+	}
+}
+
+func BatchCreateOrgAuth(w http.ResponseWriter, r *http.Request) {
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if id, err := fn.BatchInsertOrgAuth(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {

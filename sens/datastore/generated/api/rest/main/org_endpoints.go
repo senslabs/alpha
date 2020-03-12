@@ -13,6 +13,7 @@ import (
 
 func OrgEndpointMain(r *mux.Router) {
 	r.HandleFunc("/api/org-endpoints/create", CreateOrgEndpoint)
+	r.HandleFunc("/api/org-endpoints/batch/create", BatchCreateOrgEndpoint)
 	r.HandleFunc("/api/org-endpoints/update", UpdateOrgEndpoint)
 	r.HandleFunc("/api/org-endpoints/get/{id}", GetOrgEndpoint)
 	r.HandleFunc("/api/org-endpoints/find", FindOrgEndpoint)
@@ -23,6 +24,18 @@ func CreateOrgEndpoint(w http.ResponseWriter, r *http.Request) {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if id, err := fn.InsertOrgEndpoint(data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		fmt.Fprintln(w, id)
+	}
+}
+
+func BatchCreateOrgEndpoint(w http.ResponseWriter, r *http.Request) {
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if id, err := fn.BatchInsertOrgEndpoint(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {

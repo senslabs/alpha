@@ -13,6 +13,7 @@ import (
 
 func OpMain(r *mux.Router) {
 	r.HandleFunc("/api/ops/create", CreateOp)
+	r.HandleFunc("/api/ops/batch/create", BatchCreateOp)
 	r.HandleFunc("/api/ops/update", UpdateOp)
 	r.HandleFunc("/api/ops/get/{id}", GetOp)
 	r.HandleFunc("/api/ops/find", FindOp)
@@ -23,6 +24,18 @@ func CreateOp(w http.ResponseWriter, r *http.Request) {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if id, err := fn.InsertOp(data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		fmt.Fprintln(w, id)
+	}
+}
+
+func BatchCreateOp(w http.ResponseWriter, r *http.Request) {
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if id, err := fn.BatchInsertOp(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {

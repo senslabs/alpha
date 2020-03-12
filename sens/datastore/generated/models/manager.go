@@ -2,6 +2,8 @@ package models
 
 import (
 	"container/ring"
+	"fmt"
+	"os"
 	"sync"
 
 	"github.com/jmoiron/sqlx"
@@ -34,7 +36,11 @@ func GetConnection() *sqlx.DB {
 	once.Do(func() {
 		r = ring.New(10)
 		n := r.Len()
-		pgurl := "postgresql://root@localhost:26257/postgres?ssl=false&sslmode=disable"
+		host := os.Getenv("COCKROACH_HOST")
+		if host == "" {
+			host = "localhost"
+		}
+		pgurl := fmt.Sprintf("postgresql://root@%s:26257/postgres?ssl=false&sslmode=disable", host)
 		for i := 0; i < n; i++ {
 			db, err := sqlx.Open("postgres", pgurl)
 			r.Value = Connection{db, err}

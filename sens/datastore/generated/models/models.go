@@ -6,6 +6,22 @@ import (
 
 var t time.Time
 
+type Auth struct {
+	Id         string     `db:"id"`
+	Email      string     `db:"email"`
+	Mobile     string     `db:"mobile"`
+	Social     string     `db:"social"`
+	FirstName  NullString `db:"first_name"`
+	LastName   NullString `db:"last_name"`
+	CreatedAt  NullTime   `db:"created_at"`
+	UpdatedAt  NullTime   `db:"updated_at"`
+	Properties RawMessage `db:"properties"`
+}
+
+func GetAuthFieldMap() map[string]string {
+	return map[string]string{"CreatedAt": "created_at", "Email": "email", "FirstName": "first_name", "Id": "id", "LastName": "last_name", "Mobile": "mobile", "Properties": "properties", "Social": "social", "UpdatedAt": "updated_at"}
+}
+
 type Org struct {
 	Id        string     `db:"id"`
 	Name      NullString `db:"name"`
@@ -38,21 +54,15 @@ func GetUserFieldMap() map[string]string {
 }
 
 type Endpoint struct {
-	Id   string     `db:"id"`
-	Path NullString `db:"path"`
+	Id           string     `db:"id"`
+	Group        NullString `db:"group"`
+	Path         NullString `db:"path"`
+	Secure       RawMessage `db:"secure"`
+	NextEndpoint NullString `db:"next_endpoint"`
 }
 
 func GetEndpointFieldMap() map[string]string {
-	return map[string]string{"Id": "id", "Path": "path"}
-}
-
-type Group struct {
-	Id   string     `db:"id"`
-	Name NullString `db:"name"`
-}
-
-func GetGroupFieldMap() map[string]string {
-	return map[string]string{"Id": "id", "Name": "name"}
+	return map[string]string{"Group": "group", "Id": "id", "NextEndpoint": "next_endpoint", "Path": "path", "Secure": "secure"}
 }
 
 type OrgAuth struct {
@@ -134,29 +144,4 @@ type UserEndpoint struct {
 
 func GetUserEndpointFieldMap() map[string]string {
 	return map[string]string{"EndpointId": "endpoint_id", "UserId": "user_id"}
-}
-
-type EndpointGroup struct {
-	EndpointId string `db:"endpoint_id"`
-	GroupId    string `db:"group_id"`
-}
-
-func GetEndpointGroupFieldMap() map[string]string {
-	return map[string]string{"EndpointId": "endpoint_id", "GroupId": "group_id"}
-}
-
-type Auth struct {
-	Id         string     `db:"id"`
-	Email      string     `db:"email"`
-	Mobile     string     `db:"mobile"`
-	Social     string     `db:"social"`
-	FirstName  NullString `db:"first_name"`
-	LastName   NullString `db:"last_name"`
-	CreatedAt  NullTime   `db:"created_at"`
-	UpdatedAt  NullTime   `db:"updated_at"`
-	Properties RawMessage `db:"properties"`
-}
-
-func GetAuthFieldMap() map[string]string {
-	return map[string]string{"CreatedAt": "created_at", "Email": "email", "FirstName": "first_name", "Id": "id", "LastName": "last_name", "Mobile": "mobile", "Properties": "properties", "Social": "social", "UpdatedAt": "updated_at"}
 }

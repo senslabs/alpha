@@ -13,6 +13,7 @@ import (
 
 func UserEndpointMain(r *mux.Router) {
 	r.HandleFunc("/api/user-endpoints/create", CreateUserEndpoint)
+	r.HandleFunc("/api/user-endpoints/batch/create", BatchCreateUserEndpoint)
 	r.HandleFunc("/api/user-endpoints/update", UpdateUserEndpoint)
 	r.HandleFunc("/api/user-endpoints/get/{id}", GetUserEndpoint)
 	r.HandleFunc("/api/user-endpoints/find", FindUserEndpoint)
@@ -23,6 +24,18 @@ func CreateUserEndpoint(w http.ResponseWriter, r *http.Request) {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if id, err := fn.InsertUserEndpoint(data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		fmt.Fprintln(w, id)
+	}
+}
+
+func BatchCreateUserEndpoint(w http.ResponseWriter, r *http.Request) {
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if id, err := fn.BatchInsertUserEndpoint(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {

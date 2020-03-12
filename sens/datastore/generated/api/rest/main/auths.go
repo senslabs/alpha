@@ -13,6 +13,7 @@ import (
 
 func AuthMain(r *mux.Router) {
 	r.HandleFunc("/api/auths/create", CreateAuth)
+	r.HandleFunc("/api/auths/batch/create", BatchCreateAuth)
 	r.HandleFunc("/api/auths/update", UpdateAuth)
 	r.HandleFunc("/api/auths/get/{id}", GetAuth)
 	r.HandleFunc("/api/auths/find", FindAuth)
@@ -23,6 +24,18 @@ func CreateAuth(w http.ResponseWriter, r *http.Request) {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if id, err := fn.InsertAuth(data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		fmt.Fprintln(w, id)
+	}
+}
+
+func BatchCreateAuth(w http.ResponseWriter, r *http.Request) {
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if id, err := fn.BatchInsertAuth(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {

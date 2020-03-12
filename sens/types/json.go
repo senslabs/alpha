@@ -34,18 +34,17 @@ func JsonUnmarshal(input []byte, output interface{}) *errors.SensError {
 }
 
 func JsonUnmarshelFromReader(r io.Reader, output interface{}) *errors.SensError {
-	err := json.NewDecoder(r).Decode(output)
-	if err != nil {
+	if err := json.NewDecoder(r).Decode(output); err != nil {
 		logger.Error(err)
 		return errors.New(errors.GO_ERROR, err.Error())
 	}
 	return nil
 }
 
-func ConvertStruct(input interface{}, output interface{}) *errors.SensError {
-	if b, err := JsonMarshal(input); err == nil {
+func ConvertStruct(input interface{}, output interface{}) error {
+	if b, err := JsonMarshal(input); err != nil {
 		return errors.New(errors.GO_ERROR, err.Error())
-	} else if err := JsonUnmarshal(b, output); err == nil {
+	} else if err := JsonUnmarshal(b, output); err != nil {
 		return errors.New(errors.GO_ERROR, err.Error())
 	} else {
 		return nil

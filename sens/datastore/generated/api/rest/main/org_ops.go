@@ -13,6 +13,7 @@ import (
 
 func OrgOpMain(r *mux.Router) {
 	r.HandleFunc("/api/org-ops/create", CreateOrgOp)
+	r.HandleFunc("/api/org-ops/batch/create", BatchCreateOrgOp)
 	r.HandleFunc("/api/org-ops/update", UpdateOrgOp)
 	r.HandleFunc("/api/org-ops/get/{id}", GetOrgOp)
 	r.HandleFunc("/api/org-ops/find", FindOrgOp)
@@ -23,6 +24,18 @@ func CreateOrgOp(w http.ResponseWriter, r *http.Request) {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if id, err := fn.InsertOrgOp(data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		fmt.Fprintln(w, id)
+	}
+}
+
+func BatchCreateOrgOp(w http.ResponseWriter, r *http.Request) {
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if id, err := fn.BatchInsertOrgOp(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {

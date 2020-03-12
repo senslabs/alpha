@@ -13,6 +13,7 @@ import (
 
 func EndpointMain(r *mux.Router) {
 	r.HandleFunc("/api/endpoints/create", CreateEndpoint)
+	r.HandleFunc("/api/endpoints/batch/create", BatchCreateEndpoint)
 	r.HandleFunc("/api/endpoints/update", UpdateEndpoint)
 	r.HandleFunc("/api/endpoints/get/{id}", GetEndpoint)
 	r.HandleFunc("/api/endpoints/find", FindEndpoint)
@@ -23,6 +24,18 @@ func CreateEndpoint(w http.ResponseWriter, r *http.Request) {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if id, err := fn.InsertEndpoint(data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		fmt.Fprintln(w, id)
+	}
+}
+
+func BatchCreateEndpoint(w http.ResponseWriter, r *http.Request) {
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if id, err := fn.BatchInsertEndpoint(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {

@@ -13,6 +13,7 @@ import (
 
 func OpAuthMain(r *mux.Router) {
 	r.HandleFunc("/api/op-auths/create", CreateOpAuth)
+	r.HandleFunc("/api/op-auths/batch/create", BatchCreateOpAuth)
 	r.HandleFunc("/api/op-auths/update", UpdateOpAuth)
 	r.HandleFunc("/api/op-auths/get/{id}", GetOpAuth)
 	r.HandleFunc("/api/op-auths/find", FindOpAuth)
@@ -23,6 +24,18 @@ func CreateOpAuth(w http.ResponseWriter, r *http.Request) {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if id, err := fn.InsertOpAuth(data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		fmt.Fprintln(w, id)
+	}
+}
+
+func BatchCreateOpAuth(w http.ResponseWriter, r *http.Request) {
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if id, err := fn.BatchInsertOpAuth(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {

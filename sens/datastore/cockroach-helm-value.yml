@@ -197,10 +197,10 @@ statefulset:
   resources:
     limits:
       # cpu: 100m
-      memory: 2400Mi
+      memory: 1800Mi
     requests:
       # cpu: 100m
-      memory: 2400Mi
+      memory: 1800Mi
 
 service:
   ports:

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
 	"github.com/senslabs/alpha/sens/errors"
@@ -52,6 +53,52 @@ func InsertOrgOp(data []byte) (string, error) {
 	}
 }
 
+func BatchInsertOrgOp(data []byte) ([]string, error) {
+	var j []map[string]interface{}
+	if err := json.Unmarshal(data, &j); err != nil {
+		logger.Error(err)
+		return nil, errors.FromError(errors.GO_ERROR, err)
+	}
+
+	comma := ""
+	var keys []string
+	fieldMap := models.GetOrgOpFieldMap()
+	insert := bytes.NewBufferString("INSERT INTO org_ops(")
+	for k, _ := range j[0] {
+		if f, ok := fieldMap[k]; ok {
+			fmt.Fprint(insert, comma, f)
+			keys = append(keys, k)
+			comma = ", "
+		}
+	}
+
+	ph := bytes.NewBufferString(") VALUES (")
+	phidx := 1
+	var values []interface{}
+	for _, v := range j {
+		comma = ""
+		for _, k := range keys {
+			fmt.Fprint(ph, comma, "$", phidx)
+			phidx++
+			values = append(values, v[k])
+			comma = ", "
+		}
+		fmt.Fprint(ph, "), (")
+	}
+
+	fmt.Fprint(insert, strings.TrimRight(ph.String(), ", ("), " returning id")
+
+	fmt.Println(insert.String())
+
+	db := models.GetConnection()
+	_, err := db.Exec(insert.String(), values...)
+	if err != nil {
+		logger.Error(err)
+		return nil, errors.FromError(errors.DB_ERROR, err)
+	}
+	return nil, nil
+}
+
 func UpdateOrgOp(id string, data []byte) error {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
@@ -73,13 +120,14 @@ func UpdateOrgOp(id string, data []byte) error {
 			comma = ", "
 		}
 	}
+	fmt.Fprint(update, " WHERE id = :id")
 	db := models.GetConnection()
-	fmt.Println(update)
 	stmt, err := db.PrepareNamed(update.String())
 	if err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
 	}
+	
 	_, err = stmt.Exec(m)
 	if err != nil {
 		logger.Error(err)
@@ -91,7 +139,7 @@ func UpdateOrgOp(id string, data []byte) error {
 func SelectOrgOp(id string) (models.OrgOp, *errors.SensError) {
 	db := models.GetConnection()
 	m := models.OrgOp{}
-	if err := db.Get(&m, "SELECT * FROM auths WHERE id = $1", id); err != nil {
+	if err := db.Get(&m, "SELECT * FROM org_ops WHERE id = $1", id); err != nil {
 		logger.Error(err)
 		return m, errors.FromError(errors.DB_ERROR, err)
 	}

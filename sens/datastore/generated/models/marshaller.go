@@ -20,12 +20,28 @@ func (this *NullString) MarshalJSON() ([]byte, error) {
 	return json.Marshal(this.String)
 }
 
+func (this *NullString) UnmarshalJSON(data []byte) error {
+	if !this.Valid {
+		this.Valid = true
+		this.String = ""
+	}
+	return json.Unmarshal(data, &this.String)
+}
+
 func (this *NullTime) MarshalJSON() ([]byte, error) {
 	if !this.Valid {
 		this.Valid = true
 		this.Time = time.Unix(0, 0)
 	}
 	return json.Marshal(this.Time)
+}
+
+func (this *NullTime) UnmarshalJSON(data []byte) error {
+	if !this.Valid {
+		this.Valid = true
+		this.Time = time.Unix(0, 0)
+	}
+	return json.Unmarshal(data, &this.Time)
 }
 
 func (this RawMessage) Value() (driver.Value, error) {

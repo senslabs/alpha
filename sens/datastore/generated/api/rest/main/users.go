@@ -13,6 +13,7 @@ import (
 
 func UserMain(r *mux.Router) {
 	r.HandleFunc("/api/users/create", CreateUser)
+	r.HandleFunc("/api/users/batch/create", BatchCreateUser)
 	r.HandleFunc("/api/users/update", UpdateUser)
 	r.HandleFunc("/api/users/get/{id}", GetUser)
 	r.HandleFunc("/api/users/find", FindUser)
@@ -23,6 +24,18 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if id, err := fn.InsertUser(data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		fmt.Fprintln(w, id)
+	}
+}
+
+func BatchCreateUser(w http.ResponseWriter, r *http.Request) {
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if id, err := fn.BatchInsertUser(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
