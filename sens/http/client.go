@@ -52,7 +52,8 @@ func Post(url string, params map[string]interface{}, headers map[string]interfac
 			req.Header.Add(k, v.(string))
 		}
 
-		client := retryablehttp.Client{}
+		client := retryablehttp.NewClient()
+		logger.Debug(*req)
 		if res, err := client.Do(req); err != nil {
 			return http.StatusInternalServerError, nil, errors.FromError(errors.GO_ERROR, err)
 		} else if b, err := ioutil.ReadAll(res.Body); err != nil {

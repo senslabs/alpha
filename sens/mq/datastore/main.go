@@ -28,11 +28,16 @@ func processMessage(msg *stan.Msg) {
 		}
 		params := getMap(m["Params"])
 		headers := getMap(m["Headers"])
-		url := fmt.Sprintf("http://datastore.zonea.senslabs.io%s", path)
+		url := fmt.Sprintf("http://datastore.zonea.senslabs.io:9804%s", path)
 		if b, err := json.Marshal(body); err != nil {
 			logger.Error(err)
 		} else {
-			http.Post(url, params, headers, b)
+			logger.Debug(url, params, headers, body)
+			code, body, err := http.Post(url, params, headers, b)
+			logger.Debug(code, body)
+			if err != nil {
+				logger.Error(err)
+			}
 		}
 	}
 }

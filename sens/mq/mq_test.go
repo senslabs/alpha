@@ -17,6 +17,6 @@ func TestPublish(t *testing.T) {
 	if data, err := json.Marshal(body); err != nil {
 		log.Fatal(err)
 	} else {
-		log.Println(mq.Publish("sens-stan", "datastore-publisher", "datastore-subject", data))
+		log.Println(mq.Publish("sens-stan", "datastore-publisher", "datastore-test-subject", data))
 	}
 }
