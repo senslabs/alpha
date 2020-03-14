@@ -6,7 +6,7 @@ RUN apk add go
 # RUN gcloud source repos clone https://source.developers.google.com/p/sensconsole/r/github_senslabs_alpha
 
 RUN cd github_senslabs_alpha/sens/datastore/generated/api/rest/main
-RUN go build -o datastore
+RUN go build -o datastore .
 
 COPY --from=builder datastore /datastore
 ENTRYPOINT [ "/datastore" ]
