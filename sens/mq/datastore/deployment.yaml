@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: datastoreconsumer
+  name: datastoreconsumer
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: datastoreconsumer
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: datastoreconsumer
+    spec:
+      containers:
+        - env:
+            - name: NATS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: NATS_HOST
+                  name: datastoreconsumer-config-tb8b
+          image: gcr.io/sensconsole/github.com/senslabs/alpha
+          imagePullPolicy: IfNotPresent
+          name: alpha-sha256-1
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app: datastoreconsumer
+  name: datastoreconsumer-hpa-vm4b
+  namespace: default
+spec:
+  maxReplicas: 5
+  metrics:
+    - resource:
+        name: cpu
+        targetAverageUtilization: 80
+      type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: datastoreconsumer
