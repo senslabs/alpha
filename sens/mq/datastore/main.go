@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/google/uuid"
 	"github.com/nats-io/stan.go"
 	"github.com/senslabs/alpha/sens/http"
 	"github.com/senslabs/alpha/sens/logger"
@@ -17,22 +18,33 @@ func processMessage(msg *stan.Msg) {
 	if err := json.Unmarshal(msg.Data, &m); err != nil {
 		logger.Error(err)
 	} else {
-		path := m["path"]
-		body := m["body"]
-		params := map[bool]map[string]interface{}{true: m["params"].(map[string]interface{}), false: nil}[m["params"] != nil]
-		headers := map[bool]map[string]interface{}{true: m["headers"].(map[string]interface{}), false: nil}[m["headers"] != nil]
-		url := fmt.Sprintf("http://datastore.zonea.senslabs.io%s", path)
+		path := m["Path"]
+		body := m["Body"]
+		getMap := func(v interface{}) map[string]interface{} {
+			if v != nil {
+				return v.(map[string]interface{})
+			}
+			return nil
+		}
+		params := getMap(m["Params"])
+		headers := getMap(m["Headers"])
+		url := fmt.Sprintf("http://datastore.zonea.senslabs.io:9804%s", path)
 		if b, err := json.Marshal(body); err != nil {
 			logger.Error(err)
 		} else {
-			http.Post(url, params, headers, b)
+			logger.Debug(url, params, headers, body)
+			code, body, err := http.Post(url, params, headers, b)
+			logger.Debug(code, body)
+			if err != nil {
+				logger.Error(err)
+			}
 		}
 	}
 }
 
 func main() {
 	logger.InitLogger("")
-	sub, err := mq.Consume("sens-stan", "datastore-consumer", "datastore-subject", "datastore-queue", func(msg *stan.Msg) {
+	sub, err := mq.Consume("sens-stan", fmt.Sprintf("datastore-consumer-%s", uuid.New().String()), "datastore-subject", "datastore-queue", func(msg *stan.Msg) {
 		go processMessage(msg)
 	}, stan.MaxInflight(10))
 	if err != nil {

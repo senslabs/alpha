@@ -1,9 +1,8 @@
 package mq_test
 
 import (
-	"fmt"
+	"encoding/json"
 	"log"
-	"math/rand"
 	"testing"
 
 	"github.com/senslabs/alpha/sens/mq"
@@ -11,6 +10,13 @@ import (
 
 func TestPublish(t *testing.T) {
 	log.SetFlags(log.Lshortfile)
-	i := rand.Int() % 10
-	log.Println(mq.Publish("sens-stan", "datastore-publisher", "datastore-subject", fmt.Sprintf("%s: %d", "Hello", i)))
+	body := map[string]interface{}{
+		"Path": "/api/endpoints/create",
+		"Body": map[string]interface{}{"Category": "Console", "Path": "/api/groups/create", "Secure": false, "NextEndpoint": "localhost:8000"},
+	}
+	if data, err := json.Marshal(body); err != nil {
+		log.Fatal(err)
+	} else {
+		log.Println(mq.Publish("sens-stan", "datastore-publisher", "datastore-test-subject", data))
+	}
 }
