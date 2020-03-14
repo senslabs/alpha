@@ -37,7 +37,7 @@ func Get(url string, params types.Map, headers types.Map) (int, []byte, *errors.
 	}
 }
 
-func Post(url string, params types.Map, headers types.Map, body []byte) (int, []byte, *errors.SensError) {
+func Post(url string, params map[string]interface{}, headers map[string]interface{}, body []byte) (int, []byte, *errors.SensError) {
 	if req, err := retryablehttp.NewRequest("POST", url, bytes.NewBuffer(body)); err != nil {
 		logger.Error(err)
 		return http.StatusInternalServerError, nil, errors.FromError(errors.GO_ERROR, err)
