@@ -17,10 +17,10 @@ func processMessage(msg *stan.Msg) {
 	if err := json.Unmarshal(msg.Data, &m); err != nil {
 		logger.Error(err)
 	} else {
-		path := m["path"]
-		body := m["body"]
-		params := map[bool]map[string]interface{}{true: m["params"].(map[string]interface{}), false: nil}[m["params"] != nil]
-		headers := map[bool]map[string]interface{}{true: m["headers"].(map[string]interface{}), false: nil}[m["headers"] != nil]
+		path := m["Path"]
+		body := m["Body"]
+		params := map[bool]map[string]interface{}{true: m["Params"].(map[string]interface{}), false: nil}[m["Params"] != nil]
+		headers := map[bool]map[string]interface{}{true: m["Headers"].(map[string]interface{}), false: nil}[m["Headers"] != nil]
 		url := fmt.Sprintf("http://datastore.zonea.senslabs.io%s", path)
 		if b, err := json.Marshal(body); err != nil {
 			logger.Error(err)

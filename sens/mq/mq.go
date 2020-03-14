@@ -33,11 +33,11 @@ func forceConnection(clusterId string, clientId string) (stan.Conn, error) {
 	return sc, nil
 }
 
-func Publish(clusterId string, clientId string, subject string, message string) error {
+func Publish(clusterId string, clientId string, subject string, message []byte) error {
 	if conn, err := GetConnection(clusterId, clientId); err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
-	} else if err := conn.Publish(subject, []byte(message)); err != nil {
+	} else if err := conn.Publish(subject, message); err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
 	}
@@ -48,7 +48,7 @@ func Consume(clusterId string, clientId string, subject string, queue string, ha
 	if conn, err := GetConnection(clusterId, clientId); err != nil {
 		logger.Error(err)
 		return nil, errors.FromError(errors.GO_ERROR, err)
-	} else if sub, err := conn.QueueSubscribe(subject, queue, handler, stan.MaxInflight(1)); err != nil {
+	} else if sub, err := conn.QueueSubscribe(subject, queue, handler, opts...); err != nil {
 		logger.Error(err)
 		return sub, errors.FromError(errors.GO_ERROR, err)
 	} else {
