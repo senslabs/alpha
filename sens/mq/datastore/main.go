@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/google/uuid"
 	"github.com/nats-io/stan.go"
 	"github.com/senslabs/alpha/sens/http"
 	"github.com/senslabs/alpha/sens/logger"
@@ -32,7 +33,7 @@ func processMessage(msg *stan.Msg) {
 
 func main() {
 	logger.InitLogger("")
-	sub, err := mq.Consume("sens-stan", "datastore-consumer", "datastore-subject", "datastore-queue", func(msg *stan.Msg) {
+	sub, err := mq.Consume("sens-stan", fmt.Sprintf("datastore-consumer-%s", uuid.New().String()), "datastore-subject", "datastore-queue", func(msg *stan.Msg) {
 		go processMessage(msg)
 	}, stan.MaxInflight(10))
 	if err != nil {
