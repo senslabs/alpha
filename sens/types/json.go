@@ -8,7 +8,7 @@ import (
 	"github.com/senslabs/alpha/sens/logger"
 )
 
-func JsonMarshal(input interface{}) ([]byte, *errors.SensError) {
+func JsonMarshal(input interface{}) ([]byte, error) {
 	if output, err := json.Marshal(input); err != nil {
 		logger.Error(err)
 		return nil, errors.New(errors.GO_ERROR, err.Error())
@@ -17,14 +17,14 @@ func JsonMarshal(input interface{}) ([]byte, *errors.SensError) {
 	}
 }
 
-func JsonMarshalToWrite(w io.Writer, input interface{}) *errors.SensError {
+func JsonMarshalToWriter(w io.Writer, input interface{}) error {
 	if err := json.NewEncoder(w).Encode(input); err != nil {
 		return errors.New(errors.GO_ERROR, err.Error())
 	}
 	return nil
 }
 
-func JsonUnmarshal(input []byte, output interface{}) *errors.SensError {
+func JsonUnmarshal(input []byte, output interface{}) error {
 	if err := json.Unmarshal(input, output); err != nil {
 		logger.Error(err)
 		return errors.New(errors.GO_ERROR, err.Error())
@@ -33,7 +33,7 @@ func JsonUnmarshal(input []byte, output interface{}) *errors.SensError {
 	}
 }
 
-func JsonUnmarshelFromReader(r io.Reader, output interface{}) *errors.SensError {
+func JsonUnmarshalFromReader(r io.Reader, output interface{}) error {
 	if err := json.NewDecoder(r).Decode(output); err != nil {
 		logger.Error(err)
 		return errors.New(errors.GO_ERROR, err.Error())
