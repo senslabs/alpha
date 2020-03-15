@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/nats-io/stan.go"
-	"github.com/senslabs/alpha/sens/http"
+	"github.com/senslabs/alpha/sens/httpclient"
 	"github.com/senslabs/alpha/sens/logger"
 	"github.com/senslabs/alpha/sens/mq"
 )
@@ -33,7 +33,7 @@ func processMessage(msg *stan.Msg) {
 			logger.Error(err)
 		} else {
 			logger.Debug(url, params, headers, body)
-			code, body, err := http.Post(url, params, headers, b)
+			code, body, err := httpclient.Post(url, params, headers, b)
 			logger.Debug(code, body)
 			if err != nil {
 				logger.Error(err)
