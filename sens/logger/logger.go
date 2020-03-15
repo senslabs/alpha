@@ -9,6 +9,8 @@ import (
 type Logger interface {
 	Debug(v ...interface{})
 	Error(v ...interface{})
+	Debugf(format, v ...interface{})
+	Errorf(format, v ...interface{})
 }
 
 type ConsoleLogger struct{}
@@ -42,12 +44,22 @@ func InitFluentLogger() {
 	logger = &FluentLogger{}
 }
 
+// -- INIT ENDS HERE -- //
+
 func (this *ConsoleLogger) Error(v ...interface{}) {
 	log.Println(v...)
 }
 
 func (this *ConsoleLogger) Debug(v ...interface{}) {
 	log.Println(v...)
+}
+
+func (this *ConsoleLogger) Errorf(string format, v ...interface{}) {
+	log.Printf(format, v...)
+}
+
+func (this *ConsoleLogger) Debugf(string format, v ...interface{}) {
+	log.Printf(format, v...)
 }
 
 func (this *FileLogger) Error(v ...interface{}) {
@@ -58,10 +70,24 @@ func (this *FileLogger) Debug(v ...interface{}) {
 	log.Println(v...)
 }
 
+func (this *FileLogger) Errorf(string format, v ...interface{}) {
+	log.Print(format, v...)
+}
+
+func (this *FileLogger) Debugf(string format, v ...interface{}) {
+	log.Println(format, v...)
+}
+
 func (this *FluentLogger) Error(v ...interface{}) {
 }
 
 func (this *FluentLogger) Debug(v ...interface{}) {
+}
+
+func (this *FluentLogger) Errorf(string format, v ...interface{}) {
+}
+
+func (this *FluentLogger) Debugf(string format, v ...interface{}) {
 }
 
 func LogMeta(level string) {
@@ -90,6 +116,20 @@ func Error(v ...interface{}) {
 func Debug(v ...interface{}) {
 	logLevel := os.Getenv("LOG_LEVEL")
 	if logLevel == "DEBUG" {
+		LogMeta("Debug")
 		logger.Debug(v...)
+	}
+}
+
+func Errorf(format string, v ...interface{}) {
+	LogMeta("Error")
+	logger.Error(format, v...)
+}
+
+func Debugf(format string, v ...interface{}) {
+	logLevel := os.Getenv("LOG_LEVEL")
+	if logLevel == "DEBUG" {
+		LogMeta("Debug")
+		logger.Debug(format, v...)
 	}
 }
