@@ -145,3 +145,51 @@ type UserEndpoint struct {
 func GetUserEndpointFieldMap() map[string]string {
 	return map[string]string{"EndpointId": "endpoint_id", "UserId": "user_id"}
 }
+
+type Session struct {
+	Id        string     `db:"id"`
+	UserId    string     `db:"user_id"`
+	Name      string     `db:"name"`
+	Type      NullString `db:"type"`
+	StartedAt NullTime   `db:"started_at"`
+	EndedAt   NullTime   `db:"ended_at"`
+}
+
+func GetSessionFieldMap() map[string]string {
+	return map[string]string{"EndedAt": "ended_at", "Id": "id", "Name": "name", "StartedAt": "started_at", "Type": "type", "UserId": "user_id"}
+}
+
+type SessionEvent struct {
+	UserId     string     `db:"user_id"`
+	Name       string     `db:"name"`
+	StartedAt  time.Time  `db:"started_at"`
+	EndedAt    NullTime   `db:"ended_at"`
+	Properties RawMessage `db:"properties"`
+}
+
+func GetSessionEventFieldMap() map[string]string {
+	return map[string]string{"EndedAt": "ended_at", "Name": "name", "Properties": "properties", "StartedAt": "started_at", "UserId": "user_id"}
+}
+
+type SessionRecord struct {
+	UserId     string     `db:"user_id"`
+	Name       string     `db:"name"`
+	Timestamp  time.Time  `db:"timestamp"`
+	Value      RawMessage `db:"value"`
+	Properties RawMessage `db:"properties"`
+}
+
+func GetSessionRecordFieldMap() map[string]string {
+	return map[string]string{"Name": "name", "Properties": "properties", "Timestamp": "timestamp", "UserId": "user_id", "Value": "value"}
+}
+
+type SessionPropertie struct {
+	SessionId NullString `db:"session_id"`
+	Name      NullString `db:"name"`
+	Value     NullString `db:"value"`
+	Rowid     RawMessage `db:"rowid"`
+}
+
+func GetSessionPropertieFieldMap() map[string]string {
+	return map[string]string{"Name": "name", "Rowid": "rowid", "SessionId": "session_id", "Value": "value"}
+}

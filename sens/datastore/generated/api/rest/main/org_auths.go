@@ -63,7 +63,7 @@ func GetOrgAuth(w http.ResponseWriter, r *http.Request) {
 	if m, err := fn.SelectOrgAuth(id); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWrite(w, m); err != nil {
+	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -83,7 +83,7 @@ func FindOrgAuth(w http.ResponseWriter, r *http.Request) {
 	} else if ms, err := fn.FindOrgAuth(or, and, span, limit, column, order); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWrite(w, ms); err != nil {
+	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

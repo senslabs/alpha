@@ -63,7 +63,7 @@ func GetOpUser(w http.ResponseWriter, r *http.Request) {
 	if m, err := fn.SelectOpUser(id); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWrite(w, m); err != nil {
+	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -83,7 +83,7 @@ func FindOpUser(w http.ResponseWriter, r *http.Request) {
 	} else if ms, err := fn.FindOpUser(or, and, span, limit, column, order); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWrite(w, ms); err != nil {
+	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
