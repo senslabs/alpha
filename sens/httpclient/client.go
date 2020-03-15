@@ -11,7 +11,7 @@ import (
 	"github.com/senslabs/alpha/sens/logger"
 )
 
-func Perform(req *retryablehttp.Request) (int, []byte, error) {
+func Perform(req *retryablehttp.Request, params url.Values, headers map[string]string) (int, []byte, error) {
 	query := req.URL.Query()
 	for k, v := range params {
 		for _, v := range v {
@@ -21,7 +21,7 @@ func Perform(req *retryablehttp.Request) (int, []byte, error) {
 	req.URL.RawQuery = query.Encode()
 
 	for k, v := range headers {
-		req.Header.Add(k, v.(string))
+		req.Header.Add(k, v)
 	}
 
 	client := retryablehttp.NewClient()
@@ -34,20 +34,20 @@ func Perform(req *retryablehttp.Request) (int, []byte, error) {
 	}
 }
 
-func Get(url string, params url.Values, headers map[string]string) (int, []byte, *errors.SensError) {
+func Get(url string, params url.Values, headers map[string]string) (int, []byte, error) {
 	if req, err := retryablehttp.NewRequest("GET", url, nil); err != nil {
 		logger.Error(err)
 		return http.StatusInternalServerError, nil, errors.FromError(errors.GO_ERROR, err)
 	} else {
-		return Perform(req)
+		return Perform(req, params, headers)
 	}
 }
 
-func Post(url string, params map[string]interface{}, headers map[string]interface{}, body []byte) (int, []byte, *errors.SensError) {
+func Post(url string, params url.Values, headers map[string]string, body []byte) (int, []byte, error) {
 	if req, err := retryablehttp.NewRequest("POST", url, bytes.NewBuffer(body)); err != nil {
 		logger.Error(err)
 		return http.StatusInternalServerError, nil, errors.FromError(errors.GO_ERROR, err)
 	} else {
-		return Perform(req)
+		return Perform(req, params, headers)
 	}
 }
