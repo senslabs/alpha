@@ -9,8 +9,8 @@ import (
 type Logger interface {
 	Debug(v ...interface{})
 	Error(v ...interface{})
-	Debugf(format, v ...interface{})
-	Errorf(format, v ...interface{})
+	Debugf(format string, v ...interface{})
+	Errorf(format string, v ...interface{})
 }
 
 type ConsoleLogger struct{}
@@ -54,11 +54,11 @@ func (this *ConsoleLogger) Debug(v ...interface{}) {
 	log.Println(v...)
 }
 
-func (this *ConsoleLogger) Errorf(string format, v ...interface{}) {
+func (this *ConsoleLogger) Errorf(format string, v ...interface{}) {
 	log.Printf(format, v...)
 }
 
-func (this *ConsoleLogger) Debugf(string format, v ...interface{}) {
+func (this *ConsoleLogger) Debugf(format string, v ...interface{}) {
 	log.Printf(format, v...)
 }
 
@@ -70,12 +70,12 @@ func (this *FileLogger) Debug(v ...interface{}) {
 	log.Println(v...)
 }
 
-func (this *FileLogger) Errorf(string format, v ...interface{}) {
-	log.Print(format, v...)
+func (this *FileLogger) Errorf(format string, v ...interface{}) {
+	log.Printf(format, v...)
 }
 
-func (this *FileLogger) Debugf(string format, v ...interface{}) {
-	log.Println(format, v...)
+func (this *FileLogger) Debugf(format string, v ...interface{}) {
+	log.Printf(format, v...)
 }
 
 func (this *FluentLogger) Error(v ...interface{}) {
@@ -84,10 +84,10 @@ func (this *FluentLogger) Error(v ...interface{}) {
 func (this *FluentLogger) Debug(v ...interface{}) {
 }
 
-func (this *FluentLogger) Errorf(string format, v ...interface{}) {
+func (this *FluentLogger) Errorf(format string, v ...interface{}) {
 }
 
-func (this *FluentLogger) Debugf(string format, v ...interface{}) {
+func (this *FluentLogger) Debugf(format string, v ...interface{}) {
 }
 
 func LogMeta(level string) {
@@ -123,13 +123,13 @@ func Debug(v ...interface{}) {
 
 func Errorf(format string, v ...interface{}) {
 	LogMeta("Error")
-	logger.Error(format, v...)
+	logger.Errorf(format, v...)
 }
 
 func Debugf(format string, v ...interface{}) {
 	logLevel := os.Getenv("LOG_LEVEL")
 	if logLevel == "DEBUG" {
 		LogMeta("Debug")
-		logger.Debug(format, v...)
+		logger.Debugf(format, v...)
 	}
 }
