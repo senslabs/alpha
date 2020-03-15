@@ -25,6 +25,10 @@ func main() {
 	OrgEndpointMain(r)
 	OpEndpointMain(r)
 	UserEndpointMain(r)
+	SessionMain(r)
+	SessionEventMain(r)
+	SessionRecordMain(r)
+	SessionPropertieMain(r)
 	
 	http.Handle("/", r)
 	http.ListenAndServe(":9804", r)
