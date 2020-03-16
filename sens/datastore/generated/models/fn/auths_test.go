@@ -6,27 +6,23 @@ import (
 	"log"
 	"os"
 	"testing"
+
+	"github.com/google/uuid"
 )
 
 func TestInsertAuth(t *testing.T) {
 	os.Setenv("COCKROACH_HOST", "localhost")
-	data := []byte(`[{
-		"Email": "email3",
-		"Mobile": "mobile3",
-		"Social": "social3",
-		"Psroperties": {
+	u, _ := uuid.NewRandom()
+	data := []byte(fmt.Sprintf(`{
+		"Id": "%s",
+		"Email": "email9",
+		"Mobile": "mobile9",
+		"Social": "social9",
+		"Properties": {
 			"x": "y"
 		}
-	},
-	{
-		"Email": "email4",
-		"Mobile": "mobile4",
-		"Social": "social4",
-		"Psroperties": {
-			"x1": "y1"
-		}
-		}]`)
-	fmt.Println(BatchInsertAuth(data))
+	}`, u.String()))
+	fmt.Println(InsertAuth(data))
 }
 
 func TestUpdateAuth(t *testing.T) {
