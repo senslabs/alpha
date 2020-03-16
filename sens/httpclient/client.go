@@ -1,7 +1,6 @@
 package httpclient
 
 import (
-	"bytes"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -47,8 +46,8 @@ func GetR(url string, params url.Values, headers map[string]string) (int, []byte
 	}
 }
 
-func PostR(url string, params url.Values, headers map[string]string, body []byte) (int, []byte, error) {
-	if req, err := retryablehttp.NewRequest("POST", url, bytes.NewBuffer(body)); err != nil {
+func PostR(url string, params url.Values, headers map[string]string, rawBody interface{}) (int, []byte, error) {
+	if req, err := retryablehttp.NewRequest("POST", url, rawBody); err != nil {
 		logger.Error(err)
 		return http.StatusInternalServerError, nil, errors.FromError(errors.GO_ERROR, err)
 	} else {
@@ -77,8 +76,8 @@ func Get(url string, params url.Values, headers map[string]string, response inte
 	}
 }
 
-func Post(url string, params url.Values, headers map[string]string, body []byte, response interface{}) (int, error) {
-	if req, err := retryablehttp.NewRequest("POST", url, bytes.NewBuffer(body)); err != nil {
+func Post(url string, params url.Values, headers map[string]string, rawBody interface{}, response interface{}) (int, error) {
+	if req, err := retryablehttp.NewRequest("POST", url, rawBody); err != nil {
 		logger.Error(err)
 		return http.StatusInternalServerError, errors.FromError(errors.GO_ERROR, err)
 	} else {
