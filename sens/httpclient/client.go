@@ -11,7 +11,9 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func prepare(req *retryablehttp.Request, params url.Values, headers map[string]string) {
+type HttpParams map[string][]string
+
+func prepare(req *retryablehttp.Request, params HttpParams, headers HttpParams) {
 	query := req.URL.Query()
 	for k, v := range params {
 		for _, v := range v {
@@ -19,13 +21,14 @@ func prepare(req *retryablehttp.Request, params url.Values, headers map[string]s
 		}
 	}
 	req.URL.RawQuery = query.Encode()
-
 	for k, v := range headers {
-		req.Header.Add(k, v)
+		for _, v := range v {
+			req.Header.Add(k, v)
+		}
 	}
 }
 
-func PerformR(req *retryablehttp.Request, params url.Values, headers map[string]string) (int, []byte, error) {
+func PerformR(req *retryablehttp.Request, params url.Values, headers http.Header) (int, []byte, error) {
 	prepare(req, params, headers)
 	client := retryablehttp.NewClient()
 	if res, err := client.Do(req); err != nil {
@@ -37,7 +40,7 @@ func PerformR(req *retryablehttp.Request, params url.Values, headers map[string]
 	}
 }
 
-func GetR(url string, params url.Values, headers map[string]string) (int, []byte, error) {
+func GetR(url string, params url.Values, headers http.Header) (int, []byte, error) {
 	if req, err := retryablehttp.NewRequest("GET", url, nil); err != nil {
 		logger.Error(err)
 		return http.StatusInternalServerError, nil, errors.FromError(errors.GO_ERROR, err)
@@ -46,7 +49,7 @@ func GetR(url string, params url.Values, headers map[string]string) (int, []byte
 	}
 }
 
-func PostR(url string, params url.Values, headers map[string]string, rawBody interface{}) (int, []byte, error) {
+func PostR(url string, params url.Values, headers http.Header, rawBody interface{}) (int, []byte, error) {
 	if req, err := retryablehttp.NewRequest("POST", url, rawBody); err != nil {
 		logger.Error(err)
 		return http.StatusInternalServerError, nil, errors.FromError(errors.GO_ERROR, err)
@@ -55,7 +58,7 @@ func PostR(url string, params url.Values, headers map[string]string, rawBody int
 	}
 }
 
-func Perform(req *retryablehttp.Request, params url.Values, headers map[string]string, response interface{}) (int, error) {
+func Perform(req *retryablehttp.Request, params url.Values, headers http.Header, response interface{}) (int, error) {
 	prepare(req, params, headers)
 	client := retryablehttp.NewClient()
 	if res, err := client.Do(req); err != nil {
@@ -67,7 +70,7 @@ func Perform(req *retryablehttp.Request, params url.Values, headers map[string]s
 	}
 }
 
-func Get(url string, params url.Values, headers map[string]string, response interface{}) (int, error) {
+func Get(url string, params url.Values, headers http.Header, response interface{}) (int, error) {
 	if req, err := retryablehttp.NewRequest("GET", url, nil); err != nil {
 		logger.Error(err)
 		return http.StatusInternalServerError, errors.FromError(errors.GO_ERROR, err)
@@ -76,7 +79,7 @@ func Get(url string, params url.Values, headers map[string]string, response inte
 	}
 }
 
-func Post(url string, params url.Values, headers map[string]string, rawBody interface{}, response interface{}) (int, error) {
+func Post(url string, params url.Values, headers http.Header, rawBody interface{}, response interface{}) (int, error) {
 	if req, err := retryablehttp.NewRequest("POST", url, rawBody); err != nil {
 		logger.Error(err)
 		return http.StatusInternalServerError, errors.FromError(errors.GO_ERROR, err)
