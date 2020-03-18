@@ -14,26 +14,18 @@ import (
 )
 
 func processMessage(msg *stan.Msg) {
-	var m map[string]interface{}
-	if err := json.Unmarshal(msg.Data, &m); err != nil {
+	var message mq.DbMessage
+	if err := json.Unmarshal(msg.Data, &message); err != nil {
 		logger.Error(err)
+	} else if message.Path == "" || message.Body == nil {
+		logger.Errorf("Incorrect message received: %v", message)
 	} else {
-		path := m["Path"]
-		body := m["Body"]
-		getMap := func(v interface{}) map[string]interface{} {
-			if v != nil {
-				return v.(map[string]interface{})
-			}
-			return nil
-		}
-		params := getMap(m["Params"])
-		headers := getMap(m["Headers"])
-		url := fmt.Sprintf("http://datastore.zonea.senslabs.io:9804%s", path)
-		if b, err := json.Marshal(body); err != nil {
+		url := fmt.Sprintf("http://datastore.zonea.senslabs.io:9804%s", message.Path)
+		if b, err := json.Marshal(message.Body); err != nil {
 			logger.Error(err)
 		} else {
-			logger.Debug(url, params, headers, body)
-			code, body, err := httpclient.Post(url, params, headers, b)
+			logger.Debug(url, message.Params, message.Headers, message.Body)
+			code, body, err := httpclient.PostR(url, message.Params, message.Headers, b)
 			logger.Debug(code, body)
 			if err != nil {
 				logger.Error(err)
