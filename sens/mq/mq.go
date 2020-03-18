@@ -14,6 +14,11 @@ import (
 var once sync.Once
 var sc stan.Conn
 
+type DbMessage struct {
+	Path string
+	Body interface{}
+}
+
 func GetConnection(clusterId string, clientId string) (stan.Conn, error) {
 	once.Do(func() {
 		forceConnection(clusterId, clientId)
