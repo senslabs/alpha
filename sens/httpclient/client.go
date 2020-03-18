@@ -11,7 +11,9 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func prepare(req *retryablehttp.Request, params url.Values, headers http.Header) {
+type HttpParams map[string][]string
+
+func prepare(req *retryablehttp.Request, params HttpParams, headers HttpParams) {
 	query := req.URL.Query()
 	for k, v := range params {
 		for _, v := range v {
@@ -19,7 +21,11 @@ func prepare(req *retryablehttp.Request, params url.Values, headers http.Header)
 		}
 	}
 	req.URL.RawQuery = query.Encode()
-	req.Header = headers
+	for k, v := range headers {
+		for _, v := range v {
+			req.Header.Add(k, v)
+		}
+	}
 }
 
 func PerformR(req *retryablehttp.Request, params url.Values, headers http.Header) (int, []byte, error) {
