@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"fmt"
@@ -11,19 +11,19 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func AuthMain(r *mux.Router) {
-	r.HandleFunc("/api/auths/create", CreateAuth)
-	r.HandleFunc("/api/auths/batch/create", BatchCreateAuth)
-	r.HandleFunc("/api/auths/update", UpdateAuth)
-	r.HandleFunc("/api/auths/get/{id}", GetAuth)
-	r.HandleFunc("/api/auths/find", FindAuth)
+func OpUserMain(r *mux.Router) {
+	r.HandleFunc("/api/op-users/create", CreateOpUser)
+	r.HandleFunc("/api/op-users/batch/create", BatchCreateOpUser)
+	r.HandleFunc("/api/op-users/update", UpdateOpUser)
+	r.HandleFunc("/api/op-users/get/{id}", GetOpUser)
+	r.HandleFunc("/api/op-users/find", FindOpUser)
 }
 
-func CreateAuth(w http.ResponseWriter, r *http.Request) {
+func CreateOpUser(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.InsertAuth(data); err != nil {
+	} else if id, err := fn.InsertOpUser(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -31,11 +31,11 @@ func CreateAuth(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func BatchCreateAuth(w http.ResponseWriter, r *http.Request) {
+func BatchCreateOpUser(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.BatchInsertAuth(data); err != nil {
+	} else if id, err := fn.BatchInsertOpUser(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -43,13 +43,13 @@ func BatchCreateAuth(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func UpdateAuth(w http.ResponseWriter, r *http.Request) {
+func UpdateOpUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateAuth(id, data); err != nil {
+	} else if err := fn.UpdateOpUser(id, data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -57,10 +57,10 @@ func UpdateAuth(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetAuth(w http.ResponseWriter, r *http.Request) {
+func GetOpUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	if m, err := fn.SelectAuth(id); err != nil {
+	if m, err := fn.SelectOpUser(id); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
@@ -69,7 +69,7 @@ func GetAuth(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func FindAuth(w http.ResponseWriter, r *http.Request) {
+func FindOpUser(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -80,7 +80,7 @@ func FindAuth(w http.ResponseWriter, r *http.Request) {
 
 	if limit == "" {
 		http.Error(w, "Query param limit is mandatory", http.StatusBadRequest)
-	} else if ms, err := fn.FindAuth(or, and, span, limit, column, order); err != nil {
+	} else if ms, err := fn.FindOpUser(or, and, span, limit, column, order); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {

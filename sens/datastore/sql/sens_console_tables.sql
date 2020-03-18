@@ -19,13 +19,15 @@ CREATE TABLE "orgs" (
 CREATE TABLE "ops" (
   "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "created_at" timestamp,
-  "updated_at" timestamp
+  "updated_at" timestamp,
+  "status" text
 );
 
 CREATE TABLE "users" (
   "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "created_at" timestamp,
-  "updated_at" timestamp
+  "updated_at" timestamp,
+  "status" text
 );
 
 CREATE TABLE "endpoints" (
@@ -34,6 +36,18 @@ CREATE TABLE "endpoints" (
   "path" text,
   "secure" boolean DEFAULT true,
   "next_endpoint" text
+);
+
+CREATE TABLE "devices" (
+  "id" uuid PRIMARY KEY,
+  "org_id" uuid,
+  "user_id" uuid,
+  "registered_at" timestamp,
+  "unregistered_at" timestamp,
+  "paired_at" timestamp,
+  "unpaired_at" timestamp,
+  "tags" jsonb,
+  "status" text
 );
 
 CREATE TABLE "org_auths" (
@@ -89,6 +103,10 @@ CREATE TABLE "user_endpoints" (
   "endpoint_id" uuid,
   PRIMARY KEY ("user_id", "endpoint_id")
 );
+
+ALTER TABLE "devices" ADD FOREIGN KEY ("org_id") REFERENCES "orgs" ("id");
+
+ALTER TABLE "devices" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
 ALTER TABLE "org_auths" ADD FOREIGN KEY ("org_id") REFERENCES "orgs" ("id");
 

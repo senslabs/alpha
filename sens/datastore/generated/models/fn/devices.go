@@ -13,13 +13,13 @@ import (
 	"github.com/senslabs/alpha/sens/logger"
 )
 
-func InsertOpUser(data []byte) (string, error) {
+func InsertDevice(data []byte) (string, error) {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.OpUser
+	var m models.Device
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
@@ -28,8 +28,8 @@ func InsertOpUser(data []byte) (string, error) {
 	logger.Debug(m)
 
 	comma := ""
-	fieldMap := models.GetOpUserFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO op_users(")
+	fieldMap := models.GetDeviceFieldMap()
+	insert := bytes.NewBufferString("INSERT INTO devices(")
 	values := bytes.NewBufferString("VALUES(")
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -58,7 +58,7 @@ func InsertOpUser(data []byte) (string, error) {
 	}
 }
 
-func BatchInsertOpUser(data []byte) ([]string, error) {
+func BatchInsertDevice(data []byte) ([]string, error) {
 	var j []map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
@@ -67,8 +67,8 @@ func BatchInsertOpUser(data []byte) ([]string, error) {
 
 	comma := ""
 	var keys []string
-	fieldMap := models.GetOpUserFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO op_users(")
+	fieldMap := models.GetDeviceFieldMap()
+	insert := bytes.NewBufferString("INSERT INTO devices(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
@@ -104,13 +104,13 @@ func BatchInsertOpUser(data []byte) ([]string, error) {
 	return nil, nil
 }
 
-func UpdateOpUser(id string, data []byte) error {
+func UpdateDevice(id string, data []byte) error {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.OpUser
+	var m models.Device
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
@@ -119,8 +119,8 @@ func UpdateOpUser(id string, data []byte) error {
 	logger.Debug(m)
 
 	comma := ""
-	fieldMap := models.GetOpUserFieldMap()
-	update := bytes.NewBufferString("UPDATE op_users SET ")
+	fieldMap := models.GetDeviceFieldMap()
+	update := bytes.NewBufferString("UPDATE devices SET ")
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(update, comma, f, " = :", f)
@@ -137,7 +137,7 @@ func UpdateOpUser(id string, data []byte) error {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
 	}
-	
+	m.Id = id
 	_, err = stmt.Exec(m)
 	if err != nil {
 		logger.Error(err)
@@ -146,24 +146,24 @@ func UpdateOpUser(id string, data []byte) error {
 	return nil
 }
 
-func SelectOpUser(id string) (models.OpUser, *errors.SensError) {
+func SelectDevice(id string) (models.Device, *errors.SensError) {
 	db := datastore.GetConnection()
-	m := models.OpUser{}
-	if err := db.Get(&m, "SELECT * FROM op_users WHERE id = $1", id); err != nil {
+	m := models.Device{}
+	if err := db.Get(&m, "SELECT * FROM devices WHERE id = $1", id); err != nil {
 		logger.Error(err)
 		return m, errors.FromError(errors.DB_ERROR, err)
 	}
 	return m, nil
 }
 
-func FindOpUser(or []string, and []string, span []string, limit string, column string, order string) ([]models.OpUser, *errors.SensError) {
+func FindDevice(or []string, and []string, span []string, limit string, column string, order string) ([]models.Device, *errors.SensError) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
 
-	fieldMap := models.GetOpUserFieldMap()
+	fieldMap := models.GetDeviceFieldMap()
 	values := make(map[string]interface{})
-	query := bytes.NewBufferString("SELECT * FROM op_users WHERE ")
+	query := bytes.NewBufferString("SELECT * FROM devices WHERE ")
 	for _, o := range ors {
 		if f, ok := fieldMap[o.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s OR ", f, f))
@@ -195,7 +195,7 @@ func FindOpUser(or []string, and []string, span []string, limit string, column s
 
 	logger.Debug(query.String())
 	
-	m := []models.OpUser{}
+	m := []models.Device{}
 	db := datastore.GetConnection()
 	if stmt, err := db.PrepareNamed(query.String()); err != nil {
 		logger.Error(err.Error())

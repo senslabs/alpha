@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"fmt"
@@ -11,19 +11,19 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func SessionRecordMain(r *mux.Router) {
-	r.HandleFunc("/api/session-records/create", CreateSessionRecord)
-	r.HandleFunc("/api/session-records/batch/create", BatchCreateSessionRecord)
-	r.HandleFunc("/api/session-records/update", UpdateSessionRecord)
-	r.HandleFunc("/api/session-records/get/{id}", GetSessionRecord)
-	r.HandleFunc("/api/session-records/find", FindSessionRecord)
+func AuthMain(r *mux.Router) {
+	r.HandleFunc("/api/auths/create", CreateAuth)
+	r.HandleFunc("/api/auths/batch/create", BatchCreateAuth)
+	r.HandleFunc("/api/auths/update", UpdateAuth)
+	r.HandleFunc("/api/auths/get/{id}", GetAuth)
+	r.HandleFunc("/api/auths/find", FindAuth)
 }
 
-func CreateSessionRecord(w http.ResponseWriter, r *http.Request) {
+func CreateAuth(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.InsertSessionRecord(data); err != nil {
+	} else if id, err := fn.InsertAuth(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -31,11 +31,11 @@ func CreateSessionRecord(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func BatchCreateSessionRecord(w http.ResponseWriter, r *http.Request) {
+func BatchCreateAuth(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.BatchInsertSessionRecord(data); err != nil {
+	} else if id, err := fn.BatchInsertAuth(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -43,13 +43,13 @@ func BatchCreateSessionRecord(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func UpdateSessionRecord(w http.ResponseWriter, r *http.Request) {
+func UpdateAuth(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateSessionRecord(id, data); err != nil {
+	} else if err := fn.UpdateAuth(id, data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -57,10 +57,10 @@ func UpdateSessionRecord(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetSessionRecord(w http.ResponseWriter, r *http.Request) {
+func GetAuth(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	if m, err := fn.SelectSessionRecord(id); err != nil {
+	if m, err := fn.SelectAuth(id); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
@@ -69,7 +69,7 @@ func GetSessionRecord(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func FindSessionRecord(w http.ResponseWriter, r *http.Request) {
+func FindAuth(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -80,7 +80,7 @@ func FindSessionRecord(w http.ResponseWriter, r *http.Request) {
 
 	if limit == "" {
 		http.Error(w, "Query param limit is mandatory", http.StatusBadRequest)
-	} else if ms, err := fn.FindSessionRecord(or, and, span, limit, column, order); err != nil {
+	} else if ms, err := fn.FindAuth(or, and, span, limit, column, order); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {

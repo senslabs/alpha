@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"fmt"
@@ -11,19 +11,19 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func EndpointMain(r *mux.Router) {
-	r.HandleFunc("/api/endpoints/create", CreateEndpoint)
-	r.HandleFunc("/api/endpoints/batch/create", BatchCreateEndpoint)
-	r.HandleFunc("/api/endpoints/update", UpdateEndpoint)
-	r.HandleFunc("/api/endpoints/get/{id}", GetEndpoint)
-	r.HandleFunc("/api/endpoints/find", FindEndpoint)
+func OpAuthMain(r *mux.Router) {
+	r.HandleFunc("/api/op-auths/create", CreateOpAuth)
+	r.HandleFunc("/api/op-auths/batch/create", BatchCreateOpAuth)
+	r.HandleFunc("/api/op-auths/update", UpdateOpAuth)
+	r.HandleFunc("/api/op-auths/get/{id}", GetOpAuth)
+	r.HandleFunc("/api/op-auths/find", FindOpAuth)
 }
 
-func CreateEndpoint(w http.ResponseWriter, r *http.Request) {
+func CreateOpAuth(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.InsertEndpoint(data); err != nil {
+	} else if id, err := fn.InsertOpAuth(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -31,11 +31,11 @@ func CreateEndpoint(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func BatchCreateEndpoint(w http.ResponseWriter, r *http.Request) {
+func BatchCreateOpAuth(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.BatchInsertEndpoint(data); err != nil {
+	} else if id, err := fn.BatchInsertOpAuth(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -43,13 +43,13 @@ func BatchCreateEndpoint(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func UpdateEndpoint(w http.ResponseWriter, r *http.Request) {
+func UpdateOpAuth(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateEndpoint(id, data); err != nil {
+	} else if err := fn.UpdateOpAuth(id, data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -57,10 +57,10 @@ func UpdateEndpoint(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetEndpoint(w http.ResponseWriter, r *http.Request) {
+func GetOpAuth(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	if m, err := fn.SelectEndpoint(id); err != nil {
+	if m, err := fn.SelectOpAuth(id); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
@@ -69,7 +69,7 @@ func GetEndpoint(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func FindEndpoint(w http.ResponseWriter, r *http.Request) {
+func FindOpAuth(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -80,7 +80,7 @@ func FindEndpoint(w http.ResponseWriter, r *http.Request) {
 
 	if limit == "" {
 		http.Error(w, "Query param limit is mandatory", http.StatusBadRequest)
-	} else if ms, err := fn.FindEndpoint(or, and, span, limit, column, order); err != nil {
+	} else if ms, err := fn.FindOpAuth(or, and, span, limit, column, order); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {
