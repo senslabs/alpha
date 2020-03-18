@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"fmt"
@@ -11,19 +11,19 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func SessionEventMain(r *mux.Router) {
-	r.HandleFunc("/api/session-events/create", CreateSessionEvent)
-	r.HandleFunc("/api/session-events/batch/create", BatchCreateSessionEvent)
-	r.HandleFunc("/api/session-events/update", UpdateSessionEvent)
-	r.HandleFunc("/api/session-events/get/{id}", GetSessionEvent)
-	r.HandleFunc("/api/session-events/find", FindSessionEvent)
+func OrgOpMain(r *mux.Router) {
+	r.HandleFunc("/api/org-ops/create", CreateOrgOp)
+	r.HandleFunc("/api/org-ops/batch/create", BatchCreateOrgOp)
+	r.HandleFunc("/api/org-ops/update", UpdateOrgOp)
+	r.HandleFunc("/api/org-ops/get/{id}", GetOrgOp)
+	r.HandleFunc("/api/org-ops/find", FindOrgOp)
 }
 
-func CreateSessionEvent(w http.ResponseWriter, r *http.Request) {
+func CreateOrgOp(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.InsertSessionEvent(data); err != nil {
+	} else if id, err := fn.InsertOrgOp(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -31,11 +31,11 @@ func CreateSessionEvent(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func BatchCreateSessionEvent(w http.ResponseWriter, r *http.Request) {
+func BatchCreateOrgOp(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.BatchInsertSessionEvent(data); err != nil {
+	} else if id, err := fn.BatchInsertOrgOp(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -43,13 +43,13 @@ func BatchCreateSessionEvent(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func UpdateSessionEvent(w http.ResponseWriter, r *http.Request) {
+func UpdateOrgOp(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateSessionEvent(id, data); err != nil {
+	} else if err := fn.UpdateOrgOp(id, data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -57,10 +57,10 @@ func UpdateSessionEvent(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetSessionEvent(w http.ResponseWriter, r *http.Request) {
+func GetOrgOp(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	if m, err := fn.SelectSessionEvent(id); err != nil {
+	if m, err := fn.SelectOrgOp(id); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
@@ -69,7 +69,7 @@ func GetSessionEvent(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func FindSessionEvent(w http.ResponseWriter, r *http.Request) {
+func FindOrgOp(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -80,7 +80,7 @@ func FindSessionEvent(w http.ResponseWriter, r *http.Request) {
 
 	if limit == "" {
 		http.Error(w, "Query param limit is mandatory", http.StatusBadRequest)
-	} else if ms, err := fn.FindSessionEvent(or, and, span, limit, column, order); err != nil {
+	} else if ms, err := fn.FindOrgOp(or, and, span, limit, column, order); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {

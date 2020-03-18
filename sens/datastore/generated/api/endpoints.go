@@ -11,19 +11,19 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func {{.Model}}Main(r *mux.Router) {
-	r.HandleFunc("/api/{{.Path}}/create", Create{{.Model}})
-	r.HandleFunc("/api/{{.Path}}/batch/create", BatchCreate{{.Model}})
-	r.HandleFunc("/api/{{.Path}}/update", Update{{.Model}})
-	r.HandleFunc("/api/{{.Path}}/get/{id}", Get{{.Model}})
-	r.HandleFunc("/api/{{.Path}}/find", Find{{.Model}})
+func EndpointMain(r *mux.Router) {
+	r.HandleFunc("/api/endpoints/create", CreateEndpoint)
+	r.HandleFunc("/api/endpoints/batch/create", BatchCreateEndpoint)
+	r.HandleFunc("/api/endpoints/update", UpdateEndpoint)
+	r.HandleFunc("/api/endpoints/get/{id}", GetEndpoint)
+	r.HandleFunc("/api/endpoints/find", FindEndpoint)
 }
 
-func Create{{.Model}}(w http.ResponseWriter, r *http.Request) {
+func CreateEndpoint(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.Insert{{.Model}}(data); err != nil {
+	} else if id, err := fn.InsertEndpoint(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -31,11 +31,11 @@ func Create{{.Model}}(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func BatchCreate{{.Model}}(w http.ResponseWriter, r *http.Request) {
+func BatchCreateEndpoint(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.BatchInsert{{.Model}}(data); err != nil {
+	} else if id, err := fn.BatchInsertEndpoint(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -43,13 +43,13 @@ func BatchCreate{{.Model}}(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func Update{{.Model}}(w http.ResponseWriter, r *http.Request) {
+func UpdateEndpoint(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.Update{{.Model}}(id, data); err != nil {
+	} else if err := fn.UpdateEndpoint(id, data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -57,10 +57,10 @@ func Update{{.Model}}(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func Get{{.Model}}(w http.ResponseWriter, r *http.Request) {
+func GetEndpoint(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	if m, err := fn.Select{{.Model}}(id); err != nil {
+	if m, err := fn.SelectEndpoint(id); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
@@ -69,7 +69,7 @@ func Get{{.Model}}(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func Find{{.Model}}(w http.ResponseWriter, r *http.Request) {
+func FindEndpoint(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -80,7 +80,7 @@ func Find{{.Model}}(w http.ResponseWriter, r *http.Request) {
 
 	if limit == "" {
 		http.Error(w, "Query param limit is mandatory", http.StatusBadRequest)
-	} else if ms, err := fn.Find{{.Model}}(or, and, span, limit, column, order); err != nil {
+	} else if ms, err := fn.FindEndpoint(or, and, span, limit, column, order); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {

@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"fmt"
@@ -11,19 +11,19 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func UserEndpointMain(r *mux.Router) {
-	r.HandleFunc("/api/user-endpoints/create", CreateUserEndpoint)
-	r.HandleFunc("/api/user-endpoints/batch/create", BatchCreateUserEndpoint)
-	r.HandleFunc("/api/user-endpoints/update", UpdateUserEndpoint)
-	r.HandleFunc("/api/user-endpoints/get/{id}", GetUserEndpoint)
-	r.HandleFunc("/api/user-endpoints/find", FindUserEndpoint)
+func SessionEventMain(r *mux.Router) {
+	r.HandleFunc("/api/session-events/create", CreateSessionEvent)
+	r.HandleFunc("/api/session-events/batch/create", BatchCreateSessionEvent)
+	r.HandleFunc("/api/session-events/update", UpdateSessionEvent)
+	r.HandleFunc("/api/session-events/get/{id}", GetSessionEvent)
+	r.HandleFunc("/api/session-events/find", FindSessionEvent)
 }
 
-func CreateUserEndpoint(w http.ResponseWriter, r *http.Request) {
+func CreateSessionEvent(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.InsertUserEndpoint(data); err != nil {
+	} else if id, err := fn.InsertSessionEvent(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -31,11 +31,11 @@ func CreateUserEndpoint(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func BatchCreateUserEndpoint(w http.ResponseWriter, r *http.Request) {
+func BatchCreateSessionEvent(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.BatchInsertUserEndpoint(data); err != nil {
+	} else if id, err := fn.BatchInsertSessionEvent(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -43,13 +43,13 @@ func BatchCreateUserEndpoint(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func UpdateUserEndpoint(w http.ResponseWriter, r *http.Request) {
+func UpdateSessionEvent(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateUserEndpoint(id, data); err != nil {
+	} else if err := fn.UpdateSessionEvent(id, data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -57,10 +57,10 @@ func UpdateUserEndpoint(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetUserEndpoint(w http.ResponseWriter, r *http.Request) {
+func GetSessionEvent(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	if m, err := fn.SelectUserEndpoint(id); err != nil {
+	if m, err := fn.SelectSessionEvent(id); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
@@ -69,7 +69,7 @@ func GetUserEndpoint(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func FindUserEndpoint(w http.ResponseWriter, r *http.Request) {
+func FindSessionEvent(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -80,7 +80,7 @@ func FindUserEndpoint(w http.ResponseWriter, r *http.Request) {
 
 	if limit == "" {
 		http.Error(w, "Query param limit is mandatory", http.StatusBadRequest)
-	} else if ms, err := fn.FindUserEndpoint(or, and, span, limit, column, order); err != nil {
+	} else if ms, err := fn.FindSessionEvent(or, and, span, limit, column, order); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {

@@ -1,3 +1,4 @@
+@@ -1,5 +0,0 @@
 steps:
 - name: gcr.io/cloud-builders/docker
   args: ['build', '-t', 'gcr.io/$PROJECT_ID/datastore:$SHORT_SHA', '--network=cloudbuild', 'sens/datastore/generated/api/rest/main']

@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"fmt"
@@ -11,19 +11,19 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func OrgUserMain(r *mux.Router) {
-	r.HandleFunc("/api/org-users/create", CreateOrgUser)
-	r.HandleFunc("/api/org-users/batch/create", BatchCreateOrgUser)
-	r.HandleFunc("/api/org-users/update", UpdateOrgUser)
-	r.HandleFunc("/api/org-users/get/{id}", GetOrgUser)
-	r.HandleFunc("/api/org-users/find", FindOrgUser)
+func OpDetailMain(r *mux.Router) {
+	r.HandleFunc("/api/op-details/create", CreateOpDetail)
+	r.HandleFunc("/api/op-details/batch/create", BatchCreateOpDetail)
+	r.HandleFunc("/api/op-details/update", UpdateOpDetail)
+	r.HandleFunc("/api/op-details/get/{id}", GetOpDetail)
+	r.HandleFunc("/api/op-details/find", FindOpDetail)
 }
 
-func CreateOrgUser(w http.ResponseWriter, r *http.Request) {
+func CreateOpDetail(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.InsertOrgUser(data); err != nil {
+	} else if id, err := fn.InsertOpDetail(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -31,11 +31,11 @@ func CreateOrgUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func BatchCreateOrgUser(w http.ResponseWriter, r *http.Request) {
+func BatchCreateOpDetail(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.BatchInsertOrgUser(data); err != nil {
+	} else if id, err := fn.BatchInsertOpDetail(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -43,13 +43,13 @@ func BatchCreateOrgUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func UpdateOrgUser(w http.ResponseWriter, r *http.Request) {
+func UpdateOpDetail(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateOrgUser(id, data); err != nil {
+	} else if err := fn.UpdateOpDetail(id, data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -57,10 +57,10 @@ func UpdateOrgUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetOrgUser(w http.ResponseWriter, r *http.Request) {
+func GetOpDetail(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	if m, err := fn.SelectOrgUser(id); err != nil {
+	if m, err := fn.SelectOpDetail(id); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
@@ -69,7 +69,7 @@ func GetOrgUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func FindOrgUser(w http.ResponseWriter, r *http.Request) {
+func FindOpDetail(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -80,7 +80,7 @@ func FindOrgUser(w http.ResponseWriter, r *http.Request) {
 
 	if limit == "" {
 		http.Error(w, "Query param limit is mandatory", http.StatusBadRequest)
-	} else if ms, err := fn.FindOrgUser(or, and, span, limit, column, order); err != nil {
+	} else if ms, err := fn.FindOpDetail(or, and, span, limit, column, order); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {

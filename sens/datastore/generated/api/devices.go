@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"fmt"
@@ -11,19 +11,19 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func UserMain(r *mux.Router) {
-	r.HandleFunc("/api/users/create", CreateUser)
-	r.HandleFunc("/api/users/batch/create", BatchCreateUser)
-	r.HandleFunc("/api/users/update", UpdateUser)
-	r.HandleFunc("/api/users/get/{id}", GetUser)
-	r.HandleFunc("/api/users/find", FindUser)
+func DeviceMain(r *mux.Router) {
+	r.HandleFunc("/api/devices/create", CreateDevice)
+	r.HandleFunc("/api/devices/batch/create", BatchCreateDevice)
+	r.HandleFunc("/api/devices/update", UpdateDevice)
+	r.HandleFunc("/api/devices/get/{id}", GetDevice)
+	r.HandleFunc("/api/devices/find", FindDevice)
 }
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+func CreateDevice(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.InsertUser(data); err != nil {
+	} else if id, err := fn.InsertDevice(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -31,11 +31,11 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func BatchCreateUser(w http.ResponseWriter, r *http.Request) {
+func BatchCreateDevice(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.BatchInsertUser(data); err != nil {
+	} else if id, err := fn.BatchInsertDevice(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -43,13 +43,13 @@ func BatchCreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func UpdateUser(w http.ResponseWriter, r *http.Request) {
+func UpdateDevice(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateUser(id, data); err != nil {
+	} else if err := fn.UpdateDevice(id, data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -57,10 +57,10 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetUser(w http.ResponseWriter, r *http.Request) {
+func GetDevice(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	if m, err := fn.SelectUser(id); err != nil {
+	if m, err := fn.SelectDevice(id); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
@@ -69,7 +69,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func FindUser(w http.ResponseWriter, r *http.Request) {
+func FindDevice(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -80,7 +80,7 @@ func FindUser(w http.ResponseWriter, r *http.Request) {
 
 	if limit == "" {
 		http.Error(w, "Query param limit is mandatory", http.StatusBadRequest)
-	} else if ms, err := fn.FindUser(or, and, span, limit, column, order); err != nil {
+	} else if ms, err := fn.FindDevice(or, and, span, limit, column, order); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {

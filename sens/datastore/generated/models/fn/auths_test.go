@@ -31,17 +31,17 @@ func TestUpdateAuth(t *testing.T) {
 		"Properties": {"a":"b"},
 		"FirstName": "Mayank"
 	}`)
-	UpdateAuth("a43c8563-8a50-42a4-8493-77ee83526248", data)
+	UpdateAuth("50db7414-e07c-4f2c-a6e8-a0d7c38a9dd1", data)
 }
 
 func TestFindAuth(t *testing.T) {
 	log.SetFlags(log.Lshortfile)
 	a, e := FindAuth(
-		[]string{"Email:mayank@dozee.io", "Email:emayank@gmail.com", "Mobile:mobile3"},
+		[]string{"Email:mayank@dozee.io", "Email:emayank@gmail.com", "Mobile:mobile9"},
 		// []string{"Social:social", "Mobile:8309284201"},
 		// nil,
 		nil,
-		[]string{"Mobile:0:9000000000", "Email:a:mayank@dozee.io"},
+		[]string{"Mobile:0:9000000000", "Email:a:email9"},
 		"4", "id", "DESC",
 	)
 	j, ee := json.Marshal(a)

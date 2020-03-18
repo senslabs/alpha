@@ -7,6 +7,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/senslabs/alpha/sens/datastore"
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
 	"github.com/senslabs/alpha/sens/errors"
 	"github.com/senslabs/alpha/sens/logger"
@@ -39,7 +40,7 @@ func InsertUserAuth(data []byte) (string, error) {
 	}
 	fmt.Fprint(insert, ") ")
 	fmt.Fprint(insert, values, ") returning id")
-	db := models.GetConnection()
+	db := datastore.GetConnection()
 
 	logger.Debug(insert.String())
 	
@@ -94,7 +95,7 @@ func BatchInsertUserAuth(data []byte) ([]string, error) {
 
 	logger.Debug(insert.String())
 
-	db := models.GetConnection()
+	db := datastore.GetConnection()
 	_, err := db.Exec(insert.String(), values...)
 	if err != nil {
 		logger.Error(err)
@@ -130,7 +131,7 @@ func UpdateUserAuth(id string, data []byte) error {
 
 	logger.Debug(update.String())
 
-	db := models.GetConnection()
+	db := datastore.GetConnection()
 	stmt, err := db.PrepareNamed(update.String())
 	if err != nil {
 		logger.Error(err)
@@ -146,7 +147,7 @@ func UpdateUserAuth(id string, data []byte) error {
 }
 
 func SelectUserAuth(id string) (models.UserAuth, *errors.SensError) {
-	db := models.GetConnection()
+	db := datastore.GetConnection()
 	m := models.UserAuth{}
 	if err := db.Get(&m, "SELECT * FROM user_auths WHERE id = $1", id); err != nil {
 		logger.Error(err)
@@ -156,9 +157,9 @@ func SelectUserAuth(id string) (models.UserAuth, *errors.SensError) {
 }
 
 func FindUserAuth(or []string, and []string, span []string, limit string, column string, order string) ([]models.UserAuth, *errors.SensError) {
-	ors := models.ParseOrParams(or)
-	ands := models.ParseAndParams(and)
-	spans := models.ParseSpanParams(span)
+	ors := datastore.ParseOrParams(or)
+	ands := datastore.ParseAndParams(and)
+	spans := datastore.ParseSpanParams(span)
 
 	fieldMap := models.GetUserAuthFieldMap()
 	values := make(map[string]interface{})
@@ -195,7 +196,7 @@ func FindUserAuth(or []string, and []string, span []string, limit string, column
 	logger.Debug(query.String())
 	
 	m := []models.UserAuth{}
-	db := models.GetConnection()
+	db := datastore.GetConnection()
 	if stmt, err := db.PrepareNamed(query.String()); err != nil {
 		logger.Error(err.Error())
 		log.Printf("%v", err)

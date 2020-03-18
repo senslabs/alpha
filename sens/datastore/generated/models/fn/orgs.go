@@ -7,6 +7,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/senslabs/alpha/sens/datastore"
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
 	"github.com/senslabs/alpha/sens/errors"
 	"github.com/senslabs/alpha/sens/logger"
@@ -39,7 +40,7 @@ func InsertOrg(data []byte) (string, error) {
 	}
 	fmt.Fprint(insert, ") ")
 	fmt.Fprint(insert, values, ") returning id")
-	db := models.GetConnection()
+	db := datastore.GetConnection()
 
 	logger.Debug(insert.String())
 	
@@ -94,7 +95,7 @@ func BatchInsertOrg(data []byte) ([]string, error) {
 
 	logger.Debug(insert.String())
 
-	db := models.GetConnection()
+	db := datastore.GetConnection()
 	_, err := db.Exec(insert.String(), values...)
 	if err != nil {
 		logger.Error(err)
@@ -130,7 +131,7 @@ func UpdateOrg(id string, data []byte) error {
 
 	logger.Debug(update.String())
 
-	db := models.GetConnection()
+	db := datastore.GetConnection()
 	stmt, err := db.PrepareNamed(update.String())
 	if err != nil {
 		logger.Error(err)
@@ -146,7 +147,7 @@ func UpdateOrg(id string, data []byte) error {
 }
 
 func SelectOrg(id string) (models.Org, *errors.SensError) {
-	db := models.GetConnection()
+	db := datastore.GetConnection()
 	m := models.Org{}
 	if err := db.Get(&m, "SELECT * FROM orgs WHERE id = $1", id); err != nil {
 		logger.Error(err)
@@ -156,9 +157,9 @@ func SelectOrg(id string) (models.Org, *errors.SensError) {
 }
 
 func FindOrg(or []string, and []string, span []string, limit string, column string, order string) ([]models.Org, *errors.SensError) {
-	ors := models.ParseOrParams(or)
-	ands := models.ParseAndParams(and)
-	spans := models.ParseSpanParams(span)
+	ors := datastore.ParseOrParams(or)
+	ands := datastore.ParseAndParams(and)
+	spans := datastore.ParseSpanParams(span)
 
 	fieldMap := models.GetOrgFieldMap()
 	values := make(map[string]interface{})
@@ -195,7 +196,7 @@ func FindOrg(or []string, and []string, span []string, limit string, column stri
 	logger.Debug(query.String())
 	
 	m := []models.Org{}
-	db := models.GetConnection()
+	db := datastore.GetConnection()
 	if stmt, err := db.PrepareNamed(query.String()); err != nil {
 		logger.Error(err.Error())
 		log.Printf("%v", err)

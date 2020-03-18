@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"fmt"
@@ -11,19 +11,19 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func OrgMain(r *mux.Router) {
-	r.HandleFunc("/api/orgs/create", CreateOrg)
-	r.HandleFunc("/api/orgs/batch/create", BatchCreateOrg)
-	r.HandleFunc("/api/orgs/update", UpdateOrg)
-	r.HandleFunc("/api/orgs/get/{id}", GetOrg)
-	r.HandleFunc("/api/orgs/find", FindOrg)
+func OrgEndpointMain(r *mux.Router) {
+	r.HandleFunc("/api/org-endpoints/create", CreateOrgEndpoint)
+	r.HandleFunc("/api/org-endpoints/batch/create", BatchCreateOrgEndpoint)
+	r.HandleFunc("/api/org-endpoints/update", UpdateOrgEndpoint)
+	r.HandleFunc("/api/org-endpoints/get/{id}", GetOrgEndpoint)
+	r.HandleFunc("/api/org-endpoints/find", FindOrgEndpoint)
 }
 
-func CreateOrg(w http.ResponseWriter, r *http.Request) {
+func CreateOrgEndpoint(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.InsertOrg(data); err != nil {
+	} else if id, err := fn.InsertOrgEndpoint(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -31,11 +31,11 @@ func CreateOrg(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func BatchCreateOrg(w http.ResponseWriter, r *http.Request) {
+func BatchCreateOrgEndpoint(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.BatchInsertOrg(data); err != nil {
+	} else if id, err := fn.BatchInsertOrgEndpoint(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -43,13 +43,13 @@ func BatchCreateOrg(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func UpdateOrg(w http.ResponseWriter, r *http.Request) {
+func UpdateOrgEndpoint(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateOrg(id, data); err != nil {
+	} else if err := fn.UpdateOrgEndpoint(id, data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -57,10 +57,10 @@ func UpdateOrg(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetOrg(w http.ResponseWriter, r *http.Request) {
+func GetOrgEndpoint(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	if m, err := fn.SelectOrg(id); err != nil {
+	if m, err := fn.SelectOrgEndpoint(id); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
@@ -69,7 +69,7 @@ func GetOrg(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func FindOrg(w http.ResponseWriter, r *http.Request) {
+func FindOrgEndpoint(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -80,7 +80,7 @@ func FindOrg(w http.ResponseWriter, r *http.Request) {
 
 	if limit == "" {
 		http.Error(w, "Query param limit is mandatory", http.StatusBadRequest)
-	} else if ms, err := fn.FindOrg(or, and, span, limit, column, order); err != nil {
+	} else if ms, err := fn.FindOrgEndpoint(or, and, span, limit, column, order); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {
