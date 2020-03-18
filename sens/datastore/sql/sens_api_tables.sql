@@ -36,12 +36,3 @@ ALTER TABLE "session_properties" ADD FOREIGN KEY ("session_id") REFERENCES "sess
 CREATE INDEX ON "sessions" ("ended_at");
 
 CREATE INDEX ON "sessions" ("user_id");
-
-ALTER TABLE "sessions_records"
-ADD
-CONSTRAINT sessions_check CHECK (
-  name in (
-    'HeartRate',
-    'BreathRate'
-  )
-);

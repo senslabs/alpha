@@ -2,31 +2,32 @@ package models
 
 import (
 	"time"
+
+	"github.com/senslabs/alpha/sens/datastore"
 )
 
 var t time.Time
 
 type Auth struct {
-	Id         string     `db:"id"`
-	Email      string     `db:"email"`
-	Mobile     string     `db:"mobile"`
-	Social     string     `db:"social"`
-	FirstName  NullString `db:"first_name"`
-	LastName   NullString `db:"last_name"`
-	CreatedAt  NullTime   `db:"created_at"`
-	UpdatedAt  NullTime   `db:"updated_at"`
-	Properties RawMessage `db:"properties"`
+	Id        string               `db:"id"`
+	Email     string               `db:"email"`
+	Mobile    string               `db:"mobile"`
+	Social    string               `db:"social"`
+	FirstName datastore.NullString `db:"first_name"`
+	LastName  datastore.NullString `db:"last_name"`
+	CreatedAt datastore.NullTime   `db:"created_at"`
+	UpdatedAt datastore.NullTime   `db:"updated_at"`
 }
 
 func GetAuthFieldMap() map[string]string {
-	return map[string]string{"CreatedAt": "created_at", "Email": "email", "FirstName": "first_name", "Id": "id", "LastName": "last_name", "Mobile": "mobile", "Properties": "properties", "Social": "social", "UpdatedAt": "updated_at"}
+	return map[string]string{"CreatedAt": "created_at", "Email": "email", "FirstName": "first_name", "Id": "id", "LastName": "last_name", "Mobile": "mobile", "Social": "social", "UpdatedAt": "updated_at"}
 }
 
 type Org struct {
-	Id        string     `db:"id"`
-	Name      NullString `db:"name"`
-	CreatedAt NullTime   `db:"created_at"`
-	UpdatedAt NullTime   `db:"updated_at"`
+	Id        string               `db:"id"`
+	Name      datastore.NullString `db:"name"`
+	CreatedAt datastore.NullTime   `db:"created_at"`
+	UpdatedAt datastore.NullTime   `db:"updated_at"`
 }
 
 func GetOrgFieldMap() map[string]string {
@@ -34,35 +35,53 @@ func GetOrgFieldMap() map[string]string {
 }
 
 type Op struct {
-	Id        string   `db:"id"`
-	CreatedAt NullTime `db:"created_at"`
-	UpdatedAt NullTime `db:"updated_at"`
+	Id        string               `db:"id"`
+	CreatedAt datastore.NullTime   `db:"created_at"`
+	UpdatedAt datastore.NullTime   `db:"updated_at"`
+	Status    datastore.NullString `db:"status"`
 }
 
 func GetOpFieldMap() map[string]string {
-	return map[string]string{"CreatedAt": "created_at", "Id": "id", "UpdatedAt": "updated_at"}
+	return map[string]string{"CreatedAt": "created_at", "Id": "id", "Status": "status", "UpdatedAt": "updated_at"}
 }
 
 type User struct {
-	Id        string   `db:"id"`
-	CreatedAt NullTime `db:"created_at"`
-	UpdatedAt NullTime `db:"updated_at"`
+	Id        string               `db:"id"`
+	CreatedAt datastore.NullTime   `db:"created_at"`
+	UpdatedAt datastore.NullTime   `db:"updated_at"`
+	Status    datastore.NullString `db:"status"`
 }
 
 func GetUserFieldMap() map[string]string {
-	return map[string]string{"CreatedAt": "created_at", "Id": "id", "UpdatedAt": "updated_at"}
+	return map[string]string{"CreatedAt": "created_at", "Id": "id", "Status": "status", "UpdatedAt": "updated_at"}
 }
 
 type Endpoint struct {
-	Id           string     `db:"id"`
-	Category     NullString `db:"category"`
-	Path         NullString `db:"path"`
-	Secure       bool       `db:"secure"`
-	NextEndpoint NullString `db:"next_endpoint"`
+	Id           string               `db:"id"`
+	Category     datastore.NullString `db:"category"`
+	Path         datastore.NullString `db:"path"`
+	Secure       bool                 `db:"secure"`
+	NextEndpoint datastore.NullString `db:"next_endpoint"`
 }
 
 func GetEndpointFieldMap() map[string]string {
 	return map[string]string{"Category": "category", "Id": "id", "NextEndpoint": "next_endpoint", "Path": "path", "Secure": "secure"}
+}
+
+type Device struct {
+	Id             string               `db:"id"`
+	OrgId          datastore.NullString `db:"org_id"`
+	UserId         datastore.NullString `db:"user_id"`
+	RegisteredAt   datastore.NullTime   `db:"registered_at"`
+	UnregisteredAt datastore.NullTime   `db:"unregistered_at"`
+	PairedAt       datastore.NullTime   `db:"paired_at"`
+	UnpairedAt     datastore.NullTime   `db:"unpaired_at"`
+	Tags           datastore.RawMessage `db:"tags"`
+	Status         datastore.NullString `db:"status"`
+}
+
+func GetDeviceFieldMap() map[string]string {
+	return map[string]string{"Id": "id", "OrgId": "org_id", "PairedAt": "paired_at", "RegisteredAt": "registered_at", "Status": "status", "Tags": "tags", "UnpairedAt": "unpaired_at", "UnregisteredAt": "unregistered_at", "UserId": "user_id"}
 }
 
 type OrgAuth struct {
@@ -146,13 +165,55 @@ func GetUserEndpointFieldMap() map[string]string {
 	return map[string]string{"EndpointId": "endpoint_id", "UserId": "user_id"}
 }
 
+type OrgDetail struct {
+	AuthId    string `db:"auth_id"`
+	Email     string `db:"email"`
+	Mobile    string `db:"mobile"`
+	Social    string `db:"social"`
+	FirstName string `db:"first_name"`
+	LastName  string `db:"last_name"`
+	OrgId     string `db:"org_id"`
+}
+
+func GetOrgDetailFieldMap() map[string]string {
+	return map[string]string{"AuthId": "auth_id", "Email": "email", "FirstName": "first_name", "LastName": "last_name", "Mobile": "mobile", "OrgId": "org_id", "Social": "social"}
+}
+
+type OpDetail struct {
+	AuthId    string `db:"auth_id"`
+	Email     string `db:"email"`
+	Mobile    string `db:"mobile"`
+	Social    string `db:"social"`
+	FirstName string `db:"first_name"`
+	LastName  string `db:"last_name"`
+	OpId      string `db:"op_id"`
+}
+
+func GetOpDetailFieldMap() map[string]string {
+	return map[string]string{"AuthId": "auth_id", "Email": "email", "FirstName": "first_name", "LastName": "last_name", "Mobile": "mobile", "OpId": "op_id", "Social": "social"}
+}
+
+type UserDetail struct {
+	AuthId    string `db:"auth_id"`
+	Email     string `db:"email"`
+	Mobile    string `db:"mobile"`
+	Social    string `db:"social"`
+	FirstName string `db:"first_name"`
+	LastName  string `db:"last_name"`
+	UserId    string `db:"user_id"`
+}
+
+func GetUserDetailFieldMap() map[string]string {
+	return map[string]string{"AuthId": "auth_id", "Email": "email", "FirstName": "first_name", "LastName": "last_name", "Mobile": "mobile", "Social": "social", "UserId": "user_id"}
+}
+
 type Session struct {
-	Id        string     `db:"id"`
-	UserId    string     `db:"user_id"`
-	Name      string     `db:"name"`
-	Type      NullString `db:"type"`
-	StartedAt NullTime   `db:"started_at"`
-	EndedAt   NullTime   `db:"ended_at"`
+	Id        string               `db:"id"`
+	UserId    datastore.NullString `db:"user_id"`
+	Name      datastore.NullString `db:"name"`
+	Type      datastore.NullString `db:"type"`
+	StartedAt datastore.NullTime   `db:"started_at"`
+	EndedAt   datastore.NullTime   `db:"ended_at"`
 }
 
 func GetSessionFieldMap() map[string]string {
@@ -160,11 +221,11 @@ func GetSessionFieldMap() map[string]string {
 }
 
 type SessionEvent struct {
-	UserId     string     `db:"user_id"`
-	Name       string     `db:"name"`
-	StartedAt  time.Time  `db:"started_at"`
-	EndedAt    NullTime   `db:"ended_at"`
-	Properties RawMessage `db:"properties"`
+	UserId     string               `db:"user_id"`
+	Name       string               `db:"name"`
+	StartedAt  time.Time            `db:"started_at"`
+	EndedAt    datastore.NullTime   `db:"ended_at"`
+	Properties datastore.RawMessage `db:"properties"`
 }
 
 func GetSessionEventFieldMap() map[string]string {
@@ -172,11 +233,11 @@ func GetSessionEventFieldMap() map[string]string {
 }
 
 type SessionRecord struct {
-	UserId     string     `db:"user_id"`
-	Name       string     `db:"name"`
-	Timestamp  time.Time  `db:"timestamp"`
-	Value      RawMessage `db:"value"`
-	Properties RawMessage `db:"properties"`
+	UserId     string               `db:"user_id"`
+	Name       string               `db:"name"`
+	Timestamp  time.Time            `db:"timestamp"`
+	Value      datastore.RawMessage `db:"value"`
+	Properties datastore.RawMessage `db:"properties"`
 }
 
 func GetSessionRecordFieldMap() map[string]string {
@@ -184,10 +245,10 @@ func GetSessionRecordFieldMap() map[string]string {
 }
 
 type SessionPropertie struct {
-	SessionId NullString `db:"session_id"`
-	Name      NullString `db:"name"`
-	Value     NullString `db:"value"`
-	Rowid     RawMessage `db:"rowid"`
+	SessionId datastore.NullString `db:"session_id"`
+	Name      datastore.NullString `db:"name"`
+	Value     datastore.NullString `db:"value"`
+	Rowid     datastore.RawMessage `db:"rowid"`
 }
 
 func GetSessionPropertieFieldMap() map[string]string {
