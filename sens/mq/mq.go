@@ -21,6 +21,7 @@ func GetConnection(clusterId string, clientId string) (stan.Conn, error) {
 	return sc, nil
 }
 
+//Force a connection. This can be used if cached connection is closed
 func forceConnection(clusterId string, clientId string) (stan.Conn, error) {
 	natsHost := os.Getenv("NATS_HOST")
 	if nc, err := nats.Connect(fmt.Sprintf("nats://%s:4222", natsHost)); err != nil {
