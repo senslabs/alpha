@@ -17,10 +17,10 @@ type ConsoleLogger struct{}
 type FileLogger struct{}
 type FluentLogger struct{}
 
-var logger Logger
+var l Logger
 
 func InitConsoleLogger() {
-	logger = &ConsoleLogger{}
+	l = &ConsoleLogger{}
 }
 
 func InitFileLogger(name string) {
@@ -37,11 +37,11 @@ func InitFileLogger(name string) {
 	defer f.Close()
 	log.SetOutput(f)
 	log.SetFlags(log.Lshortfile)
-	logger = &FileLogger{}
+	l = &FileLogger{}
 }
 
 func InitFluentLogger() {
-	logger = &FluentLogger{}
+	l = &FluentLogger{}
 }
 
 // -- INIT ENDS HERE -- //
@@ -110,26 +110,26 @@ func InitLogger(arg interface{}) {
 
 func Error(v ...interface{}) {
 	LogMeta("Error")
-	logger.Error(v...)
+	l.Error(v...)
 }
 
 func Debug(v ...interface{}) {
 	logLevel := os.Getenv("LOG_LEVEL")
 	if logLevel == "DEBUG" {
 		LogMeta("Debug")
-		logger.Debug(v...)
+		l.Debug(v...)
 	}
 }
 
 func Errorf(format string, v ...interface{}) {
 	LogMeta("Error")
-	logger.Errorf(format, v...)
+	l.Errorf(format, v...)
 }
 
 func Debugf(format string, v ...interface{}) {
 	logLevel := os.Getenv("LOG_LEVEL")
 	if logLevel == "DEBUG" {
 		LogMeta("Debug")
-		logger.Debugf(format, v...)
+		l.Debugf(format, v...)
 	}
 }
