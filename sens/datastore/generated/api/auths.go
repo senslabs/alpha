@@ -14,8 +14,10 @@ import (
 func AuthMain(r *mux.Router) {
 	r.HandleFunc("/api/auths/create", CreateAuth)
 	r.HandleFunc("/api/auths/batch/create", BatchCreateAuth)
-	r.HandleFunc("/api/auths/update", UpdateAuth)
-	r.HandleFunc("/api/auths/get/{id}", GetAuth)
+	
+	r.HandleFunc("/api/auths/{id}/update", UpdateAuth)
+	r.HandleFunc("/api/auths/{id}/get", GetAuth)
+	
 	r.HandleFunc("/api/auths/find", FindAuth)
 }
 
@@ -43,6 +45,7 @@ func BatchCreateAuth(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
 func UpdateAuth(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -68,6 +71,7 @@ func GetAuth(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
+
 
 func FindAuth(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

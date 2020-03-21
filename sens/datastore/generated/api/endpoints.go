@@ -14,8 +14,10 @@ import (
 func EndpointMain(r *mux.Router) {
 	r.HandleFunc("/api/endpoints/create", CreateEndpoint)
 	r.HandleFunc("/api/endpoints/batch/create", BatchCreateEndpoint)
-	r.HandleFunc("/api/endpoints/update", UpdateEndpoint)
-	r.HandleFunc("/api/endpoints/get/{id}", GetEndpoint)
+	
+	r.HandleFunc("/api/endpoints/{id}/update", UpdateEndpoint)
+	r.HandleFunc("/api/endpoints/{id}/get", GetEndpoint)
+	
 	r.HandleFunc("/api/endpoints/find", FindEndpoint)
 }
 
@@ -43,6 +45,7 @@ func BatchCreateEndpoint(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
 func UpdateEndpoint(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -68,6 +71,7 @@ func GetEndpoint(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
+
 
 func FindEndpoint(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

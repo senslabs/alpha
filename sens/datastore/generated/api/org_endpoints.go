@@ -14,8 +14,7 @@ import (
 func OrgEndpointMain(r *mux.Router) {
 	r.HandleFunc("/api/org-endpoints/create", CreateOrgEndpoint)
 	r.HandleFunc("/api/org-endpoints/batch/create", BatchCreateOrgEndpoint)
-	r.HandleFunc("/api/org-endpoints/update", UpdateOrgEndpoint)
-	r.HandleFunc("/api/org-endpoints/get/{id}", GetOrgEndpoint)
+	
 	r.HandleFunc("/api/org-endpoints/find", FindOrgEndpoint)
 }
 
@@ -43,31 +42,7 @@ func BatchCreateOrgEndpoint(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func UpdateOrgEndpoint(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateOrgEndpoint(id, data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
-}
 
-func GetOrgEndpoint(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if m, err := fn.SelectOrgEndpoint(id); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
 
 func FindOrgEndpoint(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

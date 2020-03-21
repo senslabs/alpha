@@ -39,7 +39,8 @@ func InsertOrgDetailView(data []byte) (string, error) {
 		}
 	}
 	fmt.Fprint(insert, ") ")
-	fmt.Fprint(insert, values, ") returning id")
+	fmt.Fprint(insert, values, ")")
+	
 	db := datastore.GetConnection()
 
 	logger.Debug(insert.String())
@@ -49,13 +50,14 @@ func InsertOrgDetailView(data []byte) (string, error) {
 		logger.Error(err)
 		return "", errors.FromError(errors.DB_ERROR, err)
 	}
-	var id string
-	if err := stmt.Get(&id, m); err != nil {
+	
+	if _, err := stmt.Exec(m); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.DB_ERROR, err)
 	} else {
-		return id, nil
+		return "", nil
 	}
+	
 }
 
 func BatchInsertOrgDetailView(data []byte) ([]string, error) {
@@ -104,57 +106,8 @@ func BatchInsertOrgDetailView(data []byte) ([]string, error) {
 	return nil, nil
 }
 
-func UpdateOrgDetailView(id string, data []byte) error {
-	var j map[string]interface{}
-	if err := json.Unmarshal(data, &j); err != nil {
-		logger.Error(err)
-		return errors.FromError(errors.GO_ERROR, err)
-	}
-	var m models.OrgDetailView
-	if err := json.Unmarshal(data, &m); err != nil {
-		logger.Error(err)
-		return errors.FromError(errors.GO_ERROR, err)
-	}
 
-	logger.Debug(m)
 
-	comma := ""
-	fieldMap := models.GetOrgDetailViewFieldMap()
-	update := bytes.NewBufferString("UPDATE org_detail_views SET ")
-	for k, _ := range j {
-		if f, ok := fieldMap[k]; ok {
-			fmt.Fprint(update, comma, f, " = :", f)
-			comma = ", "
-		}
-	}
-	fmt.Fprint(update, " WHERE id = :id")
-
-	logger.Debug(update.String())
-
-	db := datastore.GetConnection()
-	stmt, err := db.PrepareNamed(update.String())
-	if err != nil {
-		logger.Error(err)
-		return errors.FromError(errors.GO_ERROR, err)
-	}
-	
-	_, err = stmt.Exec(m)
-	if err != nil {
-		logger.Error(err)
-		return errors.FromError(errors.GO_ERROR, err)
-	}
-	return nil
-}
-
-func SelectOrgDetailView(id string) (models.OrgDetailView, *errors.SensError) {
-	db := datastore.GetConnection()
-	m := models.OrgDetailView{}
-	if err := db.Get(&m, "SELECT * FROM org_detail_views WHERE id = $1", id); err != nil {
-		logger.Error(err)
-		return m, errors.FromError(errors.DB_ERROR, err)
-	}
-	return m, nil
-}
 
 func FindOrgDetailView(or []string, and []string, span []string, limit string, column string, order string) ([]models.OrgDetailView, *errors.SensError) {
 	ors := datastore.ParseOrParams(or)

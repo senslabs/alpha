@@ -14,8 +14,10 @@ import (
 func DeviceMain(r *mux.Router) {
 	r.HandleFunc("/api/devices/create", CreateDevice)
 	r.HandleFunc("/api/devices/batch/create", BatchCreateDevice)
-	r.HandleFunc("/api/devices/update", UpdateDevice)
-	r.HandleFunc("/api/devices/get/{id}", GetDevice)
+	
+	r.HandleFunc("/api/devices/{id}/update", UpdateDevice)
+	r.HandleFunc("/api/devices/{id}/get", GetDevice)
+	
 	r.HandleFunc("/api/devices/find", FindDevice)
 }
 
@@ -43,6 +45,7 @@ func BatchCreateDevice(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
 func UpdateDevice(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -68,6 +71,7 @@ func GetDevice(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
+
 
 func FindDevice(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

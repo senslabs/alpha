@@ -14,8 +14,10 @@ import (
 func OrgMain(r *mux.Router) {
 	r.HandleFunc("/api/orgs/create", CreateOrg)
 	r.HandleFunc("/api/orgs/batch/create", BatchCreateOrg)
-	r.HandleFunc("/api/orgs/update", UpdateOrg)
-	r.HandleFunc("/api/orgs/get/{id}", GetOrg)
+	
+	r.HandleFunc("/api/orgs/{id}/update", UpdateOrg)
+	r.HandleFunc("/api/orgs/{id}/get", GetOrg)
+	
 	r.HandleFunc("/api/orgs/find", FindOrg)
 }
 
@@ -43,6 +45,7 @@ func BatchCreateOrg(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
 func UpdateOrg(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -68,6 +71,7 @@ func GetOrg(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
+
 
 func FindOrg(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

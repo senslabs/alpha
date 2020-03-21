@@ -39,7 +39,10 @@ func Insert{{.Model}}(data []byte) (string, error) {
 		}
 	}
 	fmt.Fprint(insert, ") ")
-	fmt.Fprint(insert, values, ") returning id")
+	fmt.Fprint(insert, values, ")")
+	{{if .HasId}}
+	fmt.Fprint(insert, " returning id")
+	{{end}}
 	db := datastore.GetConnection()
 
 	logger.Debug(insert.String())
@@ -49,6 +52,7 @@ func Insert{{.Model}}(data []byte) (string, error) {
 		logger.Error(err)
 		return "", errors.FromError(errors.DB_ERROR, err)
 	}
+	{{if .HasId}}
 	var id string
 	if err := stmt.Get(&id, m); err != nil {
 		logger.Error(err)
@@ -56,6 +60,14 @@ func Insert{{.Model}}(data []byte) (string, error) {
 	} else {
 		return id, nil
 	}
+	{{else}}
+	if _, err := stmt.Exec(m); err != nil {
+		logger.Error(err)
+		return "", errors.FromError(errors.DB_ERROR, err)
+	} else {
+		return "", nil
+	}
+	{{end}}
 }
 
 func BatchInsert{{.Model}}(data []byte) ([]string, error) {
@@ -104,6 +116,7 @@ func BatchInsert{{.Model}}(data []byte) ([]string, error) {
 	return nil, nil
 }
 
+{{if .HasId}}
 func Update{{.Model}}(id string, data []byte) error {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
@@ -137,7 +150,8 @@ func Update{{.Model}}(id string, data []byte) error {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
 	}
-	{{.Id}}
+	//{{.Id}}
+	m.Id = id
 	_, err = stmt.Exec(m)
 	if err != nil {
 		logger.Error(err)
@@ -155,6 +169,8 @@ func Select{{.Model}}(id string) (models.{{.Model}}, *errors.SensError) {
 	}
 	return m, nil
 }
+{{end}}
+
 
 func Find{{.Model}}(or []string, and []string, span []string, limit string, column string, order string) ([]models.{{.Model}}, *errors.SensError) {
 	ors := datastore.ParseOrParams(or)

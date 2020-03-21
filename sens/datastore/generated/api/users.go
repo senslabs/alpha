@@ -14,8 +14,10 @@ import (
 func UserMain(r *mux.Router) {
 	r.HandleFunc("/api/users/create", CreateUser)
 	r.HandleFunc("/api/users/batch/create", BatchCreateUser)
-	r.HandleFunc("/api/users/update", UpdateUser)
-	r.HandleFunc("/api/users/get/{id}", GetUser)
+	
+	r.HandleFunc("/api/users/{id}/update", UpdateUser)
+	r.HandleFunc("/api/users/{id}/get", GetUser)
+	
 	r.HandleFunc("/api/users/find", FindUser)
 }
 
@@ -43,6 +45,7 @@ func BatchCreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -68,6 +71,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
+
 
 func FindUser(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

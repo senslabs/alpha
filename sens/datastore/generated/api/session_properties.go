@@ -14,8 +14,7 @@ import (
 func SessionPropertieMain(r *mux.Router) {
 	r.HandleFunc("/api/session-properties/create", CreateSessionPropertie)
 	r.HandleFunc("/api/session-properties/batch/create", BatchCreateSessionPropertie)
-	r.HandleFunc("/api/session-properties/update", UpdateSessionPropertie)
-	r.HandleFunc("/api/session-properties/get/{id}", GetSessionPropertie)
+	
 	r.HandleFunc("/api/session-properties/find", FindSessionPropertie)
 }
 
@@ -43,31 +42,7 @@ func BatchCreateSessionPropertie(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func UpdateSessionPropertie(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateSessionPropertie(id, data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
-}
 
-func GetSessionPropertie(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if m, err := fn.SelectSessionPropertie(id); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
 
 func FindSessionPropertie(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

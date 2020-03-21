@@ -14,8 +14,7 @@ import (
 func OrgDetailViewMain(r *mux.Router) {
 	r.HandleFunc("/api/org-detail-views/create", CreateOrgDetailView)
 	r.HandleFunc("/api/org-detail-views/batch/create", BatchCreateOrgDetailView)
-	r.HandleFunc("/api/org-detail-views/update", UpdateOrgDetailView)
-	r.HandleFunc("/api/org-detail-views/get/{id}", GetOrgDetailView)
+	
 	r.HandleFunc("/api/org-detail-views/find", FindOrgDetailView)
 }
 
@@ -43,31 +42,7 @@ func BatchCreateOrgDetailView(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func UpdateOrgDetailView(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateOrgDetailView(id, data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
-}
 
-func GetOrgDetailView(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if m, err := fn.SelectOrgDetailView(id); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
 
 func FindOrgDetailView(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

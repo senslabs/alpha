@@ -14,8 +14,7 @@ import (
 func OpEndpointMain(r *mux.Router) {
 	r.HandleFunc("/api/op-endpoints/create", CreateOpEndpoint)
 	r.HandleFunc("/api/op-endpoints/batch/create", BatchCreateOpEndpoint)
-	r.HandleFunc("/api/op-endpoints/update", UpdateOpEndpoint)
-	r.HandleFunc("/api/op-endpoints/get/{id}", GetOpEndpoint)
+	
 	r.HandleFunc("/api/op-endpoints/find", FindOpEndpoint)
 }
 
@@ -43,31 +42,7 @@ func BatchCreateOpEndpoint(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func UpdateOpEndpoint(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateOpEndpoint(id, data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
-}
 
-func GetOpEndpoint(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if m, err := fn.SelectOpEndpoint(id); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
 
 func FindOpEndpoint(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

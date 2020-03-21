@@ -14,8 +14,10 @@ import (
 func {{.Model}}Main(r *mux.Router) {
 	r.HandleFunc("/api/{{.Path}}/create", Create{{.Model}})
 	r.HandleFunc("/api/{{.Path}}/batch/create", BatchCreate{{.Model}})
-	r.HandleFunc("/api/{{.Path}}/update", Update{{.Model}})
-	r.HandleFunc("/api/{{.Path}}/get/{id}", Get{{.Model}})
+	{{if .HasId}}
+	r.HandleFunc("/api/{{.Path}}/{id}/update", Update{{.Model}})
+	r.HandleFunc("/api/{{.Path}}/{id}/get", Get{{.Model}})
+	{{end}}
 	r.HandleFunc("/api/{{.Path}}/find", Find{{.Model}})
 }
 
@@ -43,6 +45,7 @@ func BatchCreate{{.Model}}(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+{{if .HasId}}
 func Update{{.Model}}(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -68,6 +71,7 @@ func Get{{.Model}}(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
+{{end}}
 
 func Find{{.Model}}(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

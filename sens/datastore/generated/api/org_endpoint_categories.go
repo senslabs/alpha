@@ -14,8 +14,7 @@ import (
 func OrgEndpointCategorieMain(r *mux.Router) {
 	r.HandleFunc("/api/org-endpoint-categories/create", CreateOrgEndpointCategorie)
 	r.HandleFunc("/api/org-endpoint-categories/batch/create", BatchCreateOrgEndpointCategorie)
-	r.HandleFunc("/api/org-endpoint-categories/update", UpdateOrgEndpointCategorie)
-	r.HandleFunc("/api/org-endpoint-categories/get/{id}", GetOrgEndpointCategorie)
+	
 	r.HandleFunc("/api/org-endpoint-categories/find", FindOrgEndpointCategorie)
 }
 
@@ -43,31 +42,7 @@ func BatchCreateOrgEndpointCategorie(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func UpdateOrgEndpointCategorie(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateOrgEndpointCategorie(id, data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
-}
 
-func GetOrgEndpointCategorie(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if m, err := fn.SelectOrgEndpointCategorie(id); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
 
 func FindOrgEndpointCategorie(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

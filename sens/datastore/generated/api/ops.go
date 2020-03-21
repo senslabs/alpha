@@ -14,8 +14,10 @@ import (
 func OpMain(r *mux.Router) {
 	r.HandleFunc("/api/ops/create", CreateOp)
 	r.HandleFunc("/api/ops/batch/create", BatchCreateOp)
-	r.HandleFunc("/api/ops/update", UpdateOp)
-	r.HandleFunc("/api/ops/get/{id}", GetOp)
+	
+	r.HandleFunc("/api/ops/{id}/update", UpdateOp)
+	r.HandleFunc("/api/ops/{id}/get", GetOp)
+	
 	r.HandleFunc("/api/ops/find", FindOp)
 }
 
@@ -43,6 +45,7 @@ func BatchCreateOp(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
 func UpdateOp(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -68,6 +71,7 @@ func GetOp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
+
 
 func FindOp(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

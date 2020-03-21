@@ -14,8 +14,7 @@ import (
 func SessionEventMain(r *mux.Router) {
 	r.HandleFunc("/api/session-events/create", CreateSessionEvent)
 	r.HandleFunc("/api/session-events/batch/create", BatchCreateSessionEvent)
-	r.HandleFunc("/api/session-events/update", UpdateSessionEvent)
-	r.HandleFunc("/api/session-events/get/{id}", GetSessionEvent)
+	
 	r.HandleFunc("/api/session-events/find", FindSessionEvent)
 }
 
@@ -43,31 +42,7 @@ func BatchCreateSessionEvent(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func UpdateSessionEvent(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateSessionEvent(id, data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
-}
 
-func GetSessionEvent(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if m, err := fn.SelectSessionEvent(id); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
 
 func FindSessionEvent(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

@@ -144,14 +144,14 @@ func GenerateFunction(schema string, mi *ModelInfo) {
 		log.Fatal(err)
 	}
 
-	id := ""
-	if mi.HasId {
-		id = "m.Id = id"
-	}
+	// id := ""
+	// if mi.HasId {
+	// 	id = "m.Id = id"
+	// }
 	err = t.Execute(f, types.Map{
 		"Table": mi.Table,
 		"Model": mi.Model,
-		"Id":    id,
+		"HasId": mi.HasId,
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -180,7 +180,7 @@ func GenerateFunctions(db *sqlx.DB, schema string, mis []*ModelInfo) {
 // 	}
 // }
 
-func GenerateApi(table string, model string) {
+func GenerateApi(table string, model string, hasId bool) {
 	t, err := template.ParseFiles("templates/rest.tpl")
 	if err != nil {
 		log.Fatal(err)
@@ -193,6 +193,7 @@ func GenerateApi(table string, model string) {
 	err = t.Execute(f, types.Map{
 		"Path":  path,
 		"Model": model,
+		"HasId": hasId,
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -228,7 +229,7 @@ func Generate(schema string) {
 	var ms []string
 	for _, mi := range mis {
 		// GenerateDb(m.Model, m.Model)
-		GenerateApi(mi.Table, mi.Model)
+		GenerateApi(mi.Table, mi.Model, mi.HasId)
 		ms = append(ms, mi.Model)
 	}
 	GenerateMain(ms)

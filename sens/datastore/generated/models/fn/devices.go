@@ -39,7 +39,10 @@ func InsertDevice(data []byte) (string, error) {
 		}
 	}
 	fmt.Fprint(insert, ") ")
-	fmt.Fprint(insert, values, ") returning id")
+	fmt.Fprint(insert, values, ")")
+	
+	fmt.Fprint(insert, " returning id")
+	
 	db := datastore.GetConnection()
 
 	logger.Debug(insert.String())
@@ -49,6 +52,7 @@ func InsertDevice(data []byte) (string, error) {
 		logger.Error(err)
 		return "", errors.FromError(errors.DB_ERROR, err)
 	}
+	
 	var id string
 	if err := stmt.Get(&id, m); err != nil {
 		logger.Error(err)
@@ -56,6 +60,7 @@ func InsertDevice(data []byte) (string, error) {
 	} else {
 		return id, nil
 	}
+	
 }
 
 func BatchInsertDevice(data []byte) ([]string, error) {
@@ -104,6 +109,7 @@ func BatchInsertDevice(data []byte) ([]string, error) {
 	return nil, nil
 }
 
+
 func UpdateDevice(id string, data []byte) error {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
@@ -137,6 +143,7 @@ func UpdateDevice(id string, data []byte) error {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
 	}
+	//<no value>
 	m.Id = id
 	_, err = stmt.Exec(m)
 	if err != nil {
@@ -155,6 +162,8 @@ func SelectDevice(id string) (models.Device, *errors.SensError) {
 	}
 	return m, nil
 }
+
+
 
 func FindDevice(or []string, and []string, span []string, limit string, column string, order string) ([]models.Device, *errors.SensError) {
 	ors := datastore.ParseOrParams(or)

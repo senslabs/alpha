@@ -14,8 +14,7 @@ import (
 func OpUserCategorieMain(r *mux.Router) {
 	r.HandleFunc("/api/op-user-categories/create", CreateOpUserCategorie)
 	r.HandleFunc("/api/op-user-categories/batch/create", BatchCreateOpUserCategorie)
-	r.HandleFunc("/api/op-user-categories/update", UpdateOpUserCategorie)
-	r.HandleFunc("/api/op-user-categories/get/{id}", GetOpUserCategorie)
+	
 	r.HandleFunc("/api/op-user-categories/find", FindOpUserCategorie)
 }
 
@@ -43,31 +42,7 @@ func BatchCreateOpUserCategorie(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func UpdateOpUserCategorie(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateOpUserCategorie(id, data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
-}
 
-func GetOpUserCategorie(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if m, err := fn.SelectOpUserCategorie(id); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
 
 func FindOpUserCategorie(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
