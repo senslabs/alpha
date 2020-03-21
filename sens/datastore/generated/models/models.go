@@ -213,3 +213,51 @@ type OrgDetailView struct {
 func GetOrgDetailViewFieldMap() map[string]string {
 	return map[string]string{"AuthId": "auth_id", "Email": "email", "FirstName": "first_name", "LastName": "last_name", "Mobile": "mobile", "OrgId": "org_id", "OrgName": "org_name", "Social": "social"}
 }
+
+type Session struct {
+	Id        string               `db:"id"`
+	UserId    datastore.NullString `db:"user_id"`
+	Name      datastore.NullString `db:"name"`
+	Type      datastore.NullString `db:"type"`
+	StartedAt datastore.NullTime   `db:"started_at"`
+	EndedAt   datastore.NullTime   `db:"ended_at"`
+}
+
+func GetSessionFieldMap() map[string]string {
+	return map[string]string{"EndedAt": "ended_at", "Id": "id", "Name": "name", "StartedAt": "started_at", "Type": "type", "UserId": "user_id"}
+}
+
+type SessionEvent struct {
+	UserId     string               `db:"user_id"`
+	Name       string               `db:"name"`
+	StartedAt  time.Time            `db:"started_at"`
+	EndedAt    datastore.NullTime   `db:"ended_at"`
+	Properties datastore.RawMessage `db:"properties"`
+}
+
+func GetSessionEventFieldMap() map[string]string {
+	return map[string]string{"EndedAt": "ended_at", "Name": "name", "Properties": "properties", "StartedAt": "started_at", "UserId": "user_id"}
+}
+
+type SessionRecord struct {
+	UserId     string               `db:"user_id"`
+	Name       string               `db:"name"`
+	Timestamp  time.Time            `db:"timestamp"`
+	Value      datastore.RawMessage `db:"value"`
+	Properties datastore.RawMessage `db:"properties"`
+}
+
+func GetSessionRecordFieldMap() map[string]string {
+	return map[string]string{"Name": "name", "Properties": "properties", "Timestamp": "timestamp", "UserId": "user_id", "Value": "value"}
+}
+
+type SessionPropertie struct {
+	SessionId datastore.NullString `db:"session_id"`
+	Name      datastore.NullString `db:"name"`
+	Value     datastore.NullString `db:"value"`
+	Rowid     datastore.RawMessage `db:"rowid"`
+}
+
+func GetSessionPropertieFieldMap() map[string]string {
+	return map[string]string{"Name": "name", "Rowid": "rowid", "SessionId": "session_id", "Value": "value"}
+}

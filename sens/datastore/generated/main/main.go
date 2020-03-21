@@ -30,6 +30,10 @@ func main() {
 	api.UserDetailViewMain(r)
 	api.OpDetailViewMain(r)
 	api.OrgDetailViewMain(r)
+	api.SessionMain(r)
+	api.SessionEventMain(r)
+	api.SessionRecordMain(r)
+	api.SessionPropertieMain(r)
 	
 	http.Handle("/", r)
 	http.ListenAndServe(":9804", r)
