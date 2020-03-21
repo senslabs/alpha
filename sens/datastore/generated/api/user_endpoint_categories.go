@@ -11,19 +11,19 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func OrgOpMain(r *mux.Router) {
-	r.HandleFunc("/api/org-ops/create", CreateOrgOp)
-	r.HandleFunc("/api/org-ops/batch/create", BatchCreateOrgOp)
-	r.HandleFunc("/api/org-ops/update", UpdateOrgOp)
-	r.HandleFunc("/api/org-ops/get/{id}", GetOrgOp)
-	r.HandleFunc("/api/org-ops/find", FindOrgOp)
+func UserEndpointCategorieMain(r *mux.Router) {
+	r.HandleFunc("/api/user-endpoint-categories/create", CreateUserEndpointCategorie)
+	r.HandleFunc("/api/user-endpoint-categories/batch/create", BatchCreateUserEndpointCategorie)
+	r.HandleFunc("/api/user-endpoint-categories/update", UpdateUserEndpointCategorie)
+	r.HandleFunc("/api/user-endpoint-categories/get/{id}", GetUserEndpointCategorie)
+	r.HandleFunc("/api/user-endpoint-categories/find", FindUserEndpointCategorie)
 }
 
-func CreateOrgOp(w http.ResponseWriter, r *http.Request) {
+func CreateUserEndpointCategorie(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.InsertOrgOp(data); err != nil {
+	} else if id, err := fn.InsertUserEndpointCategorie(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -31,11 +31,11 @@ func CreateOrgOp(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func BatchCreateOrgOp(w http.ResponseWriter, r *http.Request) {
+func BatchCreateUserEndpointCategorie(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.BatchInsertOrgOp(data); err != nil {
+	} else if id, err := fn.BatchInsertUserEndpointCategorie(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -43,13 +43,13 @@ func BatchCreateOrgOp(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func UpdateOrgOp(w http.ResponseWriter, r *http.Request) {
+func UpdateUserEndpointCategorie(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateOrgOp(id, data); err != nil {
+	} else if err := fn.UpdateUserEndpointCategorie(id, data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -57,10 +57,10 @@ func UpdateOrgOp(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetOrgOp(w http.ResponseWriter, r *http.Request) {
+func GetUserEndpointCategorie(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	if m, err := fn.SelectOrgOp(id); err != nil {
+	if m, err := fn.SelectUserEndpointCategorie(id); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
@@ -69,7 +69,7 @@ func GetOrgOp(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func FindOrgOp(w http.ResponseWriter, r *http.Request) {
+func FindUserEndpointCategorie(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -80,7 +80,7 @@ func FindOrgOp(w http.ResponseWriter, r *http.Request) {
 
 	if limit == "" {
 		http.Error(w, "Query param limit is mandatory", http.StatusBadRequest)
-	} else if ms, err := fn.FindOrgOp(or, and, span, limit, column, order); err != nil {
+	} else if ms, err := fn.FindUserEndpointCategorie(or, and, span, limit, column, order); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {

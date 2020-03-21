@@ -13,13 +13,13 @@ import (
 	"github.com/senslabs/alpha/sens/logger"
 )
 
-func InsertSession(data []byte) (string, error) {
+func InsertOrgEndpointCategorie(data []byte) (string, error) {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.Session
+	var m models.OrgEndpointCategorie
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
@@ -28,8 +28,8 @@ func InsertSession(data []byte) (string, error) {
 	logger.Debug(m)
 
 	comma := ""
-	fieldMap := models.GetSessionFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO sessions(")
+	fieldMap := models.GetOrgEndpointCategorieFieldMap()
+	insert := bytes.NewBufferString("INSERT INTO org_endpoint_categories(")
 	values := bytes.NewBufferString("VALUES(")
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -58,7 +58,7 @@ func InsertSession(data []byte) (string, error) {
 	}
 }
 
-func BatchInsertSession(data []byte) ([]string, error) {
+func BatchInsertOrgEndpointCategorie(data []byte) ([]string, error) {
 	var j []map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
@@ -67,8 +67,8 @@ func BatchInsertSession(data []byte) ([]string, error) {
 
 	comma := ""
 	var keys []string
-	fieldMap := models.GetSessionFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO sessions(")
+	fieldMap := models.GetOrgEndpointCategorieFieldMap()
+	insert := bytes.NewBufferString("INSERT INTO org_endpoint_categories(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
@@ -104,13 +104,13 @@ func BatchInsertSession(data []byte) ([]string, error) {
 	return nil, nil
 }
 
-func UpdateSession(id string, data []byte) error {
+func UpdateOrgEndpointCategorie(id string, data []byte) error {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.Session
+	var m models.OrgEndpointCategorie
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
@@ -119,8 +119,8 @@ func UpdateSession(id string, data []byte) error {
 	logger.Debug(m)
 
 	comma := ""
-	fieldMap := models.GetSessionFieldMap()
-	update := bytes.NewBufferString("UPDATE sessions SET ")
+	fieldMap := models.GetOrgEndpointCategorieFieldMap()
+	update := bytes.NewBufferString("UPDATE org_endpoint_categories SET ")
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(update, comma, f, " = :", f)
@@ -137,7 +137,7 @@ func UpdateSession(id string, data []byte) error {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
 	}
-	m.Id = id
+	
 	_, err = stmt.Exec(m)
 	if err != nil {
 		logger.Error(err)
@@ -146,24 +146,24 @@ func UpdateSession(id string, data []byte) error {
 	return nil
 }
 
-func SelectSession(id string) (models.Session, *errors.SensError) {
+func SelectOrgEndpointCategorie(id string) (models.OrgEndpointCategorie, *errors.SensError) {
 	db := datastore.GetConnection()
-	m := models.Session{}
-	if err := db.Get(&m, "SELECT * FROM sessions WHERE id = $1", id); err != nil {
+	m := models.OrgEndpointCategorie{}
+	if err := db.Get(&m, "SELECT * FROM org_endpoint_categories WHERE id = $1", id); err != nil {
 		logger.Error(err)
 		return m, errors.FromError(errors.DB_ERROR, err)
 	}
 	return m, nil
 }
 
-func FindSession(or []string, and []string, span []string, limit string, column string, order string) ([]models.Session, *errors.SensError) {
+func FindOrgEndpointCategorie(or []string, and []string, span []string, limit string, column string, order string) ([]models.OrgEndpointCategorie, *errors.SensError) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
 
-	fieldMap := models.GetSessionFieldMap()
+	fieldMap := models.GetOrgEndpointCategorieFieldMap()
 	values := make(map[string]interface{})
-	query := bytes.NewBufferString("SELECT * FROM sessions WHERE ")
+	query := bytes.NewBufferString("SELECT * FROM org_endpoint_categories WHERE ")
 	for _, o := range ors {
 		if f, ok := fieldMap[o.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s OR ", f, f))
@@ -195,7 +195,7 @@ func FindSession(or []string, and []string, span []string, limit string, column 
 
 	logger.Debug(query.String())
 	
-	m := []models.Session{}
+	m := []models.OrgEndpointCategorie{}
 	db := datastore.GetConnection()
 	if stmt, err := db.PrepareNamed(query.String()); err != nil {
 		logger.Error(err.Error())

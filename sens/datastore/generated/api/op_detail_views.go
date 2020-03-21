@@ -11,19 +11,19 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func SessionEventMain(r *mux.Router) {
-	r.HandleFunc("/api/session-events/create", CreateSessionEvent)
-	r.HandleFunc("/api/session-events/batch/create", BatchCreateSessionEvent)
-	r.HandleFunc("/api/session-events/update", UpdateSessionEvent)
-	r.HandleFunc("/api/session-events/get/{id}", GetSessionEvent)
-	r.HandleFunc("/api/session-events/find", FindSessionEvent)
+func OpDetailViewMain(r *mux.Router) {
+	r.HandleFunc("/api/op-detail-views/create", CreateOpDetailView)
+	r.HandleFunc("/api/op-detail-views/batch/create", BatchCreateOpDetailView)
+	r.HandleFunc("/api/op-detail-views/update", UpdateOpDetailView)
+	r.HandleFunc("/api/op-detail-views/get/{id}", GetOpDetailView)
+	r.HandleFunc("/api/op-detail-views/find", FindOpDetailView)
 }
 
-func CreateSessionEvent(w http.ResponseWriter, r *http.Request) {
+func CreateOpDetailView(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.InsertSessionEvent(data); err != nil {
+	} else if id, err := fn.InsertOpDetailView(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -31,11 +31,11 @@ func CreateSessionEvent(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func BatchCreateSessionEvent(w http.ResponseWriter, r *http.Request) {
+func BatchCreateOpDetailView(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.BatchInsertSessionEvent(data); err != nil {
+	} else if id, err := fn.BatchInsertOpDetailView(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -43,13 +43,13 @@ func BatchCreateSessionEvent(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func UpdateSessionEvent(w http.ResponseWriter, r *http.Request) {
+func UpdateOpDetailView(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateSessionEvent(id, data); err != nil {
+	} else if err := fn.UpdateOpDetailView(id, data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -57,10 +57,10 @@ func UpdateSessionEvent(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetSessionEvent(w http.ResponseWriter, r *http.Request) {
+func GetOpDetailView(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	if m, err := fn.SelectSessionEvent(id); err != nil {
+	if m, err := fn.SelectOpDetailView(id); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
@@ -69,7 +69,7 @@ func GetSessionEvent(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func FindSessionEvent(w http.ResponseWriter, r *http.Request) {
+func FindOpDetailView(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -80,7 +80,7 @@ func FindSessionEvent(w http.ResponseWriter, r *http.Request) {
 
 	if limit == "" {
 		http.Error(w, "Query param limit is mandatory", http.StatusBadRequest)
-	} else if ms, err := fn.FindSessionEvent(or, and, span, limit, column, order); err != nil {
+	} else if ms, err := fn.FindOpDetailView(or, and, span, limit, column, order); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {

@@ -13,13 +13,13 @@ import (
 	"github.com/senslabs/alpha/sens/logger"
 )
 
-func InsertUserAuth(data []byte) (string, error) {
+func InsertUserDetailView(data []byte) (string, error) {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.UserAuth
+	var m models.UserDetailView
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
@@ -28,8 +28,8 @@ func InsertUserAuth(data []byte) (string, error) {
 	logger.Debug(m)
 
 	comma := ""
-	fieldMap := models.GetUserAuthFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO user_auths(")
+	fieldMap := models.GetUserDetailViewFieldMap()
+	insert := bytes.NewBufferString("INSERT INTO user_detail_views(")
 	values := bytes.NewBufferString("VALUES(")
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -58,7 +58,7 @@ func InsertUserAuth(data []byte) (string, error) {
 	}
 }
 
-func BatchInsertUserAuth(data []byte) ([]string, error) {
+func BatchInsertUserDetailView(data []byte) ([]string, error) {
 	var j []map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
@@ -67,8 +67,8 @@ func BatchInsertUserAuth(data []byte) ([]string, error) {
 
 	comma := ""
 	var keys []string
-	fieldMap := models.GetUserAuthFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO user_auths(")
+	fieldMap := models.GetUserDetailViewFieldMap()
+	insert := bytes.NewBufferString("INSERT INTO user_detail_views(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
@@ -104,13 +104,13 @@ func BatchInsertUserAuth(data []byte) ([]string, error) {
 	return nil, nil
 }
 
-func UpdateUserAuth(id string, data []byte) error {
+func UpdateUserDetailView(id string, data []byte) error {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.UserAuth
+	var m models.UserDetailView
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
@@ -119,8 +119,8 @@ func UpdateUserAuth(id string, data []byte) error {
 	logger.Debug(m)
 
 	comma := ""
-	fieldMap := models.GetUserAuthFieldMap()
-	update := bytes.NewBufferString("UPDATE user_auths SET ")
+	fieldMap := models.GetUserDetailViewFieldMap()
+	update := bytes.NewBufferString("UPDATE user_detail_views SET ")
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(update, comma, f, " = :", f)
@@ -146,24 +146,24 @@ func UpdateUserAuth(id string, data []byte) error {
 	return nil
 }
 
-func SelectUserAuth(id string) (models.UserAuth, *errors.SensError) {
+func SelectUserDetailView(id string) (models.UserDetailView, *errors.SensError) {
 	db := datastore.GetConnection()
-	m := models.UserAuth{}
-	if err := db.Get(&m, "SELECT * FROM user_auths WHERE id = $1", id); err != nil {
+	m := models.UserDetailView{}
+	if err := db.Get(&m, "SELECT * FROM user_detail_views WHERE id = $1", id); err != nil {
 		logger.Error(err)
 		return m, errors.FromError(errors.DB_ERROR, err)
 	}
 	return m, nil
 }
 
-func FindUserAuth(or []string, and []string, span []string, limit string, column string, order string) ([]models.UserAuth, *errors.SensError) {
+func FindUserDetailView(or []string, and []string, span []string, limit string, column string, order string) ([]models.UserDetailView, *errors.SensError) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
 
-	fieldMap := models.GetUserAuthFieldMap()
+	fieldMap := models.GetUserDetailViewFieldMap()
 	values := make(map[string]interface{})
-	query := bytes.NewBufferString("SELECT * FROM user_auths WHERE ")
+	query := bytes.NewBufferString("SELECT * FROM user_detail_views WHERE ")
 	for _, o := range ors {
 		if f, ok := fieldMap[o.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s OR ", f, f))
@@ -195,7 +195,7 @@ func FindUserAuth(or []string, and []string, span []string, limit string, column
 
 	logger.Debug(query.String())
 	
-	m := []models.UserAuth{}
+	m := []models.UserDetailView{}
 	db := datastore.GetConnection()
 	if stmt, err := db.PrepareNamed(query.String()); err != nil {
 		logger.Error(err.Error())

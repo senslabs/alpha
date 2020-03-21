@@ -11,19 +11,19 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func OrgDetailMain(r *mux.Router) {
-	r.HandleFunc("/api/org-details/create", CreateOrgDetail)
-	r.HandleFunc("/api/org-details/batch/create", BatchCreateOrgDetail)
-	r.HandleFunc("/api/org-details/update", UpdateOrgDetail)
-	r.HandleFunc("/api/org-details/get/{id}", GetOrgDetail)
-	r.HandleFunc("/api/org-details/find", FindOrgDetail)
+func OrgEndpointCategorieMain(r *mux.Router) {
+	r.HandleFunc("/api/org-endpoint-categories/create", CreateOrgEndpointCategorie)
+	r.HandleFunc("/api/org-endpoint-categories/batch/create", BatchCreateOrgEndpointCategorie)
+	r.HandleFunc("/api/org-endpoint-categories/update", UpdateOrgEndpointCategorie)
+	r.HandleFunc("/api/org-endpoint-categories/get/{id}", GetOrgEndpointCategorie)
+	r.HandleFunc("/api/org-endpoint-categories/find", FindOrgEndpointCategorie)
 }
 
-func CreateOrgDetail(w http.ResponseWriter, r *http.Request) {
+func CreateOrgEndpointCategorie(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.InsertOrgDetail(data); err != nil {
+	} else if id, err := fn.InsertOrgEndpointCategorie(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -31,11 +31,11 @@ func CreateOrgDetail(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func BatchCreateOrgDetail(w http.ResponseWriter, r *http.Request) {
+func BatchCreateOrgEndpointCategorie(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.BatchInsertOrgDetail(data); err != nil {
+	} else if id, err := fn.BatchInsertOrgEndpointCategorie(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -43,13 +43,13 @@ func BatchCreateOrgDetail(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func UpdateOrgDetail(w http.ResponseWriter, r *http.Request) {
+func UpdateOrgEndpointCategorie(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateOrgDetail(id, data); err != nil {
+	} else if err := fn.UpdateOrgEndpointCategorie(id, data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -57,10 +57,10 @@ func UpdateOrgDetail(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetOrgDetail(w http.ResponseWriter, r *http.Request) {
+func GetOrgEndpointCategorie(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	if m, err := fn.SelectOrgDetail(id); err != nil {
+	if m, err := fn.SelectOrgEndpointCategorie(id); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
@@ -69,7 +69,7 @@ func GetOrgDetail(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func FindOrgDetail(w http.ResponseWriter, r *http.Request) {
+func FindOrgEndpointCategorie(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -80,7 +80,7 @@ func FindOrgDetail(w http.ResponseWriter, r *http.Request) {
 
 	if limit == "" {
 		http.Error(w, "Query param limit is mandatory", http.StatusBadRequest)
-	} else if ms, err := fn.FindOrgDetail(or, and, span, limit, column, order); err != nil {
+	} else if ms, err := fn.FindOrgEndpointCategorie(or, and, span, limit, column, order); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {

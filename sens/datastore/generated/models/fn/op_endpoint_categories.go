@@ -13,13 +13,13 @@ import (
 	"github.com/senslabs/alpha/sens/logger"
 )
 
-func InsertSessionPropertie(data []byte) (string, error) {
+func InsertOpEndpointCategorie(data []byte) (string, error) {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.SessionPropertie
+	var m models.OpEndpointCategorie
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
@@ -28,8 +28,8 @@ func InsertSessionPropertie(data []byte) (string, error) {
 	logger.Debug(m)
 
 	comma := ""
-	fieldMap := models.GetSessionPropertieFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO session_properties(")
+	fieldMap := models.GetOpEndpointCategorieFieldMap()
+	insert := bytes.NewBufferString("INSERT INTO op_endpoint_categories(")
 	values := bytes.NewBufferString("VALUES(")
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -58,7 +58,7 @@ func InsertSessionPropertie(data []byte) (string, error) {
 	}
 }
 
-func BatchInsertSessionPropertie(data []byte) ([]string, error) {
+func BatchInsertOpEndpointCategorie(data []byte) ([]string, error) {
 	var j []map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
@@ -67,8 +67,8 @@ func BatchInsertSessionPropertie(data []byte) ([]string, error) {
 
 	comma := ""
 	var keys []string
-	fieldMap := models.GetSessionPropertieFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO session_properties(")
+	fieldMap := models.GetOpEndpointCategorieFieldMap()
+	insert := bytes.NewBufferString("INSERT INTO op_endpoint_categories(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
@@ -104,13 +104,13 @@ func BatchInsertSessionPropertie(data []byte) ([]string, error) {
 	return nil, nil
 }
 
-func UpdateSessionPropertie(id string, data []byte) error {
+func UpdateOpEndpointCategorie(id string, data []byte) error {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.SessionPropertie
+	var m models.OpEndpointCategorie
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
@@ -119,8 +119,8 @@ func UpdateSessionPropertie(id string, data []byte) error {
 	logger.Debug(m)
 
 	comma := ""
-	fieldMap := models.GetSessionPropertieFieldMap()
-	update := bytes.NewBufferString("UPDATE session_properties SET ")
+	fieldMap := models.GetOpEndpointCategorieFieldMap()
+	update := bytes.NewBufferString("UPDATE op_endpoint_categories SET ")
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(update, comma, f, " = :", f)
@@ -146,24 +146,24 @@ func UpdateSessionPropertie(id string, data []byte) error {
 	return nil
 }
 
-func SelectSessionPropertie(id string) (models.SessionPropertie, *errors.SensError) {
+func SelectOpEndpointCategorie(id string) (models.OpEndpointCategorie, *errors.SensError) {
 	db := datastore.GetConnection()
-	m := models.SessionPropertie{}
-	if err := db.Get(&m, "SELECT * FROM session_properties WHERE id = $1", id); err != nil {
+	m := models.OpEndpointCategorie{}
+	if err := db.Get(&m, "SELECT * FROM op_endpoint_categories WHERE id = $1", id); err != nil {
 		logger.Error(err)
 		return m, errors.FromError(errors.DB_ERROR, err)
 	}
 	return m, nil
 }
 
-func FindSessionPropertie(or []string, and []string, span []string, limit string, column string, order string) ([]models.SessionPropertie, *errors.SensError) {
+func FindOpEndpointCategorie(or []string, and []string, span []string, limit string, column string, order string) ([]models.OpEndpointCategorie, *errors.SensError) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
 
-	fieldMap := models.GetSessionPropertieFieldMap()
+	fieldMap := models.GetOpEndpointCategorieFieldMap()
 	values := make(map[string]interface{})
-	query := bytes.NewBufferString("SELECT * FROM session_properties WHERE ")
+	query := bytes.NewBufferString("SELECT * FROM op_endpoint_categories WHERE ")
 	for _, o := range ors {
 		if f, ok := fieldMap[o.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s OR ", f, f))
@@ -195,7 +195,7 @@ func FindSessionPropertie(or []string, and []string, span []string, limit string
 
 	logger.Debug(query.String())
 	
-	m := []models.SessionPropertie{}
+	m := []models.OpEndpointCategorie{}
 	db := datastore.GetConnection()
 	if stmt, err := db.PrepareNamed(query.String()); err != nil {
 		logger.Error(err.Error())

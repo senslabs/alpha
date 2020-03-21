@@ -1,4 +1,4 @@
-CREATE VIEW org_details as
+CREATE VIEW org_detail_views as
 SELECT
 	a.id as auth_id,
 	a.email,
@@ -7,15 +7,14 @@ SELECT
 	a.first_name,
 	a.last_name,
     --ORGS
-	o.id as org_id
+	o.id as org_id,
+	o.name as org_name
 FROM
 	auths a
-JOIN org_auths oa on
-	oa.auth_id = a.id
-JOIN "orgs" o on
-	o.id = oa.org_id;
+JOIN orgs o on
+	a.id = o.auth_id;
 
-CREATE VIEW op_details as
+CREATE VIEW op_detail_views as
 SELECT
 	a.id as auth_id,
 	a.email,
@@ -27,12 +26,10 @@ SELECT
 	o.id as op_id
 FROM
 	auths a
-JOIN op_auths oa on
-	oa.auth_id = a.id
-JOIN "ops" o on
-	o.id = oa.op_id;
+JOIN ops o on
+	a.id = o.auth_id;
 
-CREATE VIEW user_details as
+CREATE VIEW user_detail_views as
 SELECT
 	a.id as auth_id,
 	a.email,
@@ -44,7 +41,5 @@ SELECT
 	u.id as user_id
 FROM
 	auths a
-JOIN user_auths ua on
-	ua.auth_id = a.id
 JOIN "users" u on
-	u.id = ua.user_id;
+	a.id = u.auth_id;

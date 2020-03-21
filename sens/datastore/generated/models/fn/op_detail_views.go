@@ -13,13 +13,13 @@ import (
 	"github.com/senslabs/alpha/sens/logger"
 )
 
-func InsertSessionRecord(data []byte) (string, error) {
+func InsertOpDetailView(data []byte) (string, error) {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.SessionRecord
+	var m models.OpDetailView
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
@@ -28,8 +28,8 @@ func InsertSessionRecord(data []byte) (string, error) {
 	logger.Debug(m)
 
 	comma := ""
-	fieldMap := models.GetSessionRecordFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO session_records(")
+	fieldMap := models.GetOpDetailViewFieldMap()
+	insert := bytes.NewBufferString("INSERT INTO op_detail_views(")
 	values := bytes.NewBufferString("VALUES(")
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -58,7 +58,7 @@ func InsertSessionRecord(data []byte) (string, error) {
 	}
 }
 
-func BatchInsertSessionRecord(data []byte) ([]string, error) {
+func BatchInsertOpDetailView(data []byte) ([]string, error) {
 	var j []map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
@@ -67,8 +67,8 @@ func BatchInsertSessionRecord(data []byte) ([]string, error) {
 
 	comma := ""
 	var keys []string
-	fieldMap := models.GetSessionRecordFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO session_records(")
+	fieldMap := models.GetOpDetailViewFieldMap()
+	insert := bytes.NewBufferString("INSERT INTO op_detail_views(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
@@ -104,13 +104,13 @@ func BatchInsertSessionRecord(data []byte) ([]string, error) {
 	return nil, nil
 }
 
-func UpdateSessionRecord(id string, data []byte) error {
+func UpdateOpDetailView(id string, data []byte) error {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.SessionRecord
+	var m models.OpDetailView
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
@@ -119,8 +119,8 @@ func UpdateSessionRecord(id string, data []byte) error {
 	logger.Debug(m)
 
 	comma := ""
-	fieldMap := models.GetSessionRecordFieldMap()
-	update := bytes.NewBufferString("UPDATE session_records SET ")
+	fieldMap := models.GetOpDetailViewFieldMap()
+	update := bytes.NewBufferString("UPDATE op_detail_views SET ")
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(update, comma, f, " = :", f)
@@ -146,24 +146,24 @@ func UpdateSessionRecord(id string, data []byte) error {
 	return nil
 }
 
-func SelectSessionRecord(id string) (models.SessionRecord, *errors.SensError) {
+func SelectOpDetailView(id string) (models.OpDetailView, *errors.SensError) {
 	db := datastore.GetConnection()
-	m := models.SessionRecord{}
-	if err := db.Get(&m, "SELECT * FROM session_records WHERE id = $1", id); err != nil {
+	m := models.OpDetailView{}
+	if err := db.Get(&m, "SELECT * FROM op_detail_views WHERE id = $1", id); err != nil {
 		logger.Error(err)
 		return m, errors.FromError(errors.DB_ERROR, err)
 	}
 	return m, nil
 }
 
-func FindSessionRecord(or []string, and []string, span []string, limit string, column string, order string) ([]models.SessionRecord, *errors.SensError) {
+func FindOpDetailView(or []string, and []string, span []string, limit string, column string, order string) ([]models.OpDetailView, *errors.SensError) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
 
-	fieldMap := models.GetSessionRecordFieldMap()
+	fieldMap := models.GetOpDetailViewFieldMap()
 	values := make(map[string]interface{})
-	query := bytes.NewBufferString("SELECT * FROM session_records WHERE ")
+	query := bytes.NewBufferString("SELECT * FROM op_detail_views WHERE ")
 	for _, o := range ors {
 		if f, ok := fieldMap[o.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s OR ", f, f))
@@ -195,7 +195,7 @@ func FindSessionRecord(or []string, and []string, span []string, limit string, c
 
 	logger.Debug(query.String())
 	
-	m := []models.SessionRecord{}
+	m := []models.OpDetailView{}
 	db := datastore.GetConnection()
 	if stmt, err := db.PrepareNamed(query.String()); err != nil {
 		logger.Error(err.Error())

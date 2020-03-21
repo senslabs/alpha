@@ -13,13 +13,13 @@ import (
 	"github.com/senslabs/alpha/sens/logger"
 )
 
-func InsertSessionEvent(data []byte) (string, error) {
+func InsertOrgDetailView(data []byte) (string, error) {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.SessionEvent
+	var m models.OrgDetailView
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
@@ -28,8 +28,8 @@ func InsertSessionEvent(data []byte) (string, error) {
 	logger.Debug(m)
 
 	comma := ""
-	fieldMap := models.GetSessionEventFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO session_events(")
+	fieldMap := models.GetOrgDetailViewFieldMap()
+	insert := bytes.NewBufferString("INSERT INTO org_detail_views(")
 	values := bytes.NewBufferString("VALUES(")
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -43,7 +43,7 @@ func InsertSessionEvent(data []byte) (string, error) {
 	db := datastore.GetConnection()
 
 	logger.Debug(insert.String())
-
+	
 	stmt, err := db.PrepareNamed(insert.String())
 	if err != nil {
 		logger.Error(err)
@@ -58,7 +58,7 @@ func InsertSessionEvent(data []byte) (string, error) {
 	}
 }
 
-func BatchInsertSessionEvent(data []byte) ([]string, error) {
+func BatchInsertOrgDetailView(data []byte) ([]string, error) {
 	var j []map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
@@ -67,8 +67,8 @@ func BatchInsertSessionEvent(data []byte) ([]string, error) {
 
 	comma := ""
 	var keys []string
-	fieldMap := models.GetSessionEventFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO session_events(")
+	fieldMap := models.GetOrgDetailViewFieldMap()
+	insert := bytes.NewBufferString("INSERT INTO org_detail_views(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
@@ -104,13 +104,13 @@ func BatchInsertSessionEvent(data []byte) ([]string, error) {
 	return nil, nil
 }
 
-func UpdateSessionEvent(id string, data []byte) error {
+func UpdateOrgDetailView(id string, data []byte) error {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.SessionEvent
+	var m models.OrgDetailView
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
@@ -119,8 +119,8 @@ func UpdateSessionEvent(id string, data []byte) error {
 	logger.Debug(m)
 
 	comma := ""
-	fieldMap := models.GetSessionEventFieldMap()
-	update := bytes.NewBufferString("UPDATE session_events SET ")
+	fieldMap := models.GetOrgDetailViewFieldMap()
+	update := bytes.NewBufferString("UPDATE org_detail_views SET ")
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(update, comma, f, " = :", f)
@@ -137,7 +137,7 @@ func UpdateSessionEvent(id string, data []byte) error {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
 	}
-
+	
 	_, err = stmt.Exec(m)
 	if err != nil {
 		logger.Error(err)
@@ -146,24 +146,24 @@ func UpdateSessionEvent(id string, data []byte) error {
 	return nil
 }
 
-func SelectSessionEvent(id string) (models.SessionEvent, *errors.SensError) {
+func SelectOrgDetailView(id string) (models.OrgDetailView, *errors.SensError) {
 	db := datastore.GetConnection()
-	m := models.SessionEvent{}
-	if err := db.Get(&m, "SELECT * FROM session_events WHERE id = $1", id); err != nil {
+	m := models.OrgDetailView{}
+	if err := db.Get(&m, "SELECT * FROM org_detail_views WHERE id = $1", id); err != nil {
 		logger.Error(err)
 		return m, errors.FromError(errors.DB_ERROR, err)
 	}
 	return m, nil
 }
 
-func FindSessionEvent(or []string, and []string, span []string, limit string, column string, order string) ([]models.SessionEvent, *errors.SensError) {
+func FindOrgDetailView(or []string, and []string, span []string, limit string, column string, order string) ([]models.OrgDetailView, *errors.SensError) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
 
-	fieldMap := models.GetSessionEventFieldMap()
+	fieldMap := models.GetOrgDetailViewFieldMap()
 	values := make(map[string]interface{})
-	query := bytes.NewBufferString("SELECT * FROM session_events WHERE ")
+	query := bytes.NewBufferString("SELECT * FROM org_detail_views WHERE ")
 	for _, o := range ors {
 		if f, ok := fieldMap[o.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s OR ", f, f))
@@ -194,8 +194,8 @@ func FindSessionEvent(or []string, and []string, span []string, limit string, co
 	fmt.Fprint(query, " LIMIT ", limit)
 
 	logger.Debug(query.String())
-
-	m := []models.SessionEvent{}
+	
+	m := []models.OrgDetailView{}
 	db := datastore.GetConnection()
 	if stmt, err := db.PrepareNamed(query.String()); err != nil {
 		logger.Error(err.Error())

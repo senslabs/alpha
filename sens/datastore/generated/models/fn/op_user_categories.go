@@ -13,13 +13,13 @@ import (
 	"github.com/senslabs/alpha/sens/logger"
 )
 
-func InsertOrgOp(data []byte) (string, error) {
+func InsertOpUserCategorie(data []byte) (string, error) {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.OrgOp
+	var m models.OpUserCategorie
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
@@ -28,8 +28,8 @@ func InsertOrgOp(data []byte) (string, error) {
 	logger.Debug(m)
 
 	comma := ""
-	fieldMap := models.GetOrgOpFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO org_ops(")
+	fieldMap := models.GetOpUserCategorieFieldMap()
+	insert := bytes.NewBufferString("INSERT INTO op_user_categories(")
 	values := bytes.NewBufferString("VALUES(")
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -58,7 +58,7 @@ func InsertOrgOp(data []byte) (string, error) {
 	}
 }
 
-func BatchInsertOrgOp(data []byte) ([]string, error) {
+func BatchInsertOpUserCategorie(data []byte) ([]string, error) {
 	var j []map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
@@ -67,8 +67,8 @@ func BatchInsertOrgOp(data []byte) ([]string, error) {
 
 	comma := ""
 	var keys []string
-	fieldMap := models.GetOrgOpFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO org_ops(")
+	fieldMap := models.GetOpUserCategorieFieldMap()
+	insert := bytes.NewBufferString("INSERT INTO op_user_categories(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
@@ -104,13 +104,13 @@ func BatchInsertOrgOp(data []byte) ([]string, error) {
 	return nil, nil
 }
 
-func UpdateOrgOp(id string, data []byte) error {
+func UpdateOpUserCategorie(id string, data []byte) error {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.OrgOp
+	var m models.OpUserCategorie
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
@@ -119,8 +119,8 @@ func UpdateOrgOp(id string, data []byte) error {
 	logger.Debug(m)
 
 	comma := ""
-	fieldMap := models.GetOrgOpFieldMap()
-	update := bytes.NewBufferString("UPDATE org_ops SET ")
+	fieldMap := models.GetOpUserCategorieFieldMap()
+	update := bytes.NewBufferString("UPDATE op_user_categories SET ")
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(update, comma, f, " = :", f)
@@ -146,24 +146,24 @@ func UpdateOrgOp(id string, data []byte) error {
 	return nil
 }
 
-func SelectOrgOp(id string) (models.OrgOp, *errors.SensError) {
+func SelectOpUserCategorie(id string) (models.OpUserCategorie, *errors.SensError) {
 	db := datastore.GetConnection()
-	m := models.OrgOp{}
-	if err := db.Get(&m, "SELECT * FROM org_ops WHERE id = $1", id); err != nil {
+	m := models.OpUserCategorie{}
+	if err := db.Get(&m, "SELECT * FROM op_user_categories WHERE id = $1", id); err != nil {
 		logger.Error(err)
 		return m, errors.FromError(errors.DB_ERROR, err)
 	}
 	return m, nil
 }
 
-func FindOrgOp(or []string, and []string, span []string, limit string, column string, order string) ([]models.OrgOp, *errors.SensError) {
+func FindOpUserCategorie(or []string, and []string, span []string, limit string, column string, order string) ([]models.OpUserCategorie, *errors.SensError) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
 
-	fieldMap := models.GetOrgOpFieldMap()
+	fieldMap := models.GetOpUserCategorieFieldMap()
 	values := make(map[string]interface{})
-	query := bytes.NewBufferString("SELECT * FROM org_ops WHERE ")
+	query := bytes.NewBufferString("SELECT * FROM op_user_categories WHERE ")
 	for _, o := range ors {
 		if f, ok := fieldMap[o.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s OR ", f, f))
@@ -195,7 +195,7 @@ func FindOrgOp(or []string, and []string, span []string, limit string, column st
 
 	logger.Debug(query.String())
 	
-	m := []models.OrgOp{}
+	m := []models.OpUserCategorie{}
 	db := datastore.GetConnection()
 	if stmt, err := db.PrepareNamed(query.String()); err != nil {
 		logger.Error(err.Error())

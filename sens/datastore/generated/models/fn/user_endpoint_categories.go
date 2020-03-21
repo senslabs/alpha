@@ -13,13 +13,13 @@ import (
 	"github.com/senslabs/alpha/sens/logger"
 )
 
-func InsertOrgAuth(data []byte) (string, error) {
+func InsertUserEndpointCategorie(data []byte) (string, error) {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.OrgAuth
+	var m models.UserEndpointCategorie
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
@@ -28,8 +28,8 @@ func InsertOrgAuth(data []byte) (string, error) {
 	logger.Debug(m)
 
 	comma := ""
-	fieldMap := models.GetOrgAuthFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO org_auths(")
+	fieldMap := models.GetUserEndpointCategorieFieldMap()
+	insert := bytes.NewBufferString("INSERT INTO user_endpoint_categories(")
 	values := bytes.NewBufferString("VALUES(")
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -58,7 +58,7 @@ func InsertOrgAuth(data []byte) (string, error) {
 	}
 }
 
-func BatchInsertOrgAuth(data []byte) ([]string, error) {
+func BatchInsertUserEndpointCategorie(data []byte) ([]string, error) {
 	var j []map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
@@ -67,8 +67,8 @@ func BatchInsertOrgAuth(data []byte) ([]string, error) {
 
 	comma := ""
 	var keys []string
-	fieldMap := models.GetOrgAuthFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO org_auths(")
+	fieldMap := models.GetUserEndpointCategorieFieldMap()
+	insert := bytes.NewBufferString("INSERT INTO user_endpoint_categories(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
@@ -104,13 +104,13 @@ func BatchInsertOrgAuth(data []byte) ([]string, error) {
 	return nil, nil
 }
 
-func UpdateOrgAuth(id string, data []byte) error {
+func UpdateUserEndpointCategorie(id string, data []byte) error {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.OrgAuth
+	var m models.UserEndpointCategorie
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
@@ -119,8 +119,8 @@ func UpdateOrgAuth(id string, data []byte) error {
 	logger.Debug(m)
 
 	comma := ""
-	fieldMap := models.GetOrgAuthFieldMap()
-	update := bytes.NewBufferString("UPDATE org_auths SET ")
+	fieldMap := models.GetUserEndpointCategorieFieldMap()
+	update := bytes.NewBufferString("UPDATE user_endpoint_categories SET ")
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(update, comma, f, " = :", f)
@@ -146,24 +146,24 @@ func UpdateOrgAuth(id string, data []byte) error {
 	return nil
 }
 
-func SelectOrgAuth(id string) (models.OrgAuth, *errors.SensError) {
+func SelectUserEndpointCategorie(id string) (models.UserEndpointCategorie, *errors.SensError) {
 	db := datastore.GetConnection()
-	m := models.OrgAuth{}
-	if err := db.Get(&m, "SELECT * FROM org_auths WHERE id = $1", id); err != nil {
+	m := models.UserEndpointCategorie{}
+	if err := db.Get(&m, "SELECT * FROM user_endpoint_categories WHERE id = $1", id); err != nil {
 		logger.Error(err)
 		return m, errors.FromError(errors.DB_ERROR, err)
 	}
 	return m, nil
 }
 
-func FindOrgAuth(or []string, and []string, span []string, limit string, column string, order string) ([]models.OrgAuth, *errors.SensError) {
+func FindUserEndpointCategorie(or []string, and []string, span []string, limit string, column string, order string) ([]models.UserEndpointCategorie, *errors.SensError) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
 
-	fieldMap := models.GetOrgAuthFieldMap()
+	fieldMap := models.GetUserEndpointCategorieFieldMap()
 	values := make(map[string]interface{})
-	query := bytes.NewBufferString("SELECT * FROM org_auths WHERE ")
+	query := bytes.NewBufferString("SELECT * FROM user_endpoint_categories WHERE ")
 	for _, o := range ors {
 		if f, ok := fieldMap[o.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s OR ", f, f))
@@ -195,7 +195,7 @@ func FindOrgAuth(or []string, and []string, span []string, limit string, column 
 
 	logger.Debug(query.String())
 	
-	m := []models.OrgAuth{}
+	m := []models.UserEndpointCategorie{}
 	db := datastore.GetConnection()
 	if stmt, err := db.PrepareNamed(query.String()); err != nil {
 		logger.Error(err.Error())
