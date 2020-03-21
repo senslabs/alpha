@@ -1,9 +1,14 @@
 package logger
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"runtime"
+	"strconv"
+	"time"
+
+	"github.com/fluent/fluent-logger-golang/fluent"
 )
 
 type Logger interface {
@@ -15,7 +20,10 @@ type Logger interface {
 
 type ConsoleLogger struct{}
 type FileLogger struct{}
-type FluentLogger struct{}
+type FluentLogger struct {
+	Logger *fluent.Fluent
+	Tag    string
+}
 
 var l Logger
 
@@ -40,8 +48,19 @@ func InitFileLogger(name string) {
 	l = &FileLogger{}
 }
 
-func InitFluentLogger() {
-	l = &FluentLogger{}
+func InitFluentLogger(name string) {
+	fL, err := fluent.New(fluent.Config{
+		FluentHost: os.Getenv("FLUENTD_HOST"),
+		FluentPort: 24224,
+		RequestAck: true,
+		RetryWait:  32,
+		MaxRetry:   3,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	l = &FluentLogger{Logger: fL, Tag: name}
 }
 
 // -- INIT ENDS HERE -- //
@@ -79,15 +98,58 @@ func (this *FileLogger) Debugf(format string, v ...interface{}) {
 }
 
 func (this *FluentLogger) Error(v ...interface{}) {
+	logLevel := "ERROR"
+	logMessage := fmt.Sprint(v...)
+	fluentMessage := createFluentMessage(logLevel, logMessage)
+	err := this.Logger.PostWithTime(this.Tag, time.Now(), fluentMessage)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func (this *FluentLogger) Debug(v ...interface{}) {
+	logLevel := "DEBUG"
+	logMessage := fmt.Sprint(v...)
+	fluentMessage := createFluentMessage(logLevel, logMessage)
+	err := this.Logger.PostWithTime(this.Tag, time.Now(), fluentMessage)
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+func createFluentMessage(level string, message string) map[string]string {
+	fluentMessage := make(map[string]string, 0)
+	pc, file, line, ok := runtime.Caller(3)
+	if ok {
+		fluentMessage = map[string]string{
+			"level":    level,
+			"file":     file,
+			"line":     strconv.Itoa(line),
+			"function": runtime.FuncForPC(pc).Name(),
+		}
+	}
+	fluentMessage["message"] = message
+	return fluentMessage
 }
 
 func (this *FluentLogger) Errorf(format string, v ...interface{}) {
+	logLevel := "ERROR"
+	logMessage := fmt.Sprintf(format, v...)
+	fluentMessage := createFluentMessage(logLevel, logMessage)
+	err := this.Logger.PostWithTime(this.Tag, time.Now(), fluentMessage)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func (this *FluentLogger) Debugf(format string, v ...interface{}) {
+	logLevel := "DEBUG"
+	logMessage := fmt.Sprintf(format, v...)
+	fluentMessage := createFluentMessage(logLevel, logMessage)
+	err := this.Logger.PostWithTime(this.Tag, time.Now(), fluentMessage)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func LogMeta(level string) {
@@ -102,7 +164,7 @@ func InitLogger(arg interface{}) {
 	if logStore == "file" {
 		InitFileLogger(arg.(string))
 	} else if logStore == "fluentd" {
-		//Prabhu
+		InitFluentLogger(arg.(string))
 	} else {
 		InitConsoleLogger()
 	}
