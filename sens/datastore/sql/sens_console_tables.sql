@@ -147,5 +147,3 @@ ALTER TABLE "user_endpoint_categories" ADD FOREIGN KEY ("user_id") REFERENCES "u
 ALTER TABLE "user_endpoints" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
 ALTER TABLE "user_endpoints" ADD FOREIGN KEY ("endpoint_id") REFERENCES "endpoints" ("id");
-
-CREATE UNIQUE INDEX ON "endpoints" ("category", "path");

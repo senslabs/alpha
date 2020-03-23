@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/nats-io/nats.go"
 	stan "github.com/nats-io/stan.go"
@@ -24,7 +25,7 @@ func GetConnection(clusterId string, clientId string) (stan.Conn, error) {
 //Force a connection. This can be used if cached connection is closed
 func forceConnection(clusterId string, clientId string) (stan.Conn, error) {
 	natsHost := os.Getenv("NATS_HOST")
-	if nc, err := nats.Connect(fmt.Sprintf("nats://%s:4222", natsHost)); err != nil {
+	if nc, err := nats.Connect(fmt.Sprintf("nats://%s:4222", natsHost), nats.Timeout(30*time.Second)); err != nil {
 		logger.Error(err)
 		return nil, errors.FromError(errors.GO_ERROR, err)
 	} else if sc, err = stan.Connect(clusterId, clientId, stan.NatsConn(nc)); err != nil {
