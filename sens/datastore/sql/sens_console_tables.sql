@@ -41,7 +41,7 @@ CREATE TABLE "endpoints" (
 );
 
 CREATE TABLE "devices" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "device_id" uuid,
   "name" text,
   "org_id" uuid,

@@ -201,11 +201,12 @@ func Find{{.Model}}(or []string, and []string, span []string, limit string, colu
 		}
 	}
 	fmt.Fprint(query, "1 = 1)")
-	if column != "" {
+	if column != "" && f, ok := fieldMap[column]; ok {
 		if order == "" {
 			order = "DESC"
 		}
-		fmt.Fprint(query, " ORDER BY ", column, " ", order)
+		fmt.Fprint(query, " ORDER BY :", f, " ", order)
+		values[column] = f
 	}
 	fmt.Fprint(query, " LIMIT ", limit)
 

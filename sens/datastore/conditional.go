@@ -21,7 +21,7 @@ type Span struct {
 func ParseOrParams(ors []string) []Or {
 	var result []Or
 	for _, or := range ors {
-		tokens := strings.Split(or, ":")
+		tokens := strings.Split(or, "^")
 		if len(tokens) != 2 {
 			continue
 		}
@@ -33,7 +33,7 @@ func ParseOrParams(ors []string) []Or {
 func ParseAndParams(ands []string) []And {
 	var result []And
 	for _, and := range ands {
-		tokens := strings.Split(and, ":")
+		tokens := strings.Split(and, "^")
 		if len(tokens) != 2 {
 			continue
 		}
@@ -45,7 +45,7 @@ func ParseAndParams(ands []string) []And {
 func ParseSpanParams(spans []string) []Span {
 	var result []Span
 	for _, span := range spans {
-		tokens := strings.Split(span, ":")
+		tokens := strings.Split(span, "^")
 		if len(tokens) != 3 {
 			continue
 		}
