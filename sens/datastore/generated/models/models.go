@@ -243,7 +243,7 @@ type SessionRecord struct {
 	UserId     string               `db:"user_id"`
 	Name       string               `db:"name"`
 	Timestamp  time.Time            `db:"timestamp"`
-	Value      datastore.RawMessage `db:"value"`
+	Value      float64              `db:"value"`
 	Properties datastore.RawMessage `db:"properties"`
 }
 

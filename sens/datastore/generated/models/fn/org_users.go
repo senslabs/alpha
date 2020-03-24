@@ -139,10 +139,13 @@ func FindOrgUser(or []string, and []string, span []string, limit string, column 
 	}
 	fmt.Fprint(query, "1 = 1)")
 	if column != "" {
-		if order == "" {
-			order = "DESC"
+		if f, ok := fieldMap[column]; ok {
+			if order == "" {
+				order = "DESC"
+			}
+			fmt.Fprint(query, " ORDER BY :", f, " ", order)
+			values[column] = f
 		}
-		fmt.Fprint(query, " ORDER BY ", column, " ", order)
 	}
 	fmt.Fprint(query, " LIMIT ", limit)
 
