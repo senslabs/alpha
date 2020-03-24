@@ -1,8 +1,8 @@
 CREATE TABLE "auths" (
   "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
-  "email" text UNIQUE NOT NULL,
+  "email" text UNIQUE,
   "mobile" text UNIQUE NOT NULL,
-  "social" text UNIQUE NOT NULL,
+  "social" text UNIQUE,
   "first_name" text,
   "last_name" text,
   "created_at" timestamp,
@@ -49,6 +49,12 @@ CREATE TABLE "devices" (
   "created_at" timestamp DEFAULT (now()),
   "status" text,
   "properties" jsonb
+);
+
+CREATE TABLE "org_ops" (
+  "org_id" uuid,
+  "op_id" uuid,
+  PRIMARY KEY ("org_id", "op_id")
 );
 
 CREATE TABLE "org_users" (
@@ -119,6 +125,10 @@ ALTER TABLE "users" ADD FOREIGN KEY ("auth_id") REFERENCES "auths" ("id");
 ALTER TABLE "devices" ADD FOREIGN KEY ("org_id") REFERENCES "orgs" ("id");
 
 ALTER TABLE "devices" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+
+ALTER TABLE "org_ops" ADD FOREIGN KEY ("org_id") REFERENCES "orgs" ("id");
+
+ALTER TABLE "org_ops" ADD FOREIGN KEY ("op_id") REFERENCES "ops" ("id");
 
 ALTER TABLE "org_users" ADD FOREIGN KEY ("org_id") REFERENCES "orgs" ("id");
 

@@ -34,7 +34,8 @@ func main() {
 	api.SessionEventMain(r)
 	api.SessionRecordMain(r)
 	api.SessionPropertieMain(r)
-
+	api.OrgOpMain(r)
+	
 	http.Handle("/", r)
 	http.ListenAndServe(":9804", r)
 }

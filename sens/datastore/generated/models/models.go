@@ -261,3 +261,12 @@ type SessionPropertie struct {
 func GetSessionPropertieFieldMap() map[string]string {
 	return map[string]string{"Name": "name", "Rowid": "rowid", "SessionId": "session_id", "Value": "value"}
 }
+
+type OrgOp struct {
+	OrgId string `db:"org_id"`
+	OpId  string `db:"op_id"`
+}
+
+func GetOrgOpFieldMap() map[string]string {
+	return map[string]string{"OpId": "op_id", "OrgId": "org_id"}
+}
