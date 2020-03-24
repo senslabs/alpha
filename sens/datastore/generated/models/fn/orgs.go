@@ -96,7 +96,7 @@ func BatchInsertOrg(data []byte) ([]string, error) {
 		fmt.Fprint(ph, "), (")
 	}
 
-	fmt.Fprint(insert, strings.TrimRight(ph.String(), ", ("), " returning id")
+	fmt.Fprint(insert, strings.TrimRight(ph.String(), ", ("))
 
 	logger.Debug(insert.String())
 
