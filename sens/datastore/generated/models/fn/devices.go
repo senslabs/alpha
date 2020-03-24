@@ -40,19 +40,19 @@ func InsertDevice(data []byte) (string, error) {
 	}
 	fmt.Fprint(insert, ") ")
 	fmt.Fprint(insert, values, ")")
-	
+
 	fmt.Fprint(insert, " returning id")
-	
+
 	db := datastore.GetConnection()
 
 	logger.Debug(insert.String())
-	
+
 	stmt, err := db.PrepareNamed(insert.String())
 	if err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.DB_ERROR, err)
 	}
-	
+
 	var id string
 	if err := stmt.Get(&id, m); err != nil {
 		logger.Error(err)
@@ -60,7 +60,7 @@ func InsertDevice(data []byte) (string, error) {
 	} else {
 		return id, nil
 	}
-	
+
 }
 
 func BatchInsertDevice(data []byte) ([]string, error) {
@@ -108,7 +108,6 @@ func BatchInsertDevice(data []byte) ([]string, error) {
 	}
 	return nil, nil
 }
-
 
 func UpdateDevice(id string, data []byte) error {
 	var j map[string]interface{}
@@ -163,8 +162,6 @@ func SelectDevice(id string) (models.Device, *errors.SensError) {
 	return m, nil
 }
 
-
-
 func FindDevice(or []string, and []string, span []string, limit string, column string, order string) ([]models.Device, *errors.SensError) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
@@ -188,7 +185,7 @@ func FindDevice(or []string, and []string, span []string, limit string, column s
 	}
 	for _, s := range spans {
 		if f, ok := fieldMap[s.Column]; ok {
-			fmt.Fprint(query, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
+			fmt.Fprint(query, fmt.Sprintf("%s >= :from_%s::timestamp AND %s <= :to_%s::timestamp AND ", f, f, f, f))
 			values["from_"+f] = s.From
 			values["to_"+f] = s.To
 		}
@@ -203,7 +200,7 @@ func FindDevice(or []string, and []string, span []string, limit string, column s
 	fmt.Fprint(query, " LIMIT ", limit)
 
 	logger.Debug(query.String())
-	
+
 	m := []models.Device{}
 	db := datastore.GetConnection()
 	if stmt, err := db.PrepareNamed(query.String()); err != nil {
