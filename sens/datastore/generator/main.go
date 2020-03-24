@@ -64,6 +64,8 @@ func GetFieldType(field FieldInfo) string {
 		return "time.Time"
 	case "BOOL":
 		return "bool"
+	case "FLOAT8":
+		return "float64"
 	default:
 		return "datastore.RawMessage"
 	}

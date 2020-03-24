@@ -24,7 +24,7 @@ curl -v -H 'Content-Type: application/json' -d '{"Path":"/api/org-users/find?lim
 # org_ops
 curl -v -H 'Content-Type: application/json' -d '{"Path":"/api/org-ops/create", "Method": "POST", "Body": {"OrgId": "9f87818f-e3d8-4afe-a1af-deecb87dc4ea", "OpId": "16803204-9051-4d91-b0c4-ed598a664198", "Social": "FB"}}' http://35.238.76.35/test/ds
 curl -v -H 'Content-Type: application/json' -d '{"Path":"/api/org-ops/find?limit=100", "Method":"GET"}' http://35.238.76.35/test/ds
-curl -v -H 'Content-Type: application/json' -d '{"Path":"/api/endpoints/find?limit=100&and=Category:MQ-TEST", "Method":"GET"}' http://35.238.76.35/test/ds
+curl -v -H 'Content-Type: application/json' -d '{"Path":"/api/endpoints/find?limit=100&and=Category:MQ-TEST-39", "Method":"GET"}' http://35.238.76.35/test/ds
 
 #user_endpoints
 curl -v -H 'Content-Type: application/json' -d '{"Path":"/api/user-endpoints/create", "Method": "POST", "Body": {"UserId": "853b1233-12dc-4e02-8a34-6be65994db79", "EndpointId": "3db58d1c-3f48-47c7-b5df-a01d88e0dbae", "Access": true}}' http://35.238.76.35/test/ds
