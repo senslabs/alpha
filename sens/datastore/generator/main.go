@@ -89,11 +89,13 @@ func GenerateModel(db *sqlx.DB, schema string, mi *ModelInfo) string {
 	fields := GetTableFields(db, schema, *mi)
 	members := []string{}
 	fieldMap := map[string]string{}
+	typeMap := map[string]string{}
 	for _, f := range fields {
 		mi.HasId = mi.HasId || f.TableField == "id"
 		member := fmt.Sprintf("%s %s `db:\"%s\"`", f.ModelField, f.Type, f.TableField)
 		members = append(members, member)
 		fieldMap[f.ModelField] = f.TableField
+		typeMap[f.ModelField] = f.Type
 	}
 	st := fmt.Sprintf(`type %s struct {
 		%s
@@ -104,10 +106,18 @@ func GenerateModel(db *sqlx.DB, schema string, mi *ModelInfo) string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return st + fmt.Sprintf(`func Get%sFieldMap() map[string]string {
+	tm, err := json.Marshal(typeMap)
+	if err != nil {
+		log.Fatal(err)
+	}
+	st = st + fmt.Sprintf(`func Get%sFieldMap() map[string]string {
 		return map[string]string%s
 		}
 		`, mi.Model, fm)
+	return st + fmt.Sprintf(`func Get%sTypeMap() map[string]string {
+		return map[string]string%s
+		}
+		`, mi.Model, tm)
 }
 
 //Generate for all tables
@@ -146,10 +156,6 @@ func GenerateFunction(schema string, mi *ModelInfo) {
 		log.Fatal(err)
 	}
 
-	// id := ""
-	// if mi.HasId {
-	// 	id = "m.Id = id"
-	// }
 	err = t.Execute(f, types.Map{
 		"Table": mi.Table,
 		"Model": mi.Model,

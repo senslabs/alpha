@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/senslabs/alpha/sens/datastore"
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
@@ -164,6 +166,17 @@ func SelectDevice(id string) (models.Device, *errors.SensError) {
 }
 
 
+func getDeviceFieldValue(c string, v interface{}) interface{} {
+	typeMap := models.GetDeviceTypeMap()
+	if typeMap[c] == "datastore.NullTime" || typeMap[c] == "TIMESTAMP" {
+		if val, err := strconv.ParseInt(v.(string), 10, 64); err != nil {
+			logger.Error(err)
+		} else {
+			return time.Unix(val, 0)
+		}
+	}
+	return v
+}
 
 func FindDevice(or []string, and []string, span []string, limit string, column string, order string) ([]models.Device, *errors.SensError) {
 	ors := datastore.ParseOrParams(or)
@@ -176,21 +189,21 @@ func FindDevice(or []string, and []string, span []string, limit string, column s
 	for _, o := range ors {
 		if f, ok := fieldMap[o.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s OR ", f, f))
-			values[f] = o.Value
+			values[f] = getDeviceFieldValue(o.Column, o.Value)
 		}
 	}
 	fmt.Fprint(query, "(")
 	for _, a := range ands {
 		if f, ok := fieldMap[a.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s AND ", f, f))
-			values[f] = a.Value
+			values[f] = getDeviceFieldValue(a.Column, a.Value)
 		}
 	}
 	for _, s := range spans {
 		if f, ok := fieldMap[s.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
-			values["from_"+f] = s.From
-			values["to_"+f] = s.To
+			values["from_"+f] = getDeviceFieldValue(s.Column, s.From)
+			values["to_"+f] = getDeviceFieldValue(s.Column, s.To)
 		}
 	}
 	fmt.Fprint(query, "1 = 1)")

@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/senslabs/alpha/sens/datastore"
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
@@ -108,6 +110,17 @@ func BatchInsertOpUser(data []byte) ([]string, error) {
 
 
 
+func getOpUserFieldValue(c string, v interface{}) interface{} {
+	typeMap := models.GetOpUserTypeMap()
+	if typeMap[c] == "datastore.NullTime" || typeMap[c] == "TIMESTAMP" {
+		if val, err := strconv.ParseInt(v.(string), 10, 64); err != nil {
+			logger.Error(err)
+		} else {
+			return time.Unix(val, 0)
+		}
+	}
+	return v
+}
 
 func FindOpUser(or []string, and []string, span []string, limit string, column string, order string) ([]models.OpUser, *errors.SensError) {
 	ors := datastore.ParseOrParams(or)
@@ -120,21 +133,21 @@ func FindOpUser(or []string, and []string, span []string, limit string, column s
 	for _, o := range ors {
 		if f, ok := fieldMap[o.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s OR ", f, f))
-			values[f] = o.Value
+			values[f] = getOpUserFieldValue(o.Column, o.Value)
 		}
 	}
 	fmt.Fprint(query, "(")
 	for _, a := range ands {
 		if f, ok := fieldMap[a.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s AND ", f, f))
-			values[f] = a.Value
+			values[f] = getOpUserFieldValue(a.Column, a.Value)
 		}
 	}
 	for _, s := range spans {
 		if f, ok := fieldMap[s.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
-			values["from_"+f] = s.From
-			values["to_"+f] = s.To
+			values["from_"+f] = getOpUserFieldValue(s.Column, s.From)
+			values["to_"+f] = getOpUserFieldValue(s.Column, s.To)
 		}
 	}
 	fmt.Fprint(query, "1 = 1)")
