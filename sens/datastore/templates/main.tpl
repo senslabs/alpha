@@ -10,7 +10,7 @@ import (
 
 func main() {
 	r := mux.NewRouter()
-	logger.InitLogger("")
+	logger.InitLogger("sens.datastore")
 
 	{{range .Models}}api.{{.}}Main(r)
 	{{end}}

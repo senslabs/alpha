@@ -11,7 +11,7 @@ import (
 
 func TestPublish(t *testing.T) {
 	log.SetFlags(log.Lshortfile)
-	os.Setenv("NATS_HOST", "34.69.12.175")
+	os.Setenv("NATS_HOST", "35.226.216.211")
 	message := map[string]interface{}{
 		"Path":    "/api/endpoints/create",
 		"Body":    map[string]interface{}{"Category": "Console", "Path": "/api/groups/create", "Secure": false, "NextEndpoint": "localhost:8000"},

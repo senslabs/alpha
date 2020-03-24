@@ -10,7 +10,7 @@ import (
 
 func main() {
 	r := mux.NewRouter()
-	logger.InitLogger("")
+	logger.InitLogger("sens.datastore")
 
 	api.AuthMain(r)
 	api.OrgMain(r)
@@ -34,7 +34,7 @@ func main() {
 	api.SessionEventMain(r)
 	api.SessionRecordMain(r)
 	api.SessionPropertieMain(r)
-	
+
 	http.Handle("/", r)
 	http.ListenAndServe(":9804", r)
 }
