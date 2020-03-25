@@ -14,10 +14,10 @@ import (
 func SessionMain(r *mux.Router) {
 	r.HandleFunc("/api/sessions/create", CreateSession)
 	r.HandleFunc("/api/sessions/batch/create", BatchCreateSession)
-	
+
 	r.HandleFunc("/api/sessions/{id}/update", UpdateSession)
 	r.HandleFunc("/api/sessions/{id}/get", GetSession)
-	
+
 	r.HandleFunc("/api/sessions/find", FindSession)
 }
 
@@ -45,7 +45,6 @@ func BatchCreateSession(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 func UpdateSession(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -71,7 +70,6 @@ func GetSession(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
-
 
 func FindSession(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
