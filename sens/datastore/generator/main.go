@@ -62,6 +62,11 @@ func GetFieldType(field FieldInfo) string {
 			return "datastore.NullTime"
 		}
 		return "time.Time"
+	case "INT8":
+		if field.IsNullable == "YES" {
+			return "datastore.NullInt64"
+		}
+		return "int64"
 	case "BOOL":
 		return "bool"
 	case "FLOAT8":

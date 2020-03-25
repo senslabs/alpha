@@ -10,42 +10,42 @@ var t time.Time
 
 type Auth struct {
 	Id        string               `db:"id"`
-	Email     string               `db:"email"`
+	Email     datastore.NullString `db:"email"`
 	Mobile    string               `db:"mobile"`
-	Social    string               `db:"social"`
-	FirstName datastore.NullString `db:"first_name"`
-	LastName  datastore.NullString `db:"last_name"`
-	CreatedAt datastore.NullTime   `db:"created_at"`
-	UpdatedAt datastore.NullTime   `db:"updated_at"`
+	Social    datastore.NullString `db:"social"`
+	FirstName string               `db:"first_name"`
+	LastName  string               `db:"last_name"`
+	CreatedAt datastore.NullInt64  `db:"created_at"`
+	UpdatedAt datastore.NullInt64  `db:"updated_at"`
 }
 
 func GetAuthFieldMap() map[string]string {
 	return map[string]string{"CreatedAt": "created_at", "Email": "email", "FirstName": "first_name", "Id": "id", "LastName": "last_name", "Mobile": "mobile", "Social": "social", "UpdatedAt": "updated_at"}
 }
 func GetAuthTypeMap() map[string]string {
-	return map[string]string{"CreatedAt": "datastore.NullTime", "Email": "string", "FirstName": "datastore.NullString", "Id": "string", "LastName": "datastore.NullString", "Mobile": "string", "Social": "string", "UpdatedAt": "datastore.NullTime"}
+	return map[string]string{"CreatedAt": "datastore.NullInt64", "Email": "datastore.NullString", "FirstName": "string", "Id": "string", "LastName": "string", "Mobile": "string", "Social": "datastore.NullString", "UpdatedAt": "datastore.NullInt64"}
 }
 
 type Org struct {
 	Id        string               `db:"id"`
 	AuthId    datastore.NullString `db:"auth_id"`
-	Name      datastore.NullString `db:"name"`
-	CreatedAt datastore.NullTime   `db:"created_at"`
-	UpdatedAt datastore.NullTime   `db:"updated_at"`
+	Name      string               `db:"name"`
+	CreatedAt datastore.NullInt64  `db:"created_at"`
+	UpdatedAt datastore.NullInt64  `db:"updated_at"`
 }
 
 func GetOrgFieldMap() map[string]string {
 	return map[string]string{"AuthId": "auth_id", "CreatedAt": "created_at", "Id": "id", "Name": "name", "UpdatedAt": "updated_at"}
 }
 func GetOrgTypeMap() map[string]string {
-	return map[string]string{"AuthId": "datastore.NullString", "CreatedAt": "datastore.NullTime", "Id": "string", "Name": "datastore.NullString", "UpdatedAt": "datastore.NullTime"}
+	return map[string]string{"AuthId": "datastore.NullString", "CreatedAt": "datastore.NullInt64", "Id": "string", "Name": "string", "UpdatedAt": "datastore.NullInt64"}
 }
 
 type Op struct {
 	Id        string               `db:"id"`
 	AuthId    datastore.NullString `db:"auth_id"`
-	CreatedAt datastore.NullTime   `db:"created_at"`
-	UpdatedAt datastore.NullTime   `db:"updated_at"`
+	CreatedAt datastore.NullInt64  `db:"created_at"`
+	UpdatedAt datastore.NullInt64  `db:"updated_at"`
 	Status    datastore.NullString `db:"status"`
 }
 
@@ -53,14 +53,14 @@ func GetOpFieldMap() map[string]string {
 	return map[string]string{"AuthId": "auth_id", "CreatedAt": "created_at", "Id": "id", "Status": "status", "UpdatedAt": "updated_at"}
 }
 func GetOpTypeMap() map[string]string {
-	return map[string]string{"AuthId": "datastore.NullString", "CreatedAt": "datastore.NullTime", "Id": "string", "Status": "datastore.NullString", "UpdatedAt": "datastore.NullTime"}
+	return map[string]string{"AuthId": "datastore.NullString", "CreatedAt": "datastore.NullInt64", "Id": "string", "Status": "datastore.NullString", "UpdatedAt": "datastore.NullInt64"}
 }
 
 type User struct {
 	Id        string               `db:"id"`
 	AuthId    datastore.NullString `db:"auth_id"`
-	CreatedAt datastore.NullTime   `db:"created_at"`
-	UpdatedAt datastore.NullTime   `db:"updated_at"`
+	CreatedAt datastore.NullInt64  `db:"created_at"`
+	UpdatedAt datastore.NullInt64  `db:"updated_at"`
 	Status    datastore.NullString `db:"status"`
 }
 
@@ -68,7 +68,7 @@ func GetUserFieldMap() map[string]string {
 	return map[string]string{"AuthId": "auth_id", "CreatedAt": "created_at", "Id": "id", "Status": "status", "UpdatedAt": "updated_at"}
 }
 func GetUserTypeMap() map[string]string {
-	return map[string]string{"AuthId": "datastore.NullString", "CreatedAt": "datastore.NullTime", "Id": "string", "Status": "datastore.NullString", "UpdatedAt": "datastore.NullTime"}
+	return map[string]string{"AuthId": "datastore.NullString", "CreatedAt": "datastore.NullInt64", "Id": "string", "Status": "datastore.NullString", "UpdatedAt": "datastore.NullInt64"}
 }
 
 type Endpoint struct {
@@ -91,7 +91,7 @@ type Device struct {
 	Name       datastore.NullString `db:"name"`
 	OrgId      datastore.NullString `db:"org_id"`
 	UserId     datastore.NullString `db:"user_id"`
-	CreatedAt  datastore.NullTime   `db:"created_at"`
+	CreatedAt  datastore.NullInt64  `db:"created_at"`
 	Status     datastore.NullString `db:"status"`
 	Properties datastore.RawMessage `db:"properties"`
 }
@@ -100,7 +100,19 @@ func GetDeviceFieldMap() map[string]string {
 	return map[string]string{"CreatedAt": "created_at", "DeviceId": "device_id", "Id": "id", "Name": "name", "OrgId": "org_id", "Properties": "properties", "Status": "status", "UserId": "user_id"}
 }
 func GetDeviceTypeMap() map[string]string {
-	return map[string]string{"CreatedAt": "datastore.NullTime", "DeviceId": "datastore.NullString", "Id": "string", "Name": "datastore.NullString", "OrgId": "datastore.NullString", "Properties": "datastore.RawMessage", "Status": "datastore.NullString", "UserId": "datastore.NullString"}
+	return map[string]string{"CreatedAt": "datastore.NullInt64", "DeviceId": "datastore.NullString", "Id": "string", "Name": "datastore.NullString", "OrgId": "datastore.NullString", "Properties": "datastore.RawMessage", "Status": "datastore.NullString", "UserId": "datastore.NullString"}
+}
+
+type OrgOp struct {
+	OrgId string `db:"org_id"`
+	OpId  string `db:"op_id"`
+}
+
+func GetOrgOpFieldMap() map[string]string {
+	return map[string]string{"OpId": "op_id", "OrgId": "org_id"}
+}
+func GetOrgOpTypeMap() map[string]string {
+	return map[string]string{"OpId": "string", "OrgId": "string"}
 }
 
 type OrgUser struct {
@@ -216,38 +228,64 @@ func GetUserEndpointTypeMap() map[string]string {
 	return map[string]string{"Access": "bool", "EndpointId": "string", "UserId": "string"}
 }
 
-type UserDetailView struct {
-	AuthId    string `db:"auth_id"`
-	Email     string `db:"email"`
-	Mobile    string `db:"mobile"`
-	Social    string `db:"social"`
-	FirstName string `db:"first_name"`
-	LastName  string `db:"last_name"`
-	UserId    string `db:"user_id"`
+type Session struct {
+	Id        string               `db:"id"`
+	UserId    datastore.NullString `db:"user_id"`
+	Name      datastore.NullString `db:"name"`
+	Type      datastore.NullString `db:"type"`
+	StartedAt datastore.NullInt64  `db:"started_at"`
+	EndedAt   datastore.NullInt64  `db:"ended_at"`
 }
 
-func GetUserDetailViewFieldMap() map[string]string {
-	return map[string]string{"AuthId": "auth_id", "Email": "email", "FirstName": "first_name", "LastName": "last_name", "Mobile": "mobile", "Social": "social", "UserId": "user_id"}
+func GetSessionFieldMap() map[string]string {
+	return map[string]string{"EndedAt": "ended_at", "Id": "id", "Name": "name", "StartedAt": "started_at", "Type": "type", "UserId": "user_id"}
 }
-func GetUserDetailViewTypeMap() map[string]string {
-	return map[string]string{"AuthId": "string", "Email": "string", "FirstName": "string", "LastName": "string", "Mobile": "string", "Social": "string", "UserId": "string"}
-}
-
-type OpDetailView struct {
-	AuthId    string `db:"auth_id"`
-	Email     string `db:"email"`
-	Mobile    string `db:"mobile"`
-	Social    string `db:"social"`
-	FirstName string `db:"first_name"`
-	LastName  string `db:"last_name"`
-	OpId      string `db:"op_id"`
+func GetSessionTypeMap() map[string]string {
+	return map[string]string{"EndedAt": "datastore.NullInt64", "Id": "string", "Name": "datastore.NullString", "StartedAt": "datastore.NullInt64", "Type": "datastore.NullString", "UserId": "datastore.NullString"}
 }
 
-func GetOpDetailViewFieldMap() map[string]string {
-	return map[string]string{"AuthId": "auth_id", "Email": "email", "FirstName": "first_name", "LastName": "last_name", "Mobile": "mobile", "OpId": "op_id", "Social": "social"}
+type SessionEvent struct {
+	UserId     string               `db:"user_id"`
+	Name       string               `db:"name"`
+	StartedAt  int64                `db:"started_at"`
+	EndedAt    datastore.NullInt64  `db:"ended_at"`
+	Properties datastore.RawMessage `db:"properties"`
 }
-func GetOpDetailViewTypeMap() map[string]string {
-	return map[string]string{"AuthId": "string", "Email": "string", "FirstName": "string", "LastName": "string", "Mobile": "string", "OpId": "string", "Social": "string"}
+
+func GetSessionEventFieldMap() map[string]string {
+	return map[string]string{"EndedAt": "ended_at", "Name": "name", "Properties": "properties", "StartedAt": "started_at", "UserId": "user_id"}
+}
+func GetSessionEventTypeMap() map[string]string {
+	return map[string]string{"EndedAt": "datastore.NullInt64", "Name": "string", "Properties": "datastore.RawMessage", "StartedAt": "int64", "UserId": "string"}
+}
+
+type SessionRecord struct {
+	UserId     string               `db:"user_id"`
+	Name       string               `db:"name"`
+	Timestamp  int64                `db:"timestamp"`
+	Value      float64              `db:"value"`
+	Properties datastore.RawMessage `db:"properties"`
+}
+
+func GetSessionRecordFieldMap() map[string]string {
+	return map[string]string{"Name": "name", "Properties": "properties", "Timestamp": "timestamp", "UserId": "user_id", "Value": "value"}
+}
+func GetSessionRecordTypeMap() map[string]string {
+	return map[string]string{"Name": "string", "Properties": "datastore.RawMessage", "Timestamp": "int64", "UserId": "string", "Value": "float64"}
+}
+
+type SessionPropertie struct {
+	SessionId datastore.NullString `db:"session_id"`
+	Name      datastore.NullString `db:"name"`
+	Value     datastore.NullString `db:"value"`
+	Rowid     int64                `db:"rowid"`
+}
+
+func GetSessionPropertieFieldMap() map[string]string {
+	return map[string]string{"Name": "name", "Rowid": "rowid", "SessionId": "session_id", "Value": "value"}
+}
+func GetSessionPropertieTypeMap() map[string]string {
+	return map[string]string{"Name": "datastore.NullString", "Rowid": "int64", "SessionId": "datastore.NullString", "Value": "datastore.NullString"}
 }
 
 type OrgDetailView struct {
@@ -257,85 +295,47 @@ type OrgDetailView struct {
 	Social    string `db:"social"`
 	FirstName string `db:"first_name"`
 	LastName  string `db:"last_name"`
-	OrgId     string `db:"org_id"`
+	Id        string `db:"id"`
 	OrgName   string `db:"org_name"`
 }
 
 func GetOrgDetailViewFieldMap() map[string]string {
-	return map[string]string{"AuthId": "auth_id", "Email": "email", "FirstName": "first_name", "LastName": "last_name", "Mobile": "mobile", "OrgId": "org_id", "OrgName": "org_name", "Social": "social"}
+	return map[string]string{"AuthId": "auth_id", "Email": "email", "FirstName": "first_name", "Id": "id", "LastName": "last_name", "Mobile": "mobile", "OrgName": "org_name", "Social": "social"}
 }
 func GetOrgDetailViewTypeMap() map[string]string {
-	return map[string]string{"AuthId": "string", "Email": "string", "FirstName": "string", "LastName": "string", "Mobile": "string", "OrgId": "string", "OrgName": "string", "Social": "string"}
+	return map[string]string{"AuthId": "string", "Email": "string", "FirstName": "string", "Id": "string", "LastName": "string", "Mobile": "string", "OrgName": "string", "Social": "string"}
 }
 
-type Session struct {
-	Id        string               `db:"id"`
-	UserId    datastore.NullString `db:"user_id"`
-	Name      datastore.NullString `db:"name"`
-	Type      datastore.NullString `db:"type"`
-	StartedAt datastore.NullTime   `db:"started_at"`
-	EndedAt   datastore.NullTime   `db:"ended_at"`
+type OpDetailView struct {
+	AuthId    string `db:"auth_id"`
+	Email     string `db:"email"`
+	Mobile    string `db:"mobile"`
+	Social    string `db:"social"`
+	FirstName string `db:"first_name"`
+	LastName  string `db:"last_name"`
+	Id        string `db:"id"`
 }
 
-func GetSessionFieldMap() map[string]string {
-	return map[string]string{"EndedAt": "ended_at", "Id": "id", "Name": "name", "StartedAt": "started_at", "Type": "type", "UserId": "user_id"}
+func GetOpDetailViewFieldMap() map[string]string {
+	return map[string]string{"AuthId": "auth_id", "Email": "email", "FirstName": "first_name", "Id": "id", "LastName": "last_name", "Mobile": "mobile", "Social": "social"}
 }
-func GetSessionTypeMap() map[string]string {
-	return map[string]string{"EndedAt": "datastore.NullTime", "Id": "string", "Name": "datastore.NullString", "StartedAt": "datastore.NullTime", "Type": "datastore.NullString", "UserId": "datastore.NullString"}
-}
-
-type SessionEvent struct {
-	UserId     string               `db:"user_id"`
-	Name       string               `db:"name"`
-	StartedAt  time.Time            `db:"started_at"`
-	EndedAt    datastore.NullTime   `db:"ended_at"`
-	Properties datastore.RawMessage `db:"properties"`
+func GetOpDetailViewTypeMap() map[string]string {
+	return map[string]string{"AuthId": "string", "Email": "string", "FirstName": "string", "Id": "string", "LastName": "string", "Mobile": "string", "Social": "string"}
 }
 
-func GetSessionEventFieldMap() map[string]string {
-	return map[string]string{"EndedAt": "ended_at", "Name": "name", "Properties": "properties", "StartedAt": "started_at", "UserId": "user_id"}
-}
-func GetSessionEventTypeMap() map[string]string {
-	return map[string]string{"EndedAt": "datastore.NullTime", "Name": "string", "Properties": "datastore.RawMessage", "StartedAt": "time.Time", "UserId": "string"}
-}
-
-type SessionRecord struct {
-	UserId     string               `db:"user_id"`
-	Name       string               `db:"name"`
-	Timestamp  time.Time            `db:"timestamp"`
-	Value      float64              `db:"value"`
-	Properties datastore.RawMessage `db:"properties"`
+type UserDetailView struct {
+	AuthId    string `db:"auth_id"`
+	Email     string `db:"email"`
+	Mobile    string `db:"mobile"`
+	Social    string `db:"social"`
+	FirstName string `db:"first_name"`
+	LastName  string `db:"last_name"`
+	Id        string `db:"id"`
 }
 
-func GetSessionRecordFieldMap() map[string]string {
-	return map[string]string{"Name": "name", "Properties": "properties", "Timestamp": "timestamp", "UserId": "user_id", "Value": "value"}
+func GetUserDetailViewFieldMap() map[string]string {
+	return map[string]string{"AuthId": "auth_id", "Email": "email", "FirstName": "first_name", "Id": "id", "LastName": "last_name", "Mobile": "mobile", "Social": "social"}
 }
-func GetSessionRecordTypeMap() map[string]string {
-	return map[string]string{"Name": "string", "Properties": "datastore.RawMessage", "Timestamp": "time.Time", "UserId": "string", "Value": "float64"}
-}
-
-type SessionPropertie struct {
-	SessionId datastore.NullString `db:"session_id"`
-	Name      datastore.NullString `db:"name"`
-	Value     datastore.NullString `db:"value"`
-	Rowid     datastore.RawMessage `db:"rowid"`
-}
-
-func GetSessionPropertieFieldMap() map[string]string {
-	return map[string]string{"Name": "name", "Rowid": "rowid", "SessionId": "session_id", "Value": "value"}
-}
-func GetSessionPropertieTypeMap() map[string]string {
-	return map[string]string{"Name": "datastore.NullString", "Rowid": "datastore.RawMessage", "SessionId": "datastore.NullString", "Value": "datastore.NullString"}
-}
-
-type OrgOp struct {
-	OrgId string `db:"org_id"`
-	OpId  string `db:"op_id"`
-}
-
-func GetOrgOpFieldMap() map[string]string {
-	return map[string]string{"OpId": "op_id", "OrgId": "org_id"}
-}
-func GetOrgOpTypeMap() map[string]string {
-	return map[string]string{"OpId": "string", "OrgId": "string"}
+func GetUserDetailViewTypeMap() map[string]string {
+	return map[string]string{"AuthId": "string", "Email": "string", "FirstName": "string", "Id": "string", "LastName": "string", "Mobile": "string", "Social": "string"}
 }

@@ -9,6 +9,7 @@ import (
 )
 
 type NullString struct{ sql.NullString }
+type NullInt64 struct{ sql.NullInt64 }
 type NullTime struct{ sql.NullTime }
 type RawMessage struct{ json.RawMessage }
 
@@ -26,6 +27,22 @@ func (this *NullString) UnmarshalJSON(data []byte) error {
 		this.String = ""
 	}
 	return json.Unmarshal(data, &this.String)
+}
+
+func (this *NullInt64) MarshalJSON() ([]byte, error) {
+	if !this.Valid {
+		this.Valid = true
+		this.Int64 = 0
+	}
+	return json.Marshal(this.Int64)
+}
+
+func (this *NullInt64) UnmarshalJSON(data []byte) error {
+	if !this.Valid {
+		this.Valid = true
+		this.Int64 = 0
+	}
+	return json.Unmarshal(data, &this.Int64)
 }
 
 func (this *NullTime) MarshalJSON() ([]byte, error) {

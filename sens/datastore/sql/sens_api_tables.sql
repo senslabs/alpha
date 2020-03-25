@@ -1,17 +1,17 @@
 CREATE TABLE "sessions" (
-  "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
+  "id" uuid PRIMARY KEY,
   "user_id" uuid,
   "name" text,
   "type" text,
-  "started_at" timestamp,
-  "ended_at" timestamp
+  "started_at" int,
+  "ended_at" int
 );
 
 CREATE TABLE "session_events" (
   "user_id" uuid,
   "name" text,
-  "started_at" timestamp,
-  "ended_at" timestamp,
+  "started_at" int,
+  "ended_at" int,
   "properties" jsonb,
   PRIMARY KEY ("user_id", "name", "started_at")
 );
@@ -19,7 +19,7 @@ CREATE TABLE "session_events" (
 CREATE TABLE "session_records" (
   "user_id" uuid,
   "name" text,
-  "timestamp" timestamp,
+  "timestamp" int,
   "value" float,
   "properties" jsonb,
   PRIMARY KEY ("user_id", "name", "timestamp")

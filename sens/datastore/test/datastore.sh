@@ -36,3 +36,5 @@ curl -v -H 'Content-Type: application/json' -d '{"Path":"/api/devices/find?limit
 
 curl -v -H 'Content-Type: application/json' -d '{"Path":"/api/devices/11459195-34ce-4ad4-b565-3db59bedfc3c/get", "Method":"GET"}' http://35.238.76.35/test/ds
 
+#------------ datastore APIs
+curl -v -H 'Content-Type: application/json' -d '{"Email": "emayank@gmail.com", "Mobile": "+917032806003", "FirstName":"Mayank", "LastName":"Joshi","Social": "FB"}' http://localhost:9804/api/auths/create

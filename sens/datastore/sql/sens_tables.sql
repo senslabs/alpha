@@ -13,14 +13,14 @@ CREATE TABLE "orgs" (
   "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "auth_id" uuid,
   "name" text UNIQUE NOT NULL,
-  "created_at" int DEFAULT (now()::decimal),
+  "created_at" int DEFAULT (now()::int),
   "updated_at" int
 );
 
 CREATE TABLE "ops" (
   "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "auth_id" uuid,
-  "created_at" int DEFAULT (now()::decimal),
+  "created_at" int DEFAULT (now()::int),
   "updated_at" int,
   "status" text
 );
@@ -28,7 +28,7 @@ CREATE TABLE "ops" (
 CREATE TABLE "users" (
   "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "auth_id" uuid,
-  "created_at" int DEFAULT (now()::decimal),
+  "created_at" int DEFAULT (now()::int),
   "updated_at" int,
   "status" text
 );
@@ -41,12 +41,12 @@ CREATE TABLE "endpoints" (
 );
 
 CREATE TABLE "devices" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "device_id" uuid,
   "name" text,
   "org_id" uuid,
   "user_id" uuid,
-  "created_at" int DEFAULT (now()::decimal),
+  "created_at" int DEFAULT (now()::int),
   "status" text,
   "properties" jsonb
 );
@@ -116,6 +116,39 @@ CREATE TABLE "user_endpoints" (
   PRIMARY KEY ("user_id", "endpoint_id")
 );
 
+CREATE TABLE "sessions" (
+  "id" uuid PRIMARY KEY,
+  "user_id" uuid,
+  "name" text,
+  "type" text,
+  "started_at" int,
+  "ended_at" int
+);
+
+CREATE TABLE "session_events" (
+  "user_id" uuid,
+  "name" text,
+  "started_at" int,
+  "ended_at" int,
+  "properties" jsonb,
+  PRIMARY KEY ("user_id", "name", "started_at")
+);
+
+CREATE TABLE "session_records" (
+  "user_id" uuid,
+  "name" text,
+  "timestamp" int,
+  "value" float,
+  "properties" jsonb,
+  PRIMARY KEY ("user_id", "name", "timestamp")
+);
+
+CREATE TABLE "session_properties" (
+  "session_id" uuid,
+  "name" text,
+  "value" text
+);
+
 ALTER TABLE "orgs" ADD FOREIGN KEY ("auth_id") REFERENCES "auths" ("id");
 
 ALTER TABLE "ops" ADD FOREIGN KEY ("auth_id") REFERENCES "auths" ("id");
@@ -158,3 +191,16 @@ ALTER TABLE "user_endpoints" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id
 
 ALTER TABLE "user_endpoints" ADD FOREIGN KEY ("endpoint_id") REFERENCES "endpoints" ("id");
 
+ALTER TABLE "sessions" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+
+ALTER TABLE "session_events" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+
+ALTER TABLE "session_records" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+
+ALTER TABLE "session_properties" ADD FOREIGN KEY ("session_id") REFERENCES "sessions" ("id");
+
+CREATE INDEX ON "devices" ("device_id");
+
+CREATE INDEX ON "sessions" ("ended_at");
+
+CREATE INDEX ON "sessions" ("user_id");

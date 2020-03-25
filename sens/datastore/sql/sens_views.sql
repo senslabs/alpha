@@ -7,7 +7,7 @@ SELECT
 	a.first_name,
 	a.last_name,
     --ORGS
-	o.id as org_id,
+	o.id as id,
 	o.name as org_name
 FROM
 	auths a
@@ -23,7 +23,7 @@ SELECT
 	a.first_name,
 	a.last_name,
     --OPS
-	o.id as op_id
+	o.id as id
 FROM
 	auths a
 JOIN ops o on
@@ -38,7 +38,7 @@ SELECT
 	a.first_name,
 	a.last_name,
     --USERS
-	u.id as user_id
+	u.id as id
 FROM
 	auths a
 JOIN "users" u on
