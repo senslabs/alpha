@@ -155,13 +155,13 @@ func FindUserEndpointCategorie(or []string, and []string, span []string, limit s
 			if order == "" {
 				order = "DESC"
 			}
-			fmt.Fprint(query, " ORDER BY ", f)
+			fmt.Fprint(query, " ORDER BY ", f, " ", order)
 		}
 	}
 	fmt.Fprint(query, " LIMIT ", limit)
 
 	logger.Debug(query.String())
-	
+
 	m := []models.UserEndpointCategorie{}
 	db := datastore.GetConnection()
 	if stmt, err := db.PrepareNamed(query.String()); err != nil {

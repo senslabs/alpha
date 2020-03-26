@@ -211,13 +211,13 @@ func FindOrgDetailView(or []string, and []string, span []string, limit string, c
 			if order == "" {
 				order = "DESC"
 			}
-			fmt.Fprint(query, " ORDER BY ", f)
+			fmt.Fprint(query, " ORDER BY ", f, " ", order)
 		}
 	}
 	fmt.Fprint(query, " LIMIT ", limit)
 
 	logger.Debug(query.String())
-	
+
 	m := []models.OrgDetailView{}
 	db := datastore.GetConnection()
 	if stmt, err := db.PrepareNamed(query.String()); err != nil {

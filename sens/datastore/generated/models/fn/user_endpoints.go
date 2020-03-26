@@ -155,13 +155,13 @@ func FindUserEndpoint(or []string, and []string, span []string, limit string, co
 			if order == "" {
 				order = "DESC"
 			}
-			fmt.Fprint(query, " ORDER BY ", f)
+			fmt.Fprint(query, " ORDER BY ", f, " ", order)
 		}
 	}
 	fmt.Fprint(query, " LIMIT ", limit)
 
 	logger.Debug(query.String())
-	
+
 	m := []models.UserEndpoint{}
 	db := datastore.GetConnection()
 	if stmt, err := db.PrepareNamed(query.String()); err != nil {

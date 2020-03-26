@@ -155,13 +155,13 @@ func FindOrgEndpointCategorie(or []string, and []string, span []string, limit st
 			if order == "" {
 				order = "DESC"
 			}
-			fmt.Fprint(query, " ORDER BY ", f)
+			fmt.Fprint(query, " ORDER BY ", f, " ", order)
 		}
 	}
 	fmt.Fprint(query, " LIMIT ", limit)
 
 	logger.Debug(query.String())
-	
+
 	m := []models.OrgEndpointCategorie{}
 	db := datastore.GetConnection()
 	if stmt, err := db.PrepareNamed(query.String()); err != nil {
