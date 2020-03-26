@@ -146,7 +146,8 @@ CREATE TABLE "session_records" (
 CREATE TABLE "session_properties" (
   "session_id" uuid,
   "name" text,
-  "value" text
+  "value" text,
+  PRIMARY KEY ("session_id", "name", "value")
 );
 
 ALTER TABLE "orgs" ADD FOREIGN KEY ("auth_id") REFERENCES "auths" ("id");

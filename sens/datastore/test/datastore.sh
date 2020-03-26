@@ -36,9 +36,9 @@ curl -v -H 'Content-Type: application/json' -d '{"Path":"/api/devices/find?limit
 
 curl -v -H 'Content-Type: application/json' -d '{"Path":"/api/devices/11459195-34ce-4ad4-b565-3db59bedfc3c/get", "Method":"GET"}' http://35.238.76.35/test/ds
 
-curl -v -H 'Content-Type: application/json' -d '{"Path":"/api/sessions/create", "Method":"POST", "Body":{"UserId":"10f20136-044e-41ab-b070-fc3d47f023a3", "Name":"test", "StartedAt":"1582569662", "EndedAt":"1582569661"}}' http://35.238.76.35/test/ds
+curl -v -H 'Content-Type: application/json' -d '{"Path":"/api/sessions/create", "Method":"POST", "Body":{"UserId":"10f20136-044e-41ab-b070-fc3d47f023a3", "Name":"PrabhuJiKuchhKaro", "StartedAt":1582569662, "EndedAt":1582569661}}' http://35.238.76.35/test/ds
 
-curl -v -H 'Content-Type: application/json' -d '{"UserId":"10f20136-044e-41ab-b070-fc3d47f023a3", "Name":"test"}' http://localhost:9804/api/sessions/create
+curl -v -H 'Content-Type: application/json' -d '{"UserId":"10f20136-044e-41ab-b070-fc3d47f023a3", "Name":"test", "StartedAt":1582569662, "EndedAt":1582569661}' http://localhost:9804/api/sessions/create
 
 http://35.238.76.35/test/ds
 
