@@ -6,8 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"time"
-
-	"github.com/senslabs/alpha/sens/logger"
 )
 
 type NullString struct{ sql.NullString }
@@ -32,7 +30,6 @@ func (this *NullString) UnmarshalJSON(data []byte) error {
 }
 
 func (this *NullInt64) MarshalJSON() ([]byte, error) {
-	logger.Debugf("%#v", *this)
 	if !this.Valid {
 		return []byte("0"), nil
 	}
