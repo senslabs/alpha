@@ -155,10 +155,10 @@ func UpdateAuth(id string, data []byte) error {
 	return nil
 }
 
-func SelectAuth(id string) (models.Auth, *errors.SensError) {
+func SelectAuth(id string) ([]models.Auth, *errors.SensError) {
 	db := datastore.GetConnection()
-	m := models.Auth{}
-	if err := db.Get(&m, "SELECT * FROM auths WHERE id = $1", id); err != nil {
+	m := []models.Auth{}
+	if err := db.Select(&m, "SELECT * FROM auths WHERE id = $1", id); err != nil {
 		logger.Error(err)
 		return m, errors.FromError(errors.DB_ERROR, err)
 	}

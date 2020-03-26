@@ -42,19 +42,19 @@ func InsertSession(data []byte) (string, error) {
 	}
 	fmt.Fprint(insert, ") ")
 	fmt.Fprint(insert, values, ")")
-
+	
 	fmt.Fprint(insert, " returning id")
-
+	
 	db := datastore.GetConnection()
 
 	logger.Debug(insert.String())
-
+	
 	stmt, err := db.PrepareNamed(insert.String())
 	if err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.DB_ERROR, err)
 	}
-
+	
 	var id string
 	if err := stmt.Get(&id, m); err != nil {
 		logger.Error(err)
@@ -62,7 +62,7 @@ func InsertSession(data []byte) (string, error) {
 	} else {
 		return id, nil
 	}
-
+	
 }
 
 func BatchInsertSession(data []byte) ([]string, error) {
@@ -110,6 +110,7 @@ func BatchInsertSession(data []byte) ([]string, error) {
 	}
 	return nil, nil
 }
+
 
 func UpdateSession(id string, data []byte) error {
 	var j map[string]interface{}
@@ -164,6 +165,7 @@ func SelectSession(id string) ([]models.Session, *errors.SensError) {
 	return m, nil
 }
 
+
 func getSessionFieldValue(c string, v interface{}) interface{} {
 	typeMap := models.GetSessionTypeMap()
 	if typeMap[c] == "datastore.NullTime" || typeMap[c] == "TIMESTAMP" {
@@ -217,7 +219,7 @@ func FindSession(or []string, and []string, span []string, limit string, column 
 	fmt.Fprint(query, " LIMIT ", limit)
 
 	logger.Debug(query.String())
-
+	
 	m := []models.Session{}
 	db := datastore.GetConnection()
 	if stmt, err := db.PrepareNamed(query.String()); err != nil {

@@ -155,10 +155,10 @@ func UpdateOrgDetailView(id string, data []byte) error {
 	return nil
 }
 
-func SelectOrgDetailView(id string) (models.OrgDetailView, *errors.SensError) {
+func SelectOrgDetailView(id string) ([]models.OrgDetailView, *errors.SensError) {
 	db := datastore.GetConnection()
-	m := models.OrgDetailView{}
-	if err := db.Get(&m, "SELECT * FROM org_detail_views WHERE id = $1", id); err != nil {
+	m := []models.OrgDetailView{}
+	if err := db.Select(&m, "SELECT * FROM org_detail_views WHERE id = $1", id); err != nil {
 		logger.Error(err)
 		return m, errors.FromError(errors.DB_ERROR, err)
 	}

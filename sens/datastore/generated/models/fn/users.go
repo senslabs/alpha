@@ -155,10 +155,10 @@ func UpdateUser(id string, data []byte) error {
 	return nil
 }
 
-func SelectUser(id string) (models.User, *errors.SensError) {
+func SelectUser(id string) ([]models.User, *errors.SensError) {
 	db := datastore.GetConnection()
-	m := models.User{}
-	if err := db.Get(&m, "SELECT * FROM users WHERE id = $1", id); err != nil {
+	m := []models.User{}
+	if err := db.Select(&m, "SELECT * FROM users WHERE id = $1", id); err != nil {
 		logger.Error(err)
 		return m, errors.FromError(errors.DB_ERROR, err)
 	}

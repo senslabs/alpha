@@ -155,10 +155,10 @@ func UpdateUserDetailView(id string, data []byte) error {
 	return nil
 }
 
-func SelectUserDetailView(id string) (models.UserDetailView, *errors.SensError) {
+func SelectUserDetailView(id string) ([]models.UserDetailView, *errors.SensError) {
 	db := datastore.GetConnection()
-	m := models.UserDetailView{}
-	if err := db.Get(&m, "SELECT * FROM user_detail_views WHERE id = $1", id); err != nil {
+	m := []models.UserDetailView{}
+	if err := db.Select(&m, "SELECT * FROM user_detail_views WHERE id = $1", id); err != nil {
 		logger.Error(err)
 		return m, errors.FromError(errors.DB_ERROR, err)
 	}

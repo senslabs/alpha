@@ -155,10 +155,10 @@ func UpdateOp(id string, data []byte) error {
 	return nil
 }
 
-func SelectOp(id string) (models.Op, *errors.SensError) {
+func SelectOp(id string) ([]models.Op, *errors.SensError) {
 	db := datastore.GetConnection()
-	m := models.Op{}
-	if err := db.Get(&m, "SELECT * FROM ops WHERE id = $1", id); err != nil {
+	m := []models.Op{}
+	if err := db.Select(&m, "SELECT * FROM ops WHERE id = $1", id); err != nil {
 		logger.Error(err)
 		return m, errors.FromError(errors.DB_ERROR, err)
 	}

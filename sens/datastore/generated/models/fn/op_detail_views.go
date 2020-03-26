@@ -155,10 +155,10 @@ func UpdateOpDetailView(id string, data []byte) error {
 	return nil
 }
 
-func SelectOpDetailView(id string) (models.OpDetailView, *errors.SensError) {
+func SelectOpDetailView(id string) ([]models.OpDetailView, *errors.SensError) {
 	db := datastore.GetConnection()
-	m := models.OpDetailView{}
-	if err := db.Get(&m, "SELECT * FROM op_detail_views WHERE id = $1", id); err != nil {
+	m := []models.OpDetailView{}
+	if err := db.Select(&m, "SELECT * FROM op_detail_views WHERE id = $1", id); err != nil {
 		logger.Error(err)
 		return m, errors.FromError(errors.DB_ERROR, err)
 	}

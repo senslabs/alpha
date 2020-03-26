@@ -155,10 +155,10 @@ func UpdateOrg(id string, data []byte) error {
 	return nil
 }
 
-func SelectOrg(id string) (models.Org, *errors.SensError) {
+func SelectOrg(id string) ([]models.Org, *errors.SensError) {
 	db := datastore.GetConnection()
-	m := models.Org{}
-	if err := db.Get(&m, "SELECT * FROM orgs WHERE id = $1", id); err != nil {
+	m := []models.Org{}
+	if err := db.Select(&m, "SELECT * FROM orgs WHERE id = $1", id); err != nil {
 		logger.Error(err)
 		return m, errors.FromError(errors.DB_ERROR, err)
 	}
