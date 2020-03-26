@@ -4,10 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
-	"strconv"
 	"strings"
-	"time"
 
 	"github.com/senslabs/alpha/sens/datastore"
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
@@ -110,6 +107,7 @@ func BatchInsertSessionPropertie(data []byte) ([]string, error) {
 
 
 
+/*
 func getSessionPropertieFieldValue(c string, v interface{}) interface{} {
 	typeMap := models.GetSessionPropertieTypeMap()
 	if typeMap[c] == "datastore.NullTime" || typeMap[c] == "TIMESTAMP" {
@@ -121,6 +119,7 @@ func getSessionPropertieFieldValue(c string, v interface{}) interface{} {
 	}
 	return v
 }
+*/
 
 func FindSessionPropertie(or []string, and []string, span []string, limit string, column string, order string) ([]models.SessionPropertie, *errors.SensError) {
 	ors := datastore.ParseOrParams(or)
@@ -133,21 +132,21 @@ func FindSessionPropertie(or []string, and []string, span []string, limit string
 	for _, o := range ors {
 		if f, ok := fieldMap[o.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s OR ", f, f))
-			values[f] = getSessionPropertieFieldValue(o.Column, o.Value)
+			values[f] = o.Value
 		}
 	}
 	fmt.Fprint(query, "(")
 	for _, a := range ands {
 		if f, ok := fieldMap[a.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s AND ", f, f))
-			values[f] = getSessionPropertieFieldValue(a.Column, a.Value)
+			values[f] = a.Value
 		}
 	}
 	for _, s := range spans {
 		if f, ok := fieldMap[s.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
-			values["from_"+f] = getSessionPropertieFieldValue(s.Column, s.From)
-			values["to_"+f] = getSessionPropertieFieldValue(s.Column, s.To)
+			values["from_"+f] = s.From
+			values["to_"+f] = s.To
 		}
 	}
 	fmt.Fprint(query, "1 = 1)")
@@ -156,8 +155,7 @@ func FindSessionPropertie(or []string, and []string, span []string, limit string
 			if order == "" {
 				order = "DESC"
 			}
-			fmt.Fprint(query, " ORDER BY :", f, " ", order)
-			values[column] = f
+			fmt.Fprint(query, " ORDER BY ", f)
 		}
 	}
 	fmt.Fprint(query, " LIMIT ", limit)
@@ -168,11 +166,80 @@ func FindSessionPropertie(or []string, and []string, span []string, limit string
 	db := datastore.GetConnection()
 	if stmt, err := db.PrepareNamed(query.String()); err != nil {
 		logger.Error(err.Error())
-		log.Printf("%v", err)
 		return m, errors.New(errors.DB_ERROR, err.Error())
 	} else if err := stmt.Select(&m, values); err != nil {
 		logger.Error(err)
 		return m, errors.New(errors.DB_ERROR, err.Error())
 	}
 	return m, nil
+}
+
+func UpdateSessionPropertieWhere(or []string, and []string, span []string, data []byte) *errors.SensError {
+	ors := datastore.ParseOrParams(or)
+	ands := datastore.ParseAndParams(and)
+	spans := datastore.ParseSpanParams(span)
+
+	fieldMap := models.GetSessionPropertieFieldMap()
+	values := make(map[string]interface{})
+	update := bytes.NewBufferString("UPDATE session_properties SET ")
+
+	//SET FIELD VALUES
+	var j map[string]interface{}
+	if err := json.Unmarshal(data, &j); err != nil {
+		logger.Error(err)
+		return errors.FromError(errors.GO_ERROR, err)
+	}
+	var m models.SessionPropertie
+	if err := json.Unmarshal(data, &m); err != nil {
+		logger.Error(err)
+		return errors.FromError(errors.GO_ERROR, err)
+	}
+
+	logger.Debug(m)
+
+	comma := ""
+	for k, _ := range j {
+		if f, ok := fieldMap[k]; ok {
+			fmt.Fprint(update, comma, f, " = :set_", k)
+			values["set_"+f] = j[f]
+			comma = ", "
+		}
+	}
+	//SET ENDS
+
+	fmt.Fprint(update, " WHERE ")
+	for _, o := range ors {
+		if f, ok := fieldMap[o.Column]; ok {
+			fmt.Fprint(update, fmt.Sprintf("%s = :%s OR ", f, f))
+			values[f] = o.Value
+		}
+	}
+	fmt.Fprint(update, "(")
+	for _, a := range ands {
+		if f, ok := fieldMap[a.Column]; ok {
+			fmt.Fprint(update, fmt.Sprintf("%s = :%s AND ", f, f))
+			values[f] = a.Value
+		}
+	}
+	for _, s := range spans {
+		if f, ok := fieldMap[s.Column]; ok {
+			fmt.Fprint(update, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
+			values["from_"+f] = s.From
+			values["to_"+f] = s.To
+		}
+	}
+	fmt.Fprint(update, "1 = 1)")
+	logger.Debug(update.String())
+	db := datastore.GetConnection()
+	stmt, err := db.PrepareNamed(update.String())
+	if err != nil {
+		logger.Error(err.Error())
+		return errors.New(errors.DB_ERROR, err.Error())
+	}
+
+	if _, err := stmt.Exec(values); err != nil {
+		logger.Error(err)
+		return errors.New(errors.DB_ERROR, err.Error())
+	}
+	return nil
 }
