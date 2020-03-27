@@ -143,7 +143,7 @@ func UpdateEndpoint(id string, data []byte) error {
 		return errors.FromError(errors.GO_ERROR, err)
 	}
 	//<no value>
-	m.Id = id
+	m.Id = &id
 	_, err = stmt.Exec(m)
 	if err != nil {
 		logger.Error(err)
@@ -152,10 +152,10 @@ func UpdateEndpoint(id string, data []byte) error {
 	return nil
 }
 
-func SelectEndpoint(id string) ([]models.Endpoint, *errors.SensError) {
+func SelectEndpoint(id string) (models.Endpoint, *errors.SensError) {
 	db := datastore.GetConnection()
-	m := []models.Endpoint{}
-	if err := db.Select(&m, "SELECT * FROM endpoints WHERE id = $1", id); err != nil {
+	m := models.Endpoint{}
+	if err := db.Get(&m, "SELECT * FROM endpoints WHERE id = $1", id); err != nil {
 		logger.Error(err)
 		return m, errors.FromError(errors.DB_ERROR, err)
 	}

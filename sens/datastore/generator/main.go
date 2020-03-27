@@ -53,26 +53,26 @@ type FieldInfo struct {
 func GetFieldType(field FieldInfo) string {
 	switch field.Type {
 	case "UUID", "STRING":
-		if field.IsNullable == "YES" {
-			return "datastore.NullString"
-		}
-		return "string"
+		// if field.IsNullable == "YES" {
+		// 	return "datastore.NullString"
+		// }
+		return "*string"
 	case "TIMESTAMP":
-		if field.IsNullable == "YES" {
-			return "datastore.NullTime"
-		}
-		return "time.Time"
+		// if field.IsNullable == "YES" {
+		// 	return "datastore.NullTime"
+		// }
+		return "*time.Time"
 	case "INT8":
-		if field.IsNullable == "YES" {
-			return "datastore.NullInt64"
-		}
-		return "int64"
+		// if field.IsNullable == "YES" {
+		// 	return "datastore.NullInt64"
+		// }
+		return "*int64"
 	case "BOOL":
-		return "bool"
+		return "*bool"
 	case "FLOAT8":
-		return "float64"
+		return "*float64"
 	default:
-		return "datastore.RawMessage"
+		return "*datastore.RawMessage"
 	}
 }
 
@@ -97,7 +97,7 @@ func GenerateModel(db *sqlx.DB, schema string, mi *ModelInfo) string {
 	typeMap := map[string]string{}
 	for _, f := range fields {
 		mi.HasId = mi.HasId || f.TableField == "id"
-		member := fmt.Sprintf("%s %s `db:\"%s\"`", f.ModelField, f.Type, f.TableField)
+		member := fmt.Sprintf("%s %s `db:\"%s\" json:\",omitempty\"`", f.ModelField, f.Type, f.TableField)
 		members = append(members, member)
 		fieldMap[f.ModelField] = f.TableField
 		typeMap[f.ModelField] = f.Type

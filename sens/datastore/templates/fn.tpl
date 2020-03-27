@@ -150,7 +150,7 @@ func Update{{.Model}}(id string, data []byte) error {
 		return errors.FromError(errors.GO_ERROR, err)
 	}
 	//{{.Id}}
-	m.Id = id
+	m.Id = &id
 	_, err = stmt.Exec(m)
 	if err != nil {
 		logger.Error(err)
@@ -159,10 +159,10 @@ func Update{{.Model}}(id string, data []byte) error {
 	return nil
 }
 
-func Select{{.Model}}(id string) ([]models.{{.Model}}, *errors.SensError) {
+func Select{{.Model}}(id string) (models.{{.Model}}, *errors.SensError) {
 	db := datastore.GetConnection()
-	m := []models.{{.Model}}{}
-	if err := db.Select(&m, "SELECT * FROM {{.Table}} WHERE id = $1", id); err != nil {
+	m := models.{{.Model}}{}
+	if err := db.Get(&m, "SELECT * FROM {{.Table}} WHERE id = $1", id); err != nil {
 		logger.Error(err)
 		return m, errors.FromError(errors.DB_ERROR, err)
 	}
