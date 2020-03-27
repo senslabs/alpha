@@ -39,19 +39,19 @@ func InsertUser(data []byte) (string, error) {
 	}
 	fmt.Fprint(insert, ") ")
 	fmt.Fprint(insert, values, ")")
-	
+
 	fmt.Fprint(insert, " returning id")
-	
+
 	db := datastore.GetConnection()
 
 	logger.Debug(insert.String())
-	
+
 	stmt, err := db.PrepareNamed(insert.String())
 	if err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.DB_ERROR, err)
 	}
-	
+
 	var id string
 	if err := stmt.Get(&id, m); err != nil {
 		logger.Error(err)
@@ -59,7 +59,7 @@ func InsertUser(data []byte) (string, error) {
 	} else {
 		return id, nil
 	}
-	
+
 }
 
 func BatchInsertUser(data []byte) ([]string, error) {
@@ -108,7 +108,6 @@ func BatchInsertUser(data []byte) ([]string, error) {
 	return nil, nil
 }
 
-
 func UpdateUser(id string, data []byte) error {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
@@ -155,13 +154,13 @@ func UpdateUser(id string, data []byte) error {
 func SelectUser(id string) (models.User, *errors.SensError) {
 	db := datastore.GetConnection()
 	m := models.User{}
+	logger.Error("Hello")
 	if err := db.Get(&m, "SELECT * FROM users WHERE id = $1", id); err != nil {
 		logger.Error(err)
 		return m, errors.FromError(errors.DB_ERROR, err)
 	}
 	return m, nil
 }
-
 
 /*
 func getUserFieldValue(c string, v interface{}) interface{} {
