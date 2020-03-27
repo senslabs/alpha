@@ -186,7 +186,7 @@ func FindAuth(or []string, and []string, span []string, limit string, column str
 	cond := ""
 	for _, o := range ors {
 		if f, ok := fieldMap[o.Column]; ok {
-			fmt.Fprint(query, fmt.Sprintf(cond, "%s = :%s ", f, f))
+			fmt.Fprint(query, cond, fmt.Sprintf("%s = :%s ", f, f))
 			values[f] = o.Value
 			cond = "OR "
 		}
