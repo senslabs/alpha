@@ -39,19 +39,19 @@ func InsertAuth(data []byte) (string, error) {
 	}
 	fmt.Fprint(insert, ") ")
 	fmt.Fprint(insert, values, ")")
-	
+
 	fmt.Fprint(insert, " returning id")
-	
+
 	db := datastore.GetConnection()
 
 	logger.Debug(insert.String())
-	
+
 	stmt, err := db.PrepareNamed(insert.String())
 	if err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.DB_ERROR, err)
 	}
-	
+
 	var id string
 	if err := stmt.Get(&id, m); err != nil {
 		logger.Error(err)
@@ -59,7 +59,7 @@ func InsertAuth(data []byte) (string, error) {
 	} else {
 		return id, nil
 	}
-	
+
 }
 
 func BatchInsertAuth(data []byte) ([]string, error) {
@@ -107,7 +107,6 @@ func BatchInsertAuth(data []byte) ([]string, error) {
 	}
 	return nil, nil
 }
-
 
 func UpdateAuth(id string, data []byte) error {
 	var j map[string]interface{}
@@ -162,7 +161,6 @@ func SelectAuth(id string) (models.Auth, *errors.SensError) {
 	return m, nil
 }
 
-
 /*
 func getAuthFieldValue(c string, v interface{}) interface{} {
 	typeMap := models.GetAuthTypeMap()
@@ -185,13 +183,15 @@ func FindAuth(or []string, and []string, span []string, limit string, column str
 	fieldMap := models.GetAuthFieldMap()
 	values := make(map[string]interface{})
 	query := bytes.NewBufferString("SELECT * FROM auths WHERE ")
+	cond := ""
 	for _, o := range ors {
 		if f, ok := fieldMap[o.Column]; ok {
-			fmt.Fprint(query, fmt.Sprintf("%s = :%s OR ", f, f))
+			fmt.Fprint(query, fmt.Sprintf(cond, "%s = :%s ", f, f))
 			values[f] = o.Value
+			cond = "OR"
 		}
 	}
-	fmt.Fprint(query, "(")
+	fmt.Fprint(query, "AND (")
 	for _, a := range ands {
 		if f, ok := fieldMap[a.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s AND ", f, f))
