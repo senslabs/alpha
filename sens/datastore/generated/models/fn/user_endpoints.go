@@ -107,49 +107,51 @@ func BatchInsertUserEndpoint(data []byte) ([]string, error) {
 
 
 
-/*
-func getUserEndpointFieldValue(c string, v interface{}) interface{} {
-	typeMap := models.GetUserEndpointTypeMap()
-	if typeMap[c] == "datastore.NullTime" || typeMap[c] == "TIMESTAMP" {
-		if val, err := strconv.ParseInt(v.(string), 10, 64); err != nil {
-			logger.Error(err)
-		} else {
-			return time.Unix(val, 0)
-		}
-	}
-	return v
-}
-*/
-
-func FindUserEndpoint(or []string, and []string, span []string, limit string, column string, order string) ([]models.UserEndpoint, *errors.SensError) {
+func buildUserEndpointWhereClause(query *bytes.Buffer, or []string, and []string, span []string, values map[string]interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
-
 	fieldMap := models.GetUserEndpointFieldMap()
-	values := make(map[string]interface{})
-	query := bytes.NewBufferString("SELECT * FROM user_endpoints WHERE ")
+
+	cond := ""
 	for _, o := range ors {
 		if f, ok := fieldMap[o.Column]; ok {
-			fmt.Fprint(query, fmt.Sprintf("%s = :%s OR ", f, f))
-			values[f] = o.Value
+			fmt.Fprint(query, cond, fmt.Sprintf("%s = :%s ", f, f))
+			values[f] = getUserEndpointFieldValue(o.Column, o.Value)
+			cond = "OR "
 		}
+	}
+
+	if cond == "OR " {
+		fmt.Fprint(query, "AND ")
 	}
 	fmt.Fprint(query, "(")
 	for _, a := range ands {
 		if f, ok := fieldMap[a.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s AND ", f, f))
-			values[f] = a.Value
+			values[f] = getUserEndpointFieldValue(a.Column, a.Value)
 		}
 	}
 	for _, s := range spans {
 		if f, ok := fieldMap[s.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
-			values["from_"+f] = s.From
-			values["to_"+f] = s.To
+			values["from_"+f] = getUserEndpointFieldValue(s.Column, s.From)
+			values["to_"+f] = getUserEndpointFieldValue(s.Column, s.To)
 		}
 	}
 	fmt.Fprint(query, "1 = 1)")
+}
+
+func getUserEndpointFieldValue(c string, v interface{}) interface{} {
+	// typeMap := models.GetAuthTypeMap()
+	return v
+}
+
+func FindUserEndpoint(or []string, and []string, span []string, limit string, column string, order string) ([]models.UserEndpoint, *errors.SensError) {
+	query := bytes.NewBufferString("SELECT * FROM user_endpoints WHERE ")
+	fieldMap := models.GetUserEndpointFieldMap()
+	values := make(map[string]interface{})
+	buildUserEndpointWhereClause(query, or, and, span, values)
 	if column != "" {
 		if f, ok := fieldMap[column]; ok {
 			if order == "" {
@@ -161,6 +163,7 @@ func FindUserEndpoint(or []string, and []string, span []string, limit string, co
 	fmt.Fprint(query, " LIMIT ", limit)
 
 	logger.Debug(query.String())
+	logger.Debugf("Values: %#v", values)
 
 	m := []models.UserEndpoint{}
 	db := datastore.GetConnection()
@@ -175,10 +178,6 @@ func FindUserEndpoint(or []string, and []string, span []string, limit string, co
 }
 
 func UpdateUserEndpointWhere(or []string, and []string, span []string, data []byte) *errors.SensError {
-	ors := datastore.ParseOrParams(or)
-	ands := datastore.ParseAndParams(and)
-	spans := datastore.ParseSpanParams(span)
-
 	fieldMap := models.GetUserEndpointFieldMap()
 	values := make(map[string]interface{})
 	update := bytes.NewBufferString("UPDATE user_endpoints SET ")
@@ -195,8 +194,6 @@ func UpdateUserEndpointWhere(or []string, and []string, span []string, data []by
 		return errors.FromError(errors.GO_ERROR, err)
 	}
 
-	logger.Debug(m)
-
 	comma := ""
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -208,28 +205,11 @@ func UpdateUserEndpointWhere(or []string, and []string, span []string, data []by
 	//SET ENDS
 
 	fmt.Fprint(update, " WHERE ")
-	for _, o := range ors {
-		if f, ok := fieldMap[o.Column]; ok {
-			fmt.Fprint(update, fmt.Sprintf("%s = :%s OR ", f, f))
-			values[f] = o.Value
-		}
-	}
-	fmt.Fprint(update, "(")
-	for _, a := range ands {
-		if f, ok := fieldMap[a.Column]; ok {
-			fmt.Fprint(update, fmt.Sprintf("%s = :%s AND ", f, f))
-			values[f] = a.Value
-		}
-	}
-	for _, s := range spans {
-		if f, ok := fieldMap[s.Column]; ok {
-			fmt.Fprint(update, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
-			values["from_"+f] = s.From
-			values["to_"+f] = s.To
-		}
-	}
-	fmt.Fprint(update, "1 = 1)")
+	buildUserEndpointWhereClause(update, or, and, span, values)
+
 	logger.Debug(update.String())
+	logger.Debugf("Values: %#v", values)
+
 	db := datastore.GetConnection()
 	stmt, err := db.PrepareNamed(update.String())
 	if err != nil {

@@ -163,49 +163,51 @@ func SelectOrgDetailView(id string) (models.OrgDetailView, *errors.SensError) {
 }
 
 
-/*
-func getOrgDetailViewFieldValue(c string, v interface{}) interface{} {
-	typeMap := models.GetOrgDetailViewTypeMap()
-	if typeMap[c] == "datastore.NullTime" || typeMap[c] == "TIMESTAMP" {
-		if val, err := strconv.ParseInt(v.(string), 10, 64); err != nil {
-			logger.Error(err)
-		} else {
-			return time.Unix(val, 0)
-		}
-	}
-	return v
-}
-*/
-
-func FindOrgDetailView(or []string, and []string, span []string, limit string, column string, order string) ([]models.OrgDetailView, *errors.SensError) {
+func buildOrgDetailViewWhereClause(query *bytes.Buffer, or []string, and []string, span []string, values map[string]interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
-
 	fieldMap := models.GetOrgDetailViewFieldMap()
-	values := make(map[string]interface{})
-	query := bytes.NewBufferString("SELECT * FROM org_detail_views WHERE ")
+
+	cond := ""
 	for _, o := range ors {
 		if f, ok := fieldMap[o.Column]; ok {
-			fmt.Fprint(query, fmt.Sprintf("%s = :%s OR ", f, f))
-			values[f] = o.Value
+			fmt.Fprint(query, cond, fmt.Sprintf("%s = :%s ", f, f))
+			values[f] = getOrgDetailViewFieldValue(o.Column, o.Value)
+			cond = "OR "
 		}
+	}
+
+	if cond == "OR " {
+		fmt.Fprint(query, "AND ")
 	}
 	fmt.Fprint(query, "(")
 	for _, a := range ands {
 		if f, ok := fieldMap[a.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s AND ", f, f))
-			values[f] = a.Value
+			values[f] = getOrgDetailViewFieldValue(a.Column, a.Value)
 		}
 	}
 	for _, s := range spans {
 		if f, ok := fieldMap[s.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
-			values["from_"+f] = s.From
-			values["to_"+f] = s.To
+			values["from_"+f] = getOrgDetailViewFieldValue(s.Column, s.From)
+			values["to_"+f] = getOrgDetailViewFieldValue(s.Column, s.To)
 		}
 	}
 	fmt.Fprint(query, "1 = 1)")
+}
+
+func getOrgDetailViewFieldValue(c string, v interface{}) interface{} {
+	// typeMap := models.GetAuthTypeMap()
+	return v
+}
+
+func FindOrgDetailView(or []string, and []string, span []string, limit string, column string, order string) ([]models.OrgDetailView, *errors.SensError) {
+	query := bytes.NewBufferString("SELECT * FROM org_detail_views WHERE ")
+	fieldMap := models.GetOrgDetailViewFieldMap()
+	values := make(map[string]interface{})
+	buildOrgDetailViewWhereClause(query, or, and, span, values)
 	if column != "" {
 		if f, ok := fieldMap[column]; ok {
 			if order == "" {
@@ -217,6 +219,7 @@ func FindOrgDetailView(or []string, and []string, span []string, limit string, c
 	fmt.Fprint(query, " LIMIT ", limit)
 
 	logger.Debug(query.String())
+	logger.Debugf("Values: %#v", values)
 
 	m := []models.OrgDetailView{}
 	db := datastore.GetConnection()
@@ -231,10 +234,6 @@ func FindOrgDetailView(or []string, and []string, span []string, limit string, c
 }
 
 func UpdateOrgDetailViewWhere(or []string, and []string, span []string, data []byte) *errors.SensError {
-	ors := datastore.ParseOrParams(or)
-	ands := datastore.ParseAndParams(and)
-	spans := datastore.ParseSpanParams(span)
-
 	fieldMap := models.GetOrgDetailViewFieldMap()
 	values := make(map[string]interface{})
 	update := bytes.NewBufferString("UPDATE org_detail_views SET ")
@@ -251,8 +250,6 @@ func UpdateOrgDetailViewWhere(or []string, and []string, span []string, data []b
 		return errors.FromError(errors.GO_ERROR, err)
 	}
 
-	logger.Debug(m)
-
 	comma := ""
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -264,28 +261,11 @@ func UpdateOrgDetailViewWhere(or []string, and []string, span []string, data []b
 	//SET ENDS
 
 	fmt.Fprint(update, " WHERE ")
-	for _, o := range ors {
-		if f, ok := fieldMap[o.Column]; ok {
-			fmt.Fprint(update, fmt.Sprintf("%s = :%s OR ", f, f))
-			values[f] = o.Value
-		}
-	}
-	fmt.Fprint(update, "(")
-	for _, a := range ands {
-		if f, ok := fieldMap[a.Column]; ok {
-			fmt.Fprint(update, fmt.Sprintf("%s = :%s AND ", f, f))
-			values[f] = a.Value
-		}
-	}
-	for _, s := range spans {
-		if f, ok := fieldMap[s.Column]; ok {
-			fmt.Fprint(update, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
-			values["from_"+f] = s.From
-			values["to_"+f] = s.To
-		}
-	}
-	fmt.Fprint(update, "1 = 1)")
+	buildOrgDetailViewWhereClause(update, or, and, span, values)
+
 	logger.Debug(update.String())
+	logger.Debugf("Values: %#v", values)
+
 	db := datastore.GetConnection()
 	stmt, err := db.PrepareNamed(update.String())
 	if err != nil {

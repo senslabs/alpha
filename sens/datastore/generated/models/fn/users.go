@@ -39,19 +39,19 @@ func InsertUser(data []byte) (string, error) {
 	}
 	fmt.Fprint(insert, ") ")
 	fmt.Fprint(insert, values, ")")
-
+	
 	fmt.Fprint(insert, " returning id")
-
+	
 	db := datastore.GetConnection()
 
 	logger.Debug(insert.String())
-
+	
 	stmt, err := db.PrepareNamed(insert.String())
 	if err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.DB_ERROR, err)
 	}
-
+	
 	var id string
 	if err := stmt.Get(&id, m); err != nil {
 		logger.Error(err)
@@ -59,7 +59,7 @@ func InsertUser(data []byte) (string, error) {
 	} else {
 		return id, nil
 	}
-
+	
 }
 
 func BatchInsertUser(data []byte) ([]string, error) {
@@ -108,6 +108,7 @@ func BatchInsertUser(data []byte) ([]string, error) {
 	return nil, nil
 }
 
+
 func UpdateUser(id string, data []byte) error {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
@@ -154,7 +155,6 @@ func UpdateUser(id string, data []byte) error {
 func SelectUser(id string) (models.User, *errors.SensError) {
 	db := datastore.GetConnection()
 	m := models.User{}
-	logger.Error("Hello")
 	if err := db.Get(&m, "SELECT * FROM users WHERE id = $1", id); err != nil {
 		logger.Error(err)
 		return m, errors.FromError(errors.DB_ERROR, err)
@@ -162,49 +162,52 @@ func SelectUser(id string) (models.User, *errors.SensError) {
 	return m, nil
 }
 
-/*
-func getUserFieldValue(c string, v interface{}) interface{} {
-	typeMap := models.GetUserTypeMap()
-	if typeMap[c] == "datastore.NullTime" || typeMap[c] == "TIMESTAMP" {
-		if val, err := strconv.ParseInt(v.(string), 10, 64); err != nil {
-			logger.Error(err)
-		} else {
-			return time.Unix(val, 0)
-		}
-	}
-	return v
-}
-*/
 
-func FindUser(or []string, and []string, span []string, limit string, column string, order string) ([]models.User, *errors.SensError) {
+func buildUserWhereClause(query *bytes.Buffer, or []string, and []string, span []string, values map[string]interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
-
 	fieldMap := models.GetUserFieldMap()
-	values := make(map[string]interface{})
-	query := bytes.NewBufferString("SELECT * FROM users WHERE ")
+
+	cond := ""
 	for _, o := range ors {
 		if f, ok := fieldMap[o.Column]; ok {
-			fmt.Fprint(query, fmt.Sprintf("%s = :%s OR ", f, f))
-			values[f] = o.Value
+			fmt.Fprint(query, cond, fmt.Sprintf("%s = :%s ", f, f))
+			values[f] = getUserFieldValue(o.Column, o.Value)
+			cond = "OR "
 		}
+	}
+
+	if cond == "OR " {
+		fmt.Fprint(query, "AND ")
 	}
 	fmt.Fprint(query, "(")
 	for _, a := range ands {
 		if f, ok := fieldMap[a.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s AND ", f, f))
-			values[f] = a.Value
+			values[f] = getUserFieldValue(a.Column, a.Value)
 		}
 	}
 	for _, s := range spans {
 		if f, ok := fieldMap[s.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
-			values["from_"+f] = s.From
-			values["to_"+f] = s.To
+			values["from_"+f] = getUserFieldValue(s.Column, s.From)
+			values["to_"+f] = getUserFieldValue(s.Column, s.To)
 		}
 	}
 	fmt.Fprint(query, "1 = 1)")
+}
+
+func getUserFieldValue(c string, v interface{}) interface{} {
+	// typeMap := models.GetAuthTypeMap()
+	return v
+}
+
+func FindUser(or []string, and []string, span []string, limit string, column string, order string) ([]models.User, *errors.SensError) {
+	query := bytes.NewBufferString("SELECT * FROM users WHERE ")
+	fieldMap := models.GetUserFieldMap()
+	values := make(map[string]interface{})
+	buildUserWhereClause(query, or, and, span, values)
 	if column != "" {
 		if f, ok := fieldMap[column]; ok {
 			if order == "" {
@@ -216,6 +219,7 @@ func FindUser(or []string, and []string, span []string, limit string, column str
 	fmt.Fprint(query, " LIMIT ", limit)
 
 	logger.Debug(query.String())
+	logger.Debugf("Values: %#v", values)
 
 	m := []models.User{}
 	db := datastore.GetConnection()
@@ -230,10 +234,6 @@ func FindUser(or []string, and []string, span []string, limit string, column str
 }
 
 func UpdateUserWhere(or []string, and []string, span []string, data []byte) *errors.SensError {
-	ors := datastore.ParseOrParams(or)
-	ands := datastore.ParseAndParams(and)
-	spans := datastore.ParseSpanParams(span)
-
 	fieldMap := models.GetUserFieldMap()
 	values := make(map[string]interface{})
 	update := bytes.NewBufferString("UPDATE users SET ")
@@ -250,8 +250,6 @@ func UpdateUserWhere(or []string, and []string, span []string, data []byte) *err
 		return errors.FromError(errors.GO_ERROR, err)
 	}
 
-	logger.Debug(m)
-
 	comma := ""
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -263,28 +261,11 @@ func UpdateUserWhere(or []string, and []string, span []string, data []byte) *err
 	//SET ENDS
 
 	fmt.Fprint(update, " WHERE ")
-	for _, o := range ors {
-		if f, ok := fieldMap[o.Column]; ok {
-			fmt.Fprint(update, fmt.Sprintf("%s = :%s OR ", f, f))
-			values[f] = o.Value
-		}
-	}
-	fmt.Fprint(update, "(")
-	for _, a := range ands {
-		if f, ok := fieldMap[a.Column]; ok {
-			fmt.Fprint(update, fmt.Sprintf("%s = :%s AND ", f, f))
-			values[f] = a.Value
-		}
-	}
-	for _, s := range spans {
-		if f, ok := fieldMap[s.Column]; ok {
-			fmt.Fprint(update, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
-			values["from_"+f] = s.From
-			values["to_"+f] = s.To
-		}
-	}
-	fmt.Fprint(update, "1 = 1)")
+	buildUserWhereClause(update, or, and, span, values)
+
 	logger.Debug(update.String())
+	logger.Debugf("Values: %#v", values)
+
 	db := datastore.GetConnection()
 	stmt, err := db.PrepareNamed(update.String())
 	if err != nil {

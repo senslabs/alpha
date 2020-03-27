@@ -163,49 +163,51 @@ func SelectSession(id string) (models.Session, *errors.SensError) {
 }
 
 
-/*
-func getSessionFieldValue(c string, v interface{}) interface{} {
-	typeMap := models.GetSessionTypeMap()
-	if typeMap[c] == "datastore.NullTime" || typeMap[c] == "TIMESTAMP" {
-		if val, err := strconv.ParseInt(v.(string), 10, 64); err != nil {
-			logger.Error(err)
-		} else {
-			return time.Unix(val, 0)
-		}
-	}
-	return v
-}
-*/
-
-func FindSession(or []string, and []string, span []string, limit string, column string, order string) ([]models.Session, *errors.SensError) {
+func buildSessionWhereClause(query *bytes.Buffer, or []string, and []string, span []string, values map[string]interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
-
 	fieldMap := models.GetSessionFieldMap()
-	values := make(map[string]interface{})
-	query := bytes.NewBufferString("SELECT * FROM sessions WHERE ")
+
+	cond := ""
 	for _, o := range ors {
 		if f, ok := fieldMap[o.Column]; ok {
-			fmt.Fprint(query, fmt.Sprintf("%s = :%s OR ", f, f))
-			values[f] = o.Value
+			fmt.Fprint(query, cond, fmt.Sprintf("%s = :%s ", f, f))
+			values[f] = getSessionFieldValue(o.Column, o.Value)
+			cond = "OR "
 		}
+	}
+
+	if cond == "OR " {
+		fmt.Fprint(query, "AND ")
 	}
 	fmt.Fprint(query, "(")
 	for _, a := range ands {
 		if f, ok := fieldMap[a.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s AND ", f, f))
-			values[f] = a.Value
+			values[f] = getSessionFieldValue(a.Column, a.Value)
 		}
 	}
 	for _, s := range spans {
 		if f, ok := fieldMap[s.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
-			values["from_"+f] = s.From
-			values["to_"+f] = s.To
+			values["from_"+f] = getSessionFieldValue(s.Column, s.From)
+			values["to_"+f] = getSessionFieldValue(s.Column, s.To)
 		}
 	}
 	fmt.Fprint(query, "1 = 1)")
+}
+
+func getSessionFieldValue(c string, v interface{}) interface{} {
+	// typeMap := models.GetAuthTypeMap()
+	return v
+}
+
+func FindSession(or []string, and []string, span []string, limit string, column string, order string) ([]models.Session, *errors.SensError) {
+	query := bytes.NewBufferString("SELECT * FROM sessions WHERE ")
+	fieldMap := models.GetSessionFieldMap()
+	values := make(map[string]interface{})
+	buildSessionWhereClause(query, or, and, span, values)
 	if column != "" {
 		if f, ok := fieldMap[column]; ok {
 			if order == "" {
@@ -217,6 +219,7 @@ func FindSession(or []string, and []string, span []string, limit string, column 
 	fmt.Fprint(query, " LIMIT ", limit)
 
 	logger.Debug(query.String())
+	logger.Debugf("Values: %#v", values)
 
 	m := []models.Session{}
 	db := datastore.GetConnection()
@@ -231,10 +234,6 @@ func FindSession(or []string, and []string, span []string, limit string, column 
 }
 
 func UpdateSessionWhere(or []string, and []string, span []string, data []byte) *errors.SensError {
-	ors := datastore.ParseOrParams(or)
-	ands := datastore.ParseAndParams(and)
-	spans := datastore.ParseSpanParams(span)
-
 	fieldMap := models.GetSessionFieldMap()
 	values := make(map[string]interface{})
 	update := bytes.NewBufferString("UPDATE sessions SET ")
@@ -251,8 +250,6 @@ func UpdateSessionWhere(or []string, and []string, span []string, data []byte) *
 		return errors.FromError(errors.GO_ERROR, err)
 	}
 
-	logger.Debug(m)
-
 	comma := ""
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -264,28 +261,11 @@ func UpdateSessionWhere(or []string, and []string, span []string, data []byte) *
 	//SET ENDS
 
 	fmt.Fprint(update, " WHERE ")
-	for _, o := range ors {
-		if f, ok := fieldMap[o.Column]; ok {
-			fmt.Fprint(update, fmt.Sprintf("%s = :%s OR ", f, f))
-			values[f] = o.Value
-		}
-	}
-	fmt.Fprint(update, "(")
-	for _, a := range ands {
-		if f, ok := fieldMap[a.Column]; ok {
-			fmt.Fprint(update, fmt.Sprintf("%s = :%s AND ", f, f))
-			values[f] = a.Value
-		}
-	}
-	for _, s := range spans {
-		if f, ok := fieldMap[s.Column]; ok {
-			fmt.Fprint(update, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
-			values["from_"+f] = s.From
-			values["to_"+f] = s.To
-		}
-	}
-	fmt.Fprint(update, "1 = 1)")
+	buildSessionWhereClause(update, or, and, span, values)
+
 	logger.Debug(update.String())
+	logger.Debugf("Values: %#v", values)
+
 	db := datastore.GetConnection()
 	stmt, err := db.PrepareNamed(update.String())
 	if err != nil {

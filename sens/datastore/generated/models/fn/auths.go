@@ -39,19 +39,19 @@ func InsertAuth(data []byte) (string, error) {
 	}
 	fmt.Fprint(insert, ") ")
 	fmt.Fprint(insert, values, ")")
-
+	
 	fmt.Fprint(insert, " returning id")
-
+	
 	db := datastore.GetConnection()
 
 	logger.Debug(insert.String())
-
+	
 	stmt, err := db.PrepareNamed(insert.String())
 	if err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.DB_ERROR, err)
 	}
-
+	
 	var id string
 	if err := stmt.Get(&id, m); err != nil {
 		logger.Error(err)
@@ -59,7 +59,7 @@ func InsertAuth(data []byte) (string, error) {
 	} else {
 		return id, nil
 	}
-
+	
 }
 
 func BatchInsertAuth(data []byte) ([]string, error) {
@@ -107,6 +107,7 @@ func BatchInsertAuth(data []byte) ([]string, error) {
 	}
 	return nil, nil
 }
+
 
 func UpdateAuth(id string, data []byte) error {
 	var j map[string]interface{}
@@ -161,33 +162,18 @@ func SelectAuth(id string) (models.Auth, *errors.SensError) {
 	return m, nil
 }
 
-/*
-func getAuthFieldValue(c string, v interface{}) interface{} {
-	typeMap := models.GetAuthTypeMap()
-	if typeMap[c] == "datastore.NullTime" || typeMap[c] == "TIMESTAMP" {
-		if val, err := strconv.ParseInt(v.(string), 10, 64); err != nil {
-			logger.Error(err)
-		} else {
-			return time.Unix(val, 0)
-		}
-	}
-	return v
-}
-*/
 
-func FindAuth(or []string, and []string, span []string, limit string, column string, order string) ([]models.Auth, *errors.SensError) {
+func buildAuthWhereClause(query *bytes.Buffer, or []string, and []string, span []string, values map[string]interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
-
 	fieldMap := models.GetAuthFieldMap()
-	values := make(map[string]interface{})
-	query := bytes.NewBufferString("SELECT * FROM auths WHERE ")
+
 	cond := ""
 	for _, o := range ors {
 		if f, ok := fieldMap[o.Column]; ok {
 			fmt.Fprint(query, cond, fmt.Sprintf("%s = :%s ", f, f))
-			values[f] = o.Value
+			values[f] = getAuthFieldValue(o.Column, o.Value)
 			cond = "OR "
 		}
 	}
@@ -199,17 +185,29 @@ func FindAuth(or []string, and []string, span []string, limit string, column str
 	for _, a := range ands {
 		if f, ok := fieldMap[a.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s AND ", f, f))
-			values[f] = a.Value
+			values[f] = getAuthFieldValue(a.Column, a.Value)
 		}
 	}
 	for _, s := range spans {
 		if f, ok := fieldMap[s.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
-			values["from_"+f] = s.From
-			values["to_"+f] = s.To
+			values["from_"+f] = getAuthFieldValue(s.Column, s.From)
+			values["to_"+f] = getAuthFieldValue(s.Column, s.To)
 		}
 	}
 	fmt.Fprint(query, "1 = 1)")
+}
+
+func getAuthFieldValue(c string, v interface{}) interface{} {
+	// typeMap := models.GetAuthTypeMap()
+	return v
+}
+
+func FindAuth(or []string, and []string, span []string, limit string, column string, order string) ([]models.Auth, *errors.SensError) {
+	query := bytes.NewBufferString("SELECT * FROM auths WHERE ")
+	fieldMap := models.GetAuthFieldMap()
+	values := make(map[string]interface{})
+	buildAuthWhereClause(query, or, and, span, values)
 	if column != "" {
 		if f, ok := fieldMap[column]; ok {
 			if order == "" {
@@ -221,6 +219,7 @@ func FindAuth(or []string, and []string, span []string, limit string, column str
 	fmt.Fprint(query, " LIMIT ", limit)
 
 	logger.Debug(query.String())
+	logger.Debugf("Values: %#v", values)
 
 	m := []models.Auth{}
 	db := datastore.GetConnection()
@@ -235,10 +234,6 @@ func FindAuth(or []string, and []string, span []string, limit string, column str
 }
 
 func UpdateAuthWhere(or []string, and []string, span []string, data []byte) *errors.SensError {
-	ors := datastore.ParseOrParams(or)
-	ands := datastore.ParseAndParams(and)
-	spans := datastore.ParseSpanParams(span)
-
 	fieldMap := models.GetAuthFieldMap()
 	values := make(map[string]interface{})
 	update := bytes.NewBufferString("UPDATE auths SET ")
@@ -255,8 +250,6 @@ func UpdateAuthWhere(or []string, and []string, span []string, data []byte) *err
 		return errors.FromError(errors.GO_ERROR, err)
 	}
 
-	logger.Debug(m)
-
 	comma := ""
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -268,28 +261,11 @@ func UpdateAuthWhere(or []string, and []string, span []string, data []byte) *err
 	//SET ENDS
 
 	fmt.Fprint(update, " WHERE ")
-	for _, o := range ors {
-		if f, ok := fieldMap[o.Column]; ok {
-			fmt.Fprint(update, fmt.Sprintf("%s = :%s OR ", f, f))
-			values[f] = o.Value
-		}
-	}
-	fmt.Fprint(update, "(")
-	for _, a := range ands {
-		if f, ok := fieldMap[a.Column]; ok {
-			fmt.Fprint(update, fmt.Sprintf("%s = :%s AND ", f, f))
-			values[f] = a.Value
-		}
-	}
-	for _, s := range spans {
-		if f, ok := fieldMap[s.Column]; ok {
-			fmt.Fprint(update, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
-			values["from_"+f] = s.From
-			values["to_"+f] = s.To
-		}
-	}
-	fmt.Fprint(update, "1 = 1)")
+	buildAuthWhereClause(update, or, and, span, values)
+
 	logger.Debug(update.String())
+	logger.Debugf("Values: %#v", values)
+
 	db := datastore.GetConnection()
 	stmt, err := db.PrepareNamed(update.String())
 	if err != nil {
