@@ -37,9 +37,17 @@ SELECT
 	a.social,
 	a.first_name,
 	a.last_name,
-    --USERS
-	u.id as id
+    -- USERS
+	u.id as id,
+    -- DEVICES
+    d.device_id,
+	d.status,
+    d.name,
+    d.created_at
 FROM
 	auths a
+    -- WHERE d.user_id=u.id
 JOIN "users" u on
-	a.id = u.auth_id;
+	a.id = u.auth_id
+LEFT JOIN devices d on
+    d.user_id = u.id;

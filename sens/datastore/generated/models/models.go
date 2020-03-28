@@ -331,11 +331,15 @@ type UserDetailView struct {
 	FirstName *string `db:"first_name" json:",omitempty"`
 	LastName  *string `db:"last_name" json:",omitempty"`
 	Id        *string `db:"id" json:",omitempty"`
+	DeviceId  *string `db:"device_id" json:",omitempty"`
+	Status    *string `db:"status" json:",omitempty"`
+	Name      *string `db:"name" json:",omitempty"`
+	CreatedAt *int64  `db:"created_at" json:",omitempty"`
 }
 
 func GetUserDetailViewFieldMap() map[string]string {
-	return map[string]string{"AuthId": "auth_id", "Email": "email", "FirstName": "first_name", "Id": "id", "LastName": "last_name", "Mobile": "mobile", "Social": "social"}
+	return map[string]string{"AuthId": "auth_id", "CreatedAt": "created_at", "DeviceId": "device_id", "Email": "email", "FirstName": "first_name", "Id": "id", "LastName": "last_name", "Mobile": "mobile", "Name": "name", "Social": "social", "Status": "status"}
 }
 func GetUserDetailViewTypeMap() map[string]string {
-	return map[string]string{"AuthId": "*string", "Email": "*string", "FirstName": "*string", "Id": "*string", "LastName": "*string", "Mobile": "*string", "Social": "*string"}
+	return map[string]string{"AuthId": "*string", "CreatedAt": "*int64", "DeviceId": "*string", "Email": "*string", "FirstName": "*string", "Id": "*string", "LastName": "*string", "Mobile": "*string", "Name": "*string", "Social": "*string", "Status": "*string"}
 }
