@@ -88,7 +88,6 @@ func Post(url string, params HttpParams, headers HttpParams, rawBody interface{}
 }
 
 func WriteError(w http.ResponseWriter, code int, err error) error {
-	logger.Error(err)
 	http.Error(w, err.Error(), code)
 	return err
 }

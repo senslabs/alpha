@@ -58,7 +58,14 @@ func verifyToken(tokenText string, signingMethod *jwt.SigningMethodHMAC, signing
 	return m, err
 }
 
-func VerifyToken(tokenText string) (map[string]interface{}, error) {
+func VerifyToken(token interface{}) (map[string]interface{}, error) {
+	if token == nil {
+		return nil, errors.New(errors.GO_ERROR, "No token found")
+	}
+	return VerifyTokenString(token.(string))
+}
+
+func VerifyTokenString(tokenText string) (map[string]interface{}, error) {
 	return verifyToken(tokenText, jwt.SigningMethodHS256, accessSigningKey)
 }
 
