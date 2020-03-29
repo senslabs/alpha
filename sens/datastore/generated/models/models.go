@@ -343,3 +343,19 @@ func GetUserDetailViewFieldMap() map[string]string {
 func GetUserDetailViewTypeMap() map[string]string {
 	return map[string]string{"AuthId": "*string", "CreatedAt": "*int64", "DeviceId": "*string", "Email": "*string", "FirstName": "*string", "Id": "*string", "LastName": "*string", "Mobile": "*string", "Name": "*string", "Social": "*string", "Status": "*string"}
 }
+
+type DeviceView struct {
+	DeviceId  *string `db:"device_id" json:",omitempty"`
+	Name      *string `db:"name" json:",omitempty"`
+	OrgId     *string `db:"org_id" json:",omitempty"`
+	UserId    *string `db:"user_id" json:",omitempty"`
+	CreatedAt *int64  `db:"created_at" json:",omitempty"`
+	Status    *string `db:"status" json:",omitempty"`
+}
+
+func GetDeviceViewFieldMap() map[string]string {
+	return map[string]string{"CreatedAt": "created_at", "DeviceId": "device_id", "Name": "name", "OrgId": "org_id", "Status": "status", "UserId": "user_id"}
+}
+func GetDeviceViewTypeMap() map[string]string {
+	return map[string]string{"CreatedAt": "*int64", "DeviceId": "*string", "Name": "*string", "OrgId": "*string", "Status": "*string", "UserId": "*string"}
+}

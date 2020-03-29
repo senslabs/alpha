@@ -51,3 +51,18 @@ JOIN "users" u on
 	a.id = u.auth_id
 LEFT JOIN devices d on
     d.user_id = u.id;
+
+
+CREATE VIEW device_views AS
+SELECT
+  device_id, name, org_id, user_id, created_at, status
+FROM (
+    SELECT
+      DISTINCT ON(device_id) device_id, name, org_id, user_id, created_at, status
+    from devices
+    ORDER BY
+      device_id,
+      created_at desc
+  ) t
+ORDER BY
+  created_at DESC;

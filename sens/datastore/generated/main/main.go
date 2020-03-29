@@ -35,6 +35,7 @@ func main() {
 	api.OrgDetailViewMain(r)
 	api.OpDetailViewMain(r)
 	api.UserDetailViewMain(r)
+	api.DeviceViewMain(r)
 	
 	http.Handle("/", r)
 	http.ListenAndServe(":9804", r)
