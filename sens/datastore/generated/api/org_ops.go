@@ -15,6 +15,7 @@ func OrgOpMain(r *mux.Router) {
 	r.HandleFunc("/api/org-ops/create", CreateOrgOp)
 	r.HandleFunc("/api/org-ops/batch/create", BatchCreateOrgOp)
 	
+	r.HandleFunc("/api/org-ops/update", UpdateOrgOpWhere)
 	r.HandleFunc("/api/org-ops/find", FindOrgOp)
 }
 
@@ -43,6 +44,23 @@ func BatchCreateOrgOp(w http.ResponseWriter, r *http.Request) {
 }
 
 
+
+func UpdateOrgOpWhere(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if err := fn.UpdateOrgOpWhere(or, and, span, data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
 
 func FindOrgOp(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

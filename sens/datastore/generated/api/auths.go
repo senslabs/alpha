@@ -18,6 +18,7 @@ func AuthMain(r *mux.Router) {
 	r.HandleFunc("/api/auths/{id}/update", UpdateAuth)
 	r.HandleFunc("/api/auths/{id}/get", GetAuth)
 	
+	r.HandleFunc("/api/auths/update", UpdateAuthWhere)
 	r.HandleFunc("/api/auths/find", FindAuth)
 }
 
@@ -72,6 +73,23 @@ func GetAuth(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
+func UpdateAuthWhere(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if err := fn.UpdateAuthWhere(or, and, span, data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
 
 func FindAuth(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

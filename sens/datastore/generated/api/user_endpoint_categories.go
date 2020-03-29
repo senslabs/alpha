@@ -15,6 +15,7 @@ func UserEndpointCategorieMain(r *mux.Router) {
 	r.HandleFunc("/api/user-endpoint-categories/create", CreateUserEndpointCategorie)
 	r.HandleFunc("/api/user-endpoint-categories/batch/create", BatchCreateUserEndpointCategorie)
 	
+	r.HandleFunc("/api/user-endpoint-categories/update", UpdateUserEndpointCategorieWhere)
 	r.HandleFunc("/api/user-endpoint-categories/find", FindUserEndpointCategorie)
 }
 
@@ -43,6 +44,23 @@ func BatchCreateUserEndpointCategorie(w http.ResponseWriter, r *http.Request) {
 }
 
 
+
+func UpdateUserEndpointCategorieWhere(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if err := fn.UpdateUserEndpointCategorieWhere(or, and, span, data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
 
 func FindUserEndpointCategorie(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

@@ -15,6 +15,7 @@ func OpEndpointMain(r *mux.Router) {
 	r.HandleFunc("/api/op-endpoints/create", CreateOpEndpoint)
 	r.HandleFunc("/api/op-endpoints/batch/create", BatchCreateOpEndpoint)
 	
+	r.HandleFunc("/api/op-endpoints/update", UpdateOpEndpointWhere)
 	r.HandleFunc("/api/op-endpoints/find", FindOpEndpoint)
 }
 
@@ -43,6 +44,23 @@ func BatchCreateOpEndpoint(w http.ResponseWriter, r *http.Request) {
 }
 
 
+
+func UpdateOpEndpointWhere(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if err := fn.UpdateOpEndpointWhere(or, and, span, data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
 
 func FindOpEndpoint(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

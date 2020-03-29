@@ -15,6 +15,7 @@ func OpUserCategorieMain(r *mux.Router) {
 	r.HandleFunc("/api/op-user-categories/create", CreateOpUserCategorie)
 	r.HandleFunc("/api/op-user-categories/batch/create", BatchCreateOpUserCategorie)
 	
+	r.HandleFunc("/api/op-user-categories/update", UpdateOpUserCategorieWhere)
 	r.HandleFunc("/api/op-user-categories/find", FindOpUserCategorie)
 }
 
@@ -43,6 +44,23 @@ func BatchCreateOpUserCategorie(w http.ResponseWriter, r *http.Request) {
 }
 
 
+
+func UpdateOpUserCategorieWhere(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if err := fn.UpdateOpUserCategorieWhere(or, and, span, data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
 
 func FindOpUserCategorie(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

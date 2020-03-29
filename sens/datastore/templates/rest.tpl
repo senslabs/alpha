@@ -18,6 +18,7 @@ func {{.Model}}Main(r *mux.Router) {
 	r.HandleFunc("/api/{{.Path}}/{id}/update", Update{{.Model}})
 	r.HandleFunc("/api/{{.Path}}/{id}/get", Get{{.Model}})
 	{{end}}
+	r.HandleFunc("/api/{{.Path}}/update", Update{{.Model}}Where)
 	r.HandleFunc("/api/{{.Path}}/find", Find{{.Model}})
 }
 
@@ -72,6 +73,23 @@ func Get{{.Model}}(w http.ResponseWriter, r *http.Request) {
 	}
 }
 {{end}}
+
+func Update{{.Model}}Where(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if err := fn.Update{{.Model}}Where(or, and, span, data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
 
 func Find{{.Model}}(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

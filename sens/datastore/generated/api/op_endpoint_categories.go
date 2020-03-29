@@ -15,6 +15,7 @@ func OpEndpointCategorieMain(r *mux.Router) {
 	r.HandleFunc("/api/op-endpoint-categories/create", CreateOpEndpointCategorie)
 	r.HandleFunc("/api/op-endpoint-categories/batch/create", BatchCreateOpEndpointCategorie)
 	
+	r.HandleFunc("/api/op-endpoint-categories/update", UpdateOpEndpointCategorieWhere)
 	r.HandleFunc("/api/op-endpoint-categories/find", FindOpEndpointCategorie)
 }
 
@@ -43,6 +44,23 @@ func BatchCreateOpEndpointCategorie(w http.ResponseWriter, r *http.Request) {
 }
 
 
+
+func UpdateOpEndpointCategorieWhere(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if err := fn.UpdateOpEndpointCategorieWhere(or, and, span, data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
 
 func FindOpEndpointCategorie(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

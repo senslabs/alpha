@@ -18,6 +18,7 @@ func UserMain(r *mux.Router) {
 	r.HandleFunc("/api/users/{id}/update", UpdateUser)
 	r.HandleFunc("/api/users/{id}/get", GetUser)
 	
+	r.HandleFunc("/api/users/update", UpdateUserWhere)
 	r.HandleFunc("/api/users/find", FindUser)
 }
 
@@ -72,6 +73,23 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
+func UpdateUserWhere(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if err := fn.UpdateUserWhere(or, and, span, data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
 
 func FindUser(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

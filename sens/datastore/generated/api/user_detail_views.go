@@ -18,6 +18,7 @@ func UserDetailViewMain(r *mux.Router) {
 	r.HandleFunc("/api/user-detail-views/{id}/update", UpdateUserDetailView)
 	r.HandleFunc("/api/user-detail-views/{id}/get", GetUserDetailView)
 	
+	r.HandleFunc("/api/user-detail-views/update", UpdateUserDetailViewWhere)
 	r.HandleFunc("/api/user-detail-views/find", FindUserDetailView)
 }
 
@@ -72,6 +73,23 @@ func GetUserDetailView(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
+func UpdateUserDetailViewWhere(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if err := fn.UpdateUserDetailViewWhere(or, and, span, data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
 
 func FindUserDetailView(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

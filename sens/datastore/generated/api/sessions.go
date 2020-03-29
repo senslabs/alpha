@@ -18,6 +18,7 @@ func SessionMain(r *mux.Router) {
 	r.HandleFunc("/api/sessions/{id}/update", UpdateSession)
 	r.HandleFunc("/api/sessions/{id}/get", GetSession)
 	
+	r.HandleFunc("/api/sessions/update", UpdateSessionWhere)
 	r.HandleFunc("/api/sessions/find", FindSession)
 }
 
@@ -72,6 +73,23 @@ func GetSession(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
+func UpdateSessionWhere(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if err := fn.UpdateSessionWhere(or, and, span, data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
 
 func FindSession(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

@@ -18,6 +18,7 @@ func DeviceMain(r *mux.Router) {
 	r.HandleFunc("/api/devices/{id}/update", UpdateDevice)
 	r.HandleFunc("/api/devices/{id}/get", GetDevice)
 	
+	r.HandleFunc("/api/devices/update", UpdateDeviceWhere)
 	r.HandleFunc("/api/devices/find", FindDevice)
 }
 
@@ -72,6 +73,23 @@ func GetDevice(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
+func UpdateDeviceWhere(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if err := fn.UpdateDeviceWhere(or, and, span, data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
 
 func FindDevice(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

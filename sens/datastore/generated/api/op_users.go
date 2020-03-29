@@ -15,6 +15,7 @@ func OpUserMain(r *mux.Router) {
 	r.HandleFunc("/api/op-users/create", CreateOpUser)
 	r.HandleFunc("/api/op-users/batch/create", BatchCreateOpUser)
 	
+	r.HandleFunc("/api/op-users/update", UpdateOpUserWhere)
 	r.HandleFunc("/api/op-users/find", FindOpUser)
 }
 
@@ -43,6 +44,23 @@ func BatchCreateOpUser(w http.ResponseWriter, r *http.Request) {
 }
 
 
+
+func UpdateOpUserWhere(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if err := fn.UpdateOpUserWhere(or, and, span, data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
 
 func FindOpUser(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

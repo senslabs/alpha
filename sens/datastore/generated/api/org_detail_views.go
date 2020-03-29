@@ -18,6 +18,7 @@ func OrgDetailViewMain(r *mux.Router) {
 	r.HandleFunc("/api/org-detail-views/{id}/update", UpdateOrgDetailView)
 	r.HandleFunc("/api/org-detail-views/{id}/get", GetOrgDetailView)
 	
+	r.HandleFunc("/api/org-detail-views/update", UpdateOrgDetailViewWhere)
 	r.HandleFunc("/api/org-detail-views/find", FindOrgDetailView)
 }
 
@@ -72,6 +73,23 @@ func GetOrgDetailView(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
+func UpdateOrgDetailViewWhere(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if err := fn.UpdateOrgDetailViewWhere(or, and, span, data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
 
 func FindOrgDetailView(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

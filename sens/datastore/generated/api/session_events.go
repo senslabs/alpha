@@ -15,6 +15,7 @@ func SessionEventMain(r *mux.Router) {
 	r.HandleFunc("/api/session-events/create", CreateSessionEvent)
 	r.HandleFunc("/api/session-events/batch/create", BatchCreateSessionEvent)
 	
+	r.HandleFunc("/api/session-events/update", UpdateSessionEventWhere)
 	r.HandleFunc("/api/session-events/find", FindSessionEvent)
 }
 
@@ -43,6 +44,23 @@ func BatchCreateSessionEvent(w http.ResponseWriter, r *http.Request) {
 }
 
 
+
+func UpdateSessionEventWhere(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if err := fn.UpdateSessionEventWhere(or, and, span, data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
 
 func FindSessionEvent(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

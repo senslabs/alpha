@@ -18,6 +18,7 @@ func OrgMain(r *mux.Router) {
 	r.HandleFunc("/api/orgs/{id}/update", UpdateOrg)
 	r.HandleFunc("/api/orgs/{id}/get", GetOrg)
 	
+	r.HandleFunc("/api/orgs/update", UpdateOrgWhere)
 	r.HandleFunc("/api/orgs/find", FindOrg)
 }
 
@@ -72,6 +73,23 @@ func GetOrg(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
+func UpdateOrgWhere(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if err := fn.UpdateOrgWhere(or, and, span, data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
 
 func FindOrg(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

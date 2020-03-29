@@ -197,8 +197,8 @@ func UpdateOpUserWhere(or []string, and []string, span []string, data []byte) *e
 	comma := ""
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
-			fmt.Fprint(update, comma, f, " = :set_", k)
-			values["set_"+f] = j[f]
+			fmt.Fprint(update, comma, f, " = :set_", f)
+			values["set_"+f] = j[k]
 			comma = ", "
 		}
 	}

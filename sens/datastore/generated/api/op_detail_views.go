@@ -18,6 +18,7 @@ func OpDetailViewMain(r *mux.Router) {
 	r.HandleFunc("/api/op-detail-views/{id}/update", UpdateOpDetailView)
 	r.HandleFunc("/api/op-detail-views/{id}/get", GetOpDetailView)
 	
+	r.HandleFunc("/api/op-detail-views/update", UpdateOpDetailViewWhere)
 	r.HandleFunc("/api/op-detail-views/find", FindOpDetailView)
 }
 
@@ -72,6 +73,23 @@ func GetOpDetailView(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
+func UpdateOpDetailViewWhere(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if err := fn.UpdateOpDetailViewWhere(or, and, span, data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
 
 func FindOpDetailView(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()

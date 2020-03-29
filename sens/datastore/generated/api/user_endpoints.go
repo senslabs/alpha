@@ -15,6 +15,7 @@ func UserEndpointMain(r *mux.Router) {
 	r.HandleFunc("/api/user-endpoints/create", CreateUserEndpoint)
 	r.HandleFunc("/api/user-endpoints/batch/create", BatchCreateUserEndpoint)
 	
+	r.HandleFunc("/api/user-endpoints/update", UpdateUserEndpointWhere)
 	r.HandleFunc("/api/user-endpoints/find", FindUserEndpoint)
 }
 
@@ -43,6 +44,23 @@ func BatchCreateUserEndpoint(w http.ResponseWriter, r *http.Request) {
 }
 
 
+
+func UpdateUserEndpointWhere(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if err := fn.UpdateUserEndpointWhere(or, and, span, data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
 
 func FindUserEndpoint(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
