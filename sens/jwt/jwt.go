@@ -51,6 +51,10 @@ func verifyToken(tokenText string, signingMethod *jwt.SigningMethodHMAC, signing
 		}
 		return []byte(signingKey), nil
 	})
+	if err != nil {
+		logger.Error("Error: ", err)
+		return m, errors.New(errors.GO_ERROR, err.Error())
+	}
 	if token == nil || !token.Valid {
 		logger.Error("Token: ", token)
 		return m, errors.New(errors.GO_ERROR, "Invalid Token Received")
