@@ -54,7 +54,7 @@ func verifyToken(tokenText string, signingMethod *jwt.SigningMethodHMAC, signing
 	})
 	if token == nil || !token.Valid {
 		logger.Error("Token: ", token)
-		return m, errors.New("Invalid Token Received")
+		return m, errors.New(errors.GO_ERROR, "Invalid Token Received")
 	}
 	if claims, ok := token.Claims.(jwt.MapClaims); ok {
 		err = types.JsonUnmarshal(claims["sub"].([]byte), &m)
