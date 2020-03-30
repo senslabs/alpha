@@ -39,7 +39,7 @@ func GenerateRefreshToken(subject interface{}) (string, error) {
 }
 
 func GenerateTemporaryToken(subject interface{}) (string, error) {
-	return generateToken(subject, 15*time.Minute, jwt.SigningMethodHS512, refreshSigningKey)
+	return GenerateAccessToken(subject, 15*time.Minute)
 }
 
 func verifyToken(tokenText string, signingMethod *jwt.SigningMethodHMAC, signingKey string) (map[string]interface{}, error) {
