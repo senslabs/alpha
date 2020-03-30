@@ -8,7 +8,6 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/senslabs/alpha/sens/errors"
 	"github.com/senslabs/alpha/sens/logger"
-	"github.com/senslabs/alpha/sens/types"
 )
 
 const accessSigningKey = "L7zBtmHybEkjubZfvkAs-3gklypIZGO5WZKZZQuLQ"
@@ -57,7 +56,8 @@ func verifyToken(tokenText string, signingMethod *jwt.SigningMethodHMAC, signing
 		return m, errors.New(errors.GO_ERROR, "Invalid Token Received")
 	}
 	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-		err = types.JsonUnmarshal(claims["sub"].([]byte), &m)
+		// err = types.JsonUnmarshal(claims["sub"].([]byte), &m)
+		err = json.Unmarshal([]byte(claims["sub"].(string)), &m)
 	}
 	return m, err
 }
