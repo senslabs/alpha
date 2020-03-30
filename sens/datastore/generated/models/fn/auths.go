@@ -72,7 +72,7 @@ func BatchInsertAuth(data []byte) ([]string, error) {
 	comma := ""
 	var keys []string
 	fieldMap := models.GetAuthFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO auths(")
+	insert := bytes.NewBufferString("UPSERT INTO auths(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)

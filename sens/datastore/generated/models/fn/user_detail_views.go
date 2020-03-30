@@ -72,7 +72,7 @@ func BatchInsertUserDetailView(data []byte) ([]string, error) {
 	comma := ""
 	var keys []string
 	fieldMap := models.GetUserDetailViewFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO user_detail_views(")
+	insert := bytes.NewBufferString("UPSERT INTO user_detail_views(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)

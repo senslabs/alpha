@@ -69,7 +69,7 @@ func BatchInsertSessionPropertie(data []byte) ([]string, error) {
 	comma := ""
 	var keys []string
 	fieldMap := models.GetSessionPropertieFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO session_properties(")
+	insert := bytes.NewBufferString("UPSERT INTO session_properties(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)

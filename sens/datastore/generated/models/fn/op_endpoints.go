@@ -69,7 +69,7 @@ func BatchInsertOpEndpoint(data []byte) ([]string, error) {
 	comma := ""
 	var keys []string
 	fieldMap := models.GetOpEndpointFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO op_endpoints(")
+	insert := bytes.NewBufferString("UPSERT INTO op_endpoints(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)

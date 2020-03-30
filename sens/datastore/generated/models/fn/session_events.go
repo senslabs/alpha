@@ -69,7 +69,7 @@ func BatchInsertSessionEvent(data []byte) ([]string, error) {
 	comma := ""
 	var keys []string
 	fieldMap := models.GetSessionEventFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO session_events(")
+	insert := bytes.NewBufferString("UPSERT INTO session_events(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)

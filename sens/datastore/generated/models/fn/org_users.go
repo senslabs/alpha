@@ -69,7 +69,7 @@ func BatchInsertOrgUser(data []byte) ([]string, error) {
 	comma := ""
 	var keys []string
 	fieldMap := models.GetOrgUserFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO org_users(")
+	insert := bytes.NewBufferString("UPSERT INTO org_users(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)

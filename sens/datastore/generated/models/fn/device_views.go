@@ -69,7 +69,7 @@ func BatchInsertDeviceView(data []byte) ([]string, error) {
 	comma := ""
 	var keys []string
 	fieldMap := models.GetDeviceViewFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO device_views(")
+	insert := bytes.NewBufferString("UPSERT INTO device_views(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)

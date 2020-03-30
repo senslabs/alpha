@@ -72,7 +72,7 @@ func BatchInsertDevice(data []byte) ([]string, error) {
 	comma := ""
 	var keys []string
 	fieldMap := models.GetDeviceFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO devices(")
+	insert := bytes.NewBufferString("UPSERT INTO devices(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)

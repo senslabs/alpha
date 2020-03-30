@@ -72,7 +72,7 @@ func BatchInsertUser(data []byte) ([]string, error) {
 	comma := ""
 	var keys []string
 	fieldMap := models.GetUserFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO users(")
+	insert := bytes.NewBufferString("UPSERT INTO users(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)

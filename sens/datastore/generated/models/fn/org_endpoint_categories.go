@@ -69,7 +69,7 @@ func BatchInsertOrgEndpointCategorie(data []byte) ([]string, error) {
 	comma := ""
 	var keys []string
 	fieldMap := models.GetOrgEndpointCategorieFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO org_endpoint_categories(")
+	insert := bytes.NewBufferString("UPSERT INTO org_endpoint_categories(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
