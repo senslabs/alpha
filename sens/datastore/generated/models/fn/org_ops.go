@@ -51,7 +51,7 @@ func InsertOrgOp(data []byte) (string, error) {
 	}
 	
 	if _, err := stmt.Exec(m); err != nil {
-		logger.Error(err)
+		logger.Errorf("Received error %s while inserting values\n\t %#v", err, values)
 		return "", errors.FromError(errors.DB_ERROR, err)
 	} else {
 		return "", nil
@@ -99,7 +99,7 @@ func BatchInsertOrgOp(data []byte) ([]string, error) {
 	db := datastore.GetConnection()
 	_, err := db.Exec(insert.String(), values...)
 	if err != nil {
-		logger.Error(err)
+		logger.Errorf("Received error %s while inserting values\n\t %#v", err, values)
 		return nil, errors.FromError(errors.DB_ERROR, err)
 	}
 	return nil, nil

@@ -54,14 +54,14 @@ func Insert{{.Model}}(data []byte) (string, error) {
 	{{if .HasId}}
 	var id string
 	if err := stmt.Get(&id, m); err != nil {
-		logger.Error(err)
+		logger.Errorf("Received error %s while inserting values\n\t %#v", err, values)
 		return "", errors.FromError(errors.DB_ERROR, err)
 	} else {
 		return id, nil
 	}
 	{{else}}
 	if _, err := stmt.Exec(m); err != nil {
-		logger.Error(err)
+		logger.Errorf("Received error %s while inserting values\n\t %#v", err, values)
 		return "", errors.FromError(errors.DB_ERROR, err)
 	} else {
 		return "", nil
@@ -109,7 +109,7 @@ func BatchInsert{{.Model}}(data []byte) ([]string, error) {
 	db := datastore.GetConnection()
 	_, err := db.Exec(insert.String(), values...)
 	if err != nil {
-		logger.Error(err)
+		logger.Errorf("Received error %s while inserting values\n\t %#v", err, values)
 		return nil, errors.FromError(errors.DB_ERROR, err)
 	}
 	return nil, nil
