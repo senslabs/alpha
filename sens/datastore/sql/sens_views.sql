@@ -78,6 +78,16 @@ FROM (
 ORDER BY
   created_at DESC;
 
+-- The user_session_views is meant to view the activity type and timestamp of a user
+CREATE VIEW user_session_views AS 
+SELECT type, ended_at AS timestamp, user_id FROM sessions WHERE type = 'Sleep'
+UNION
+SELECT type, ended_at AS timestamp, user_id FROM sessions WHERE type = 'Meditation'
+UNION
+SELECT 'Alert', created_at AS timestamp, user_id FROM alerts
+UNION
+SELECT 'Device', da.active_at AS timestamp, dv.user_id FROM device_activities da JOIN device_views dv ON dv.device_id = da.device_id
+
 CREATE VIEW user_alert_views AS
 SELECT
   a.user_id,

@@ -2,7 +2,6 @@ package ext
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
@@ -13,7 +12,7 @@ import (
 
 func ExtMain(r *mux.Router) {
 	s := r.PathPrefix("/api/ext").Subrouter()
-	s.HandleFunc("/activities/get", GetOrgActivites)
+	s.HandleFunc("/activities/get", GetOrgActivites).Queries("days", "{days:[0-9]+}")
 }
 
 type Activity struct {
@@ -23,12 +22,11 @@ type Activity struct {
 
 func GetOrgActivites(w http.ResponseWriter, r *http.Request) {
 	userIds := r.URL.Query()["UserId"]
-	days := r.URL.Query()["Days"]
+	days := r.URL.Query().Get("days")
 	values := map[string]interface{}{
 		"user_ids": userIds,
-		"when":     time.Now().Add(-10 * 24 * time.Hour).Unix(),
+		"when":     days,
 	}
-
 	if query, args, err := sqlx.Named(ACTIVITY_DASHBOARD_QUERY, values); err != nil {
 		logger.Error(err)
 		httpclient.WriteError(w, http.StatusInternalServerError, err)

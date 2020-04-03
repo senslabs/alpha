@@ -27,6 +27,8 @@ func main() {
 	api.UserEndpointAccessGroupMain(r)
 	api.UserEndpointMain(r)
 	api.DeviceMain(r)
+	api.DeviceActivitieMain(r)
+	api.AlertMain(r)
 	api.SessionMain(r)
 	api.SessionEventMain(r)
 	api.SessionRecordMain(r)
@@ -35,7 +37,12 @@ func main() {
 	api.OpDetailViewMain(r)
 	api.UserDetailViewMain(r)
 	api.DeviceViewMain(r)
-
+	api.UserAlertViewMain(r)
+	api.SleepViewMain(r)
+	api.MeditationViewMain(r)
+	api.SleepSummarieMain(r)
+	api.MeditationSummarieMain(r)
+	
 	ext.ExtMain(r)
 
 	http.Handle("/", r)
