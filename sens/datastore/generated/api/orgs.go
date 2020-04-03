@@ -30,7 +30,7 @@ func CreateOrg(w http.ResponseWriter, r *http.Request) {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
-		fmt.Fprintln(w, id)
+		fmt.Fprint(w, id)
 	}
 }
 
@@ -42,7 +42,7 @@ func BatchCreateOrg(w http.ResponseWriter, r *http.Request) {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
-		fmt.Fprintln(w, id)
+		fmt.Fprint(w, id)
 	}
 }
 

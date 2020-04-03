@@ -29,60 +29,164 @@ func GetAuthTypeMap() map[string]string {
 type Org struct {
 	Id        *string `db:"id" json:",omitempty"`
 	AuthId    *string `db:"auth_id" json:",omitempty"`
-	Name      *string `db:"name" json:",omitempty"`
+	OrgName   *string `db:"org_name" json:",omitempty"`
 	CreatedAt *int64  `db:"created_at" json:",omitempty"`
 	UpdatedAt *int64  `db:"updated_at" json:",omitempty"`
 }
 
 func GetOrgFieldMap() map[string]string {
-	return map[string]string{"AuthId": "auth_id", "CreatedAt": "created_at", "Id": "id", "Name": "name", "UpdatedAt": "updated_at"}
+	return map[string]string{"AuthId": "auth_id", "CreatedAt": "created_at", "Id": "id", "OrgName": "org_name", "UpdatedAt": "updated_at"}
 }
 func GetOrgTypeMap() map[string]string {
-	return map[string]string{"AuthId": "*string", "CreatedAt": "*int64", "Id": "*string", "Name": "*string", "UpdatedAt": "*int64"}
+	return map[string]string{"AuthId": "*string", "CreatedAt": "*int64", "Id": "*string", "OrgName": "*string", "UpdatedAt": "*int64"}
 }
 
 type Op struct {
 	Id        *string `db:"id" json:",omitempty"`
 	AuthId    *string `db:"auth_id" json:",omitempty"`
+	OrgId     *string `db:"org_id" json:",omitempty"`
 	CreatedAt *int64  `db:"created_at" json:",omitempty"`
 	UpdatedAt *int64  `db:"updated_at" json:",omitempty"`
 	Status    *string `db:"status" json:",omitempty"`
 }
 
 func GetOpFieldMap() map[string]string {
-	return map[string]string{"AuthId": "auth_id", "CreatedAt": "created_at", "Id": "id", "Status": "status", "UpdatedAt": "updated_at"}
+	return map[string]string{"AuthId": "auth_id", "CreatedAt": "created_at", "Id": "id", "OrgId": "org_id", "Status": "status", "UpdatedAt": "updated_at"}
 }
 func GetOpTypeMap() map[string]string {
-	return map[string]string{"AuthId": "*string", "CreatedAt": "*int64", "Id": "*string", "Status": "*string", "UpdatedAt": "*int64"}
+	return map[string]string{"AuthId": "*string", "CreatedAt": "*int64", "Id": "*string", "OrgId": "*string", "Status": "*string", "UpdatedAt": "*int64"}
 }
 
 type User struct {
-	Id        *string `db:"id" json:",omitempty"`
-	AuthId    *string `db:"auth_id" json:",omitempty"`
-	CreatedAt *int64  `db:"created_at" json:",omitempty"`
-	UpdatedAt *int64  `db:"updated_at" json:",omitempty"`
-	Status    *string `db:"status" json:",omitempty"`
+	Id          *string `db:"id" json:",omitempty"`
+	AuthId      *string `db:"auth_id" json:",omitempty"`
+	OrgId       *string `db:"org_id" json:",omitempty"`
+	AccessGroup *string `db:"access_group" json:",omitempty"`
+	CreatedAt   *int64  `db:"created_at" json:",omitempty"`
+	UpdatedAt   *int64  `db:"updated_at" json:",omitempty"`
+	Age         *int64  `db:"age" json:",omitempty"`
+	Status      *string `db:"status" json:",omitempty"`
 }
 
 func GetUserFieldMap() map[string]string {
-	return map[string]string{"AuthId": "auth_id", "CreatedAt": "created_at", "Id": "id", "Status": "status", "UpdatedAt": "updated_at"}
+	return map[string]string{"AccessGroup": "access_group", "Age": "age", "AuthId": "auth_id", "CreatedAt": "created_at", "Id": "id", "OrgId": "org_id", "Status": "status", "UpdatedAt": "updated_at"}
 }
 func GetUserTypeMap() map[string]string {
-	return map[string]string{"AuthId": "*string", "CreatedAt": "*int64", "Id": "*string", "Status": "*string", "UpdatedAt": "*int64"}
+	return map[string]string{"AccessGroup": "*string", "Age": "*int64", "AuthId": "*string", "CreatedAt": "*int64", "Id": "*string", "OrgId": "*string", "Status": "*string", "UpdatedAt": "*int64"}
+}
+
+type OpUserAccessGroup struct {
+	OpId        *string `db:"op_id" json:",omitempty"`
+	AccessGroup *string `db:"access_group" json:",omitempty"`
+}
+
+func GetOpUserAccessGroupFieldMap() map[string]string {
+	return map[string]string{"AccessGroup": "access_group", "OpId": "op_id"}
+}
+func GetOpUserAccessGroupTypeMap() map[string]string {
+	return map[string]string{"AccessGroup": "*string", "OpId": "*string"}
+}
+
+type OpUser struct {
+	OpId   *string `db:"op_id" json:",omitempty"`
+	UserId *string `db:"user_id" json:",omitempty"`
+	Access *bool   `db:"access" json:",omitempty"`
+}
+
+func GetOpUserFieldMap() map[string]string {
+	return map[string]string{"Access": "access", "OpId": "op_id", "UserId": "user_id"}
+}
+func GetOpUserTypeMap() map[string]string {
+	return map[string]string{"Access": "*bool", "OpId": "*string", "UserId": "*string"}
 }
 
 type Endpoint struct {
-	Id       *string `db:"id" json:",omitempty"`
-	Category *string `db:"category" json:",omitempty"`
-	Path     *string `db:"path" json:",omitempty"`
-	Secure   *bool   `db:"secure" json:",omitempty"`
+	Id          *string `db:"id" json:",omitempty"`
+	AccessGroup *string `db:"access_group" json:",omitempty"`
+	Path        *string `db:"path" json:",omitempty"`
+	Secure      *bool   `db:"secure" json:",omitempty"`
 }
 
 func GetEndpointFieldMap() map[string]string {
-	return map[string]string{"Category": "category", "Id": "id", "Path": "path", "Secure": "secure"}
+	return map[string]string{"AccessGroup": "access_group", "Id": "id", "Path": "path", "Secure": "secure"}
 }
 func GetEndpointTypeMap() map[string]string {
-	return map[string]string{"Category": "*string", "Id": "*string", "Path": "*string", "Secure": "*bool"}
+	return map[string]string{"AccessGroup": "*string", "Id": "*string", "Path": "*string", "Secure": "*bool"}
+}
+
+type OrgEndpointAccessGroup struct {
+	OrgId       *string `db:"org_id" json:",omitempty"`
+	AccessGroup *string `db:"access_group" json:",omitempty"`
+}
+
+func GetOrgEndpointAccessGroupFieldMap() map[string]string {
+	return map[string]string{"AccessGroup": "access_group", "OrgId": "org_id"}
+}
+func GetOrgEndpointAccessGroupTypeMap() map[string]string {
+	return map[string]string{"AccessGroup": "*string", "OrgId": "*string"}
+}
+
+type OrgEndpoint struct {
+	OrgId      *string `db:"org_id" json:",omitempty"`
+	EndpointId *string `db:"endpoint_id" json:",omitempty"`
+	Access     *bool   `db:"access" json:",omitempty"`
+}
+
+func GetOrgEndpointFieldMap() map[string]string {
+	return map[string]string{"Access": "access", "EndpointId": "endpoint_id", "OrgId": "org_id"}
+}
+func GetOrgEndpointTypeMap() map[string]string {
+	return map[string]string{"Access": "*bool", "EndpointId": "*string", "OrgId": "*string"}
+}
+
+type OpEndpointAccessGroup struct {
+	OpId        *string `db:"op_id" json:",omitempty"`
+	AccessGroup *string `db:"access_group" json:",omitempty"`
+}
+
+func GetOpEndpointAccessGroupFieldMap() map[string]string {
+	return map[string]string{"AccessGroup": "access_group", "OpId": "op_id"}
+}
+func GetOpEndpointAccessGroupTypeMap() map[string]string {
+	return map[string]string{"AccessGroup": "*string", "OpId": "*string"}
+}
+
+type OpEndpoint struct {
+	OpId       *string `db:"op_id" json:",omitempty"`
+	EndpointId *string `db:"endpoint_id" json:",omitempty"`
+	Access     *bool   `db:"access" json:",omitempty"`
+}
+
+func GetOpEndpointFieldMap() map[string]string {
+	return map[string]string{"Access": "access", "EndpointId": "endpoint_id", "OpId": "op_id"}
+}
+func GetOpEndpointTypeMap() map[string]string {
+	return map[string]string{"Access": "*bool", "EndpointId": "*string", "OpId": "*string"}
+}
+
+type UserEndpointAccessGroup struct {
+	UserId           *string `db:"user_id" json:",omitempty"`
+	EndpointCategory *string `db:"endpoint_category" json:",omitempty"`
+}
+
+func GetUserEndpointAccessGroupFieldMap() map[string]string {
+	return map[string]string{"EndpointCategory": "endpoint_category", "UserId": "user_id"}
+}
+func GetUserEndpointAccessGroupTypeMap() map[string]string {
+	return map[string]string{"EndpointCategory": "*string", "UserId": "*string"}
+}
+
+type UserEndpoint struct {
+	UserId     *string `db:"user_id" json:",omitempty"`
+	EndpointId *string `db:"endpoint_id" json:",omitempty"`
+	Access     *bool   `db:"access" json:",omitempty"`
+}
+
+func GetUserEndpointFieldMap() map[string]string {
+	return map[string]string{"Access": "access", "EndpointId": "endpoint_id", "UserId": "user_id"}
+}
+func GetUserEndpointTypeMap() map[string]string {
+	return map[string]string{"Access": "*bool", "EndpointId": "*string", "UserId": "*string"}
 }
 
 type Device struct {
@@ -101,131 +205,6 @@ func GetDeviceFieldMap() map[string]string {
 }
 func GetDeviceTypeMap() map[string]string {
 	return map[string]string{"CreatedAt": "*int64", "DeviceId": "*string", "Id": "*string", "Name": "*string", "OrgId": "*string", "Properties": "*datastore.RawMessage", "Status": "*string", "UserId": "*string"}
-}
-
-type OrgOp struct {
-	OrgId *string `db:"org_id" json:",omitempty"`
-	OpId  *string `db:"op_id" json:",omitempty"`
-}
-
-func GetOrgOpFieldMap() map[string]string {
-	return map[string]string{"OpId": "op_id", "OrgId": "org_id"}
-}
-func GetOrgOpTypeMap() map[string]string {
-	return map[string]string{"OpId": "*string", "OrgId": "*string"}
-}
-
-type OrgUser struct {
-	OrgId    *string `db:"org_id" json:",omitempty"`
-	UserId   *string `db:"user_id" json:",omitempty"`
-	Category *string `db:"category" json:",omitempty"`
-}
-
-func GetOrgUserFieldMap() map[string]string {
-	return map[string]string{"Category": "category", "OrgId": "org_id", "UserId": "user_id"}
-}
-func GetOrgUserTypeMap() map[string]string {
-	return map[string]string{"Category": "*string", "OrgId": "*string", "UserId": "*string"}
-}
-
-type OpUserCategorie struct {
-	OpId         *string `db:"op_id" json:",omitempty"`
-	UserCategory *string `db:"user_category" json:",omitempty"`
-}
-
-func GetOpUserCategorieFieldMap() map[string]string {
-	return map[string]string{"OpId": "op_id", "UserCategory": "user_category"}
-}
-func GetOpUserCategorieTypeMap() map[string]string {
-	return map[string]string{"OpId": "*string", "UserCategory": "*string"}
-}
-
-type OpUser struct {
-	OpId   *string `db:"op_id" json:",omitempty"`
-	UserId *string `db:"user_id" json:",omitempty"`
-	Access *bool   `db:"access" json:",omitempty"`
-}
-
-func GetOpUserFieldMap() map[string]string {
-	return map[string]string{"Access": "access", "OpId": "op_id", "UserId": "user_id"}
-}
-func GetOpUserTypeMap() map[string]string {
-	return map[string]string{"Access": "*bool", "OpId": "*string", "UserId": "*string"}
-}
-
-type OrgEndpointCategorie struct {
-	OrgId            *string `db:"org_id" json:",omitempty"`
-	EndpointCategory *string `db:"endpoint_category" json:",omitempty"`
-}
-
-func GetOrgEndpointCategorieFieldMap() map[string]string {
-	return map[string]string{"EndpointCategory": "endpoint_category", "OrgId": "org_id"}
-}
-func GetOrgEndpointCategorieTypeMap() map[string]string {
-	return map[string]string{"EndpointCategory": "*string", "OrgId": "*string"}
-}
-
-type OrgEndpoint struct {
-	OrgId      *string `db:"org_id" json:",omitempty"`
-	EndpointId *string `db:"endpoint_id" json:",omitempty"`
-	Access     *bool   `db:"access" json:",omitempty"`
-}
-
-func GetOrgEndpointFieldMap() map[string]string {
-	return map[string]string{"Access": "access", "EndpointId": "endpoint_id", "OrgId": "org_id"}
-}
-func GetOrgEndpointTypeMap() map[string]string {
-	return map[string]string{"Access": "*bool", "EndpointId": "*string", "OrgId": "*string"}
-}
-
-type OpEndpointCategorie struct {
-	OpId             *string `db:"op_id" json:",omitempty"`
-	EndpointCategory *string `db:"endpoint_category" json:",omitempty"`
-}
-
-func GetOpEndpointCategorieFieldMap() map[string]string {
-	return map[string]string{"EndpointCategory": "endpoint_category", "OpId": "op_id"}
-}
-func GetOpEndpointCategorieTypeMap() map[string]string {
-	return map[string]string{"EndpointCategory": "*string", "OpId": "*string"}
-}
-
-type OpEndpoint struct {
-	OpId       *string `db:"op_id" json:",omitempty"`
-	EndpointId *string `db:"endpoint_id" json:",omitempty"`
-	Access     *bool   `db:"access" json:",omitempty"`
-}
-
-func GetOpEndpointFieldMap() map[string]string {
-	return map[string]string{"Access": "access", "EndpointId": "endpoint_id", "OpId": "op_id"}
-}
-func GetOpEndpointTypeMap() map[string]string {
-	return map[string]string{"Access": "*bool", "EndpointId": "*string", "OpId": "*string"}
-}
-
-type UserEndpointCategorie struct {
-	UserId           *string `db:"user_id" json:",omitempty"`
-	EndpointCategory *string `db:"endpoint_category" json:",omitempty"`
-}
-
-func GetUserEndpointCategorieFieldMap() map[string]string {
-	return map[string]string{"EndpointCategory": "endpoint_category", "UserId": "user_id"}
-}
-func GetUserEndpointCategorieTypeMap() map[string]string {
-	return map[string]string{"EndpointCategory": "*string", "UserId": "*string"}
-}
-
-type UserEndpoint struct {
-	UserId     *string `db:"user_id" json:",omitempty"`
-	EndpointId *string `db:"endpoint_id" json:",omitempty"`
-	Access     *bool   `db:"access" json:",omitempty"`
-}
-
-func GetUserEndpointFieldMap() map[string]string {
-	return map[string]string{"Access": "access", "EndpointId": "endpoint_id", "UserId": "user_id"}
-}
-func GetUserEndpointTypeMap() map[string]string {
-	return map[string]string{"Access": "*bool", "EndpointId": "*string", "UserId": "*string"}
 }
 
 type Session struct {
@@ -278,14 +257,13 @@ type SessionPropertie struct {
 	SessionId *string `db:"session_id" json:",omitempty"`
 	Name      *string `db:"name" json:",omitempty"`
 	Value     *string `db:"value" json:",omitempty"`
-	Rowid     *int64  `db:"rowid" json:",omitempty"`
 }
 
 func GetSessionPropertieFieldMap() map[string]string {
-	return map[string]string{"Name": "name", "Rowid": "rowid", "SessionId": "session_id", "Value": "value"}
+	return map[string]string{"Name": "name", "SessionId": "session_id", "Value": "value"}
 }
 func GetSessionPropertieTypeMap() map[string]string {
-	return map[string]string{"Name": "*string", "Rowid": "*int64", "SessionId": "*string", "Value": "*string"}
+	return map[string]string{"Name": "*string", "SessionId": "*string", "Value": "*string"}
 }
 
 type OrgDetailView struct {
@@ -314,13 +292,14 @@ type OpDetailView struct {
 	FirstName *string `db:"first_name" json:",omitempty"`
 	LastName  *string `db:"last_name" json:",omitempty"`
 	Id        *string `db:"id" json:",omitempty"`
+	OrgId     *string `db:"org_id" json:",omitempty"`
 }
 
 func GetOpDetailViewFieldMap() map[string]string {
-	return map[string]string{"AuthId": "auth_id", "Email": "email", "FirstName": "first_name", "Id": "id", "LastName": "last_name", "Mobile": "mobile", "Social": "social"}
+	return map[string]string{"AuthId": "auth_id", "Email": "email", "FirstName": "first_name", "Id": "id", "LastName": "last_name", "Mobile": "mobile", "OrgId": "org_id", "Social": "social"}
 }
 func GetOpDetailViewTypeMap() map[string]string {
-	return map[string]string{"AuthId": "*string", "Email": "*string", "FirstName": "*string", "Id": "*string", "LastName": "*string", "Mobile": "*string", "Social": "*string"}
+	return map[string]string{"AuthId": "*string", "Email": "*string", "FirstName": "*string", "Id": "*string", "LastName": "*string", "Mobile": "*string", "OrgId": "*string", "Social": "*string"}
 }
 
 type UserDetailView struct {
@@ -331,17 +310,14 @@ type UserDetailView struct {
 	FirstName *string `db:"first_name" json:",omitempty"`
 	LastName  *string `db:"last_name" json:",omitempty"`
 	Id        *string `db:"id" json:",omitempty"`
-	DeviceId  *string `db:"device_id" json:",omitempty"`
-	Status    *string `db:"status" json:",omitempty"`
-	Name      *string `db:"name" json:",omitempty"`
-	CreatedAt *int64  `db:"created_at" json:",omitempty"`
+	OrgId     *string `db:"org_id" json:",omitempty"`
 }
 
 func GetUserDetailViewFieldMap() map[string]string {
-	return map[string]string{"AuthId": "auth_id", "CreatedAt": "created_at", "DeviceId": "device_id", "Email": "email", "FirstName": "first_name", "Id": "id", "LastName": "last_name", "Mobile": "mobile", "Name": "name", "Social": "social", "Status": "status"}
+	return map[string]string{"AuthId": "auth_id", "Email": "email", "FirstName": "first_name", "Id": "id", "LastName": "last_name", "Mobile": "mobile", "OrgId": "org_id", "Social": "social"}
 }
 func GetUserDetailViewTypeMap() map[string]string {
-	return map[string]string{"AuthId": "*string", "CreatedAt": "*int64", "DeviceId": "*string", "Email": "*string", "FirstName": "*string", "Id": "*string", "LastName": "*string", "Mobile": "*string", "Name": "*string", "Social": "*string", "Status": "*string"}
+	return map[string]string{"AuthId": "*string", "Email": "*string", "FirstName": "*string", "Id": "*string", "LastName": "*string", "Mobile": "*string", "OrgId": "*string", "Social": "*string"}
 }
 
 type DeviceView struct {

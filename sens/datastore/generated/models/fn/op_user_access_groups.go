@@ -12,13 +12,13 @@ import (
 	"github.com/senslabs/alpha/sens/logger"
 )
 
-func InsertOrgEndpointCategorie(data []byte) (string, error) {
+func InsertOpUserAccessGroup(data []byte) (string, error) {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.OrgEndpointCategorie
+	var m models.OpUserAccessGroup
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
@@ -27,8 +27,8 @@ func InsertOrgEndpointCategorie(data []byte) (string, error) {
 	logger.Debug(m)
 
 	comma := ""
-	fieldMap := models.GetOrgEndpointCategorieFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO org_endpoint_categories(")
+	fieldMap := models.GetOpUserAccessGroupFieldMap()
+	insert := bytes.NewBufferString("INSERT INTO op_user_access_groups(")
 	values := bytes.NewBufferString("VALUES(")
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -59,7 +59,7 @@ func InsertOrgEndpointCategorie(data []byte) (string, error) {
 	
 }
 
-func BatchInsertOrgEndpointCategorie(data []byte) ([]string, error) {
+func BatchInsertOpUserAccessGroup(data []byte) ([]string, error) {
 	var j []map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
@@ -68,8 +68,8 @@ func BatchInsertOrgEndpointCategorie(data []byte) ([]string, error) {
 
 	comma := ""
 	var keys []string
-	fieldMap := models.GetOrgEndpointCategorieFieldMap()
-	insert := bytes.NewBufferString("UPSERT INTO org_endpoint_categories(")
+	fieldMap := models.GetOpUserAccessGroupFieldMap()
+	insert := bytes.NewBufferString("UPSERT INTO op_user_access_groups(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
@@ -107,17 +107,17 @@ func BatchInsertOrgEndpointCategorie(data []byte) ([]string, error) {
 
 
 
-func buildOrgEndpointCategorieWhereClause(query *bytes.Buffer, or []string, and []string, span []string, values map[string]interface{}) {
+func buildOpUserAccessGroupWhereClause(query *bytes.Buffer, or []string, and []string, span []string, values map[string]interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
-	fieldMap := models.GetOrgEndpointCategorieFieldMap()
+	fieldMap := models.GetOpUserAccessGroupFieldMap()
 
 	cond := ""
 	for _, o := range ors {
 		if f, ok := fieldMap[o.Column]; ok {
 			fmt.Fprint(query, cond, fmt.Sprintf("%s = :%s ", f, f))
-			values[f] = getOrgEndpointCategorieFieldValue(o.Column, o.Value)
+			values[f] = getOpUserAccessGroupFieldValue(o.Column, o.Value)
 			cond = "OR "
 		}
 	}
@@ -129,29 +129,29 @@ func buildOrgEndpointCategorieWhereClause(query *bytes.Buffer, or []string, and 
 	for _, a := range ands {
 		if f, ok := fieldMap[a.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s AND ", f, f))
-			values[f] = getOrgEndpointCategorieFieldValue(a.Column, a.Value)
+			values[f] = getOpUserAccessGroupFieldValue(a.Column, a.Value)
 		}
 	}
 	for _, s := range spans {
 		if f, ok := fieldMap[s.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
-			values["from_"+f] = getOrgEndpointCategorieFieldValue(s.Column, s.From)
-			values["to_"+f] = getOrgEndpointCategorieFieldValue(s.Column, s.To)
+			values["from_"+f] = getOpUserAccessGroupFieldValue(s.Column, s.From)
+			values["to_"+f] = getOpUserAccessGroupFieldValue(s.Column, s.To)
 		}
 	}
 	fmt.Fprint(query, "1 = 1)")
 }
 
-func getOrgEndpointCategorieFieldValue(c string, v interface{}) interface{} {
+func getOpUserAccessGroupFieldValue(c string, v interface{}) interface{} {
 	// typeMap := models.GetAuthTypeMap()
 	return v
 }
 
-func FindOrgEndpointCategorie(or []string, and []string, span []string, limit string, column string, order string) ([]models.OrgEndpointCategorie, *errors.SensError) {
-	query := bytes.NewBufferString("SELECT * FROM org_endpoint_categories WHERE ")
-	fieldMap := models.GetOrgEndpointCategorieFieldMap()
+func FindOpUserAccessGroup(or []string, and []string, span []string, limit string, column string, order string) ([]models.OpUserAccessGroup, *errors.SensError) {
+	query := bytes.NewBufferString("SELECT * FROM op_user_access_groups WHERE ")
+	fieldMap := models.GetOpUserAccessGroupFieldMap()
 	values := make(map[string]interface{})
-	buildOrgEndpointCategorieWhereClause(query, or, and, span, values)
+	buildOpUserAccessGroupWhereClause(query, or, and, span, values)
 	if column != "" {
 		if f, ok := fieldMap[column]; ok {
 			if order == "" {
@@ -165,7 +165,7 @@ func FindOrgEndpointCategorie(or []string, and []string, span []string, limit st
 	logger.Debug(query.String())
 	logger.Debugf("Values: %#v", values)
 
-	m := []models.OrgEndpointCategorie{}
+	m := []models.OpUserAccessGroup{}
 	db := datastore.GetConnection()
 	if stmt, err := db.PrepareNamed(query.String()); err != nil {
 		logger.Error(err.Error())
@@ -177,10 +177,10 @@ func FindOrgEndpointCategorie(or []string, and []string, span []string, limit st
 	return m, nil
 }
 
-func UpdateOrgEndpointCategorieWhere(or []string, and []string, span []string, data []byte) *errors.SensError {
-	fieldMap := models.GetOrgEndpointCategorieFieldMap()
+func UpdateOpUserAccessGroupWhere(or []string, and []string, span []string, data []byte) *errors.SensError {
+	fieldMap := models.GetOpUserAccessGroupFieldMap()
 	values := make(map[string]interface{})
-	update := bytes.NewBufferString("UPDATE org_endpoint_categories SET ")
+	update := bytes.NewBufferString("UPDATE op_user_access_groups SET ")
 
 	//SET FIELD VALUES
 	var j map[string]interface{}
@@ -188,7 +188,7 @@ func UpdateOrgEndpointCategorieWhere(or []string, and []string, span []string, d
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.OrgEndpointCategorie
+	var m models.OpUserAccessGroup
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
@@ -205,7 +205,7 @@ func UpdateOrgEndpointCategorieWhere(or []string, and []string, span []string, d
 	//SET ENDS
 
 	fmt.Fprint(update, " WHERE ")
-	buildOrgEndpointCategorieWhereClause(update, or, and, span, values)
+	buildOpUserAccessGroupWhereClause(update, or, and, span, values)
 
 	logger.Debug(update.String())
 	logger.Debugf("Values: %#v", values)

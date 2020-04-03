@@ -11,41 +11,41 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func OrgUserMain(r *mux.Router) {
-	r.HandleFunc("/api/org-users/create", CreateOrgUser)
-	r.HandleFunc("/api/org-users/batch/create", BatchCreateOrgUser)
+func OrgEndpointAccessGroupMain(r *mux.Router) {
+	r.HandleFunc("/api/org-endpoint-access-groups/create", CreateOrgEndpointAccessGroup)
+	r.HandleFunc("/api/org-endpoint-access-groups/batch/create", BatchCreateOrgEndpointAccessGroup)
 	
-	r.HandleFunc("/api/org-users/update", UpdateOrgUserWhere)
-	r.HandleFunc("/api/org-users/find", FindOrgUser)
+	r.HandleFunc("/api/org-endpoint-access-groups/update", UpdateOrgEndpointAccessGroupWhere)
+	r.HandleFunc("/api/org-endpoint-access-groups/find", FindOrgEndpointAccessGroup)
 }
 
-func CreateOrgUser(w http.ResponseWriter, r *http.Request) {
+func CreateOrgEndpointAccessGroup(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.InsertOrgUser(data); err != nil {
+	} else if id, err := fn.InsertOrgEndpointAccessGroup(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
-		fmt.Fprintln(w, id)
+		fmt.Fprint(w, id)
 	}
 }
 
-func BatchCreateOrgUser(w http.ResponseWriter, r *http.Request) {
+func BatchCreateOrgEndpointAccessGroup(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.BatchInsertOrgUser(data); err != nil {
+	} else if id, err := fn.BatchInsertOrgEndpointAccessGroup(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
-		fmt.Fprintln(w, id)
+		fmt.Fprint(w, id)
 	}
 }
 
 
 
-func UpdateOrgUserWhere(w http.ResponseWriter, r *http.Request) {
+func UpdateOrgEndpointAccessGroupWhere(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -54,7 +54,7 @@ func UpdateOrgUserWhere(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateOrgUserWhere(or, and, span, data); err != nil {
+	} else if err := fn.UpdateOrgEndpointAccessGroupWhere(or, and, span, data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -62,7 +62,7 @@ func UpdateOrgUserWhere(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func FindOrgUser(w http.ResponseWriter, r *http.Request) {
+func FindOrgEndpointAccessGroup(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -73,7 +73,7 @@ func FindOrgUser(w http.ResponseWriter, r *http.Request) {
 
 	if limit == "" {
 		http.Error(w, "Query param limit is mandatory", http.StatusBadRequest)
-	} else if ms, err := fn.FindOrgUser(or, and, span, limit, column, order); err != nil {
+	} else if ms, err := fn.FindOrgEndpointAccessGroup(or, and, span, limit, column, order); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {

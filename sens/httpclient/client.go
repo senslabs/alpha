@@ -95,3 +95,11 @@ func WriteError(w http.ResponseWriter, code int, err error) error {
 	}
 	return err
 }
+
+func WriteInternalServerError(w http.ResponseWriter, err error) error {
+	return WriteError(w, http.StatusInternalServerError, err)
+}
+
+func WriteUnauthorizedError(w http.ResponseWriter, err error) error {
+	return WriteError(w, http.StatusUnauthorized, err)
+}

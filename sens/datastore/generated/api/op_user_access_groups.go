@@ -11,41 +11,41 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func OpUserCategorieMain(r *mux.Router) {
-	r.HandleFunc("/api/op-user-categories/create", CreateOpUserCategorie)
-	r.HandleFunc("/api/op-user-categories/batch/create", BatchCreateOpUserCategorie)
+func OpUserAccessGroupMain(r *mux.Router) {
+	r.HandleFunc("/api/op-user-access-groups/create", CreateOpUserAccessGroup)
+	r.HandleFunc("/api/op-user-access-groups/batch/create", BatchCreateOpUserAccessGroup)
 	
-	r.HandleFunc("/api/op-user-categories/update", UpdateOpUserCategorieWhere)
-	r.HandleFunc("/api/op-user-categories/find", FindOpUserCategorie)
+	r.HandleFunc("/api/op-user-access-groups/update", UpdateOpUserAccessGroupWhere)
+	r.HandleFunc("/api/op-user-access-groups/find", FindOpUserAccessGroup)
 }
 
-func CreateOpUserCategorie(w http.ResponseWriter, r *http.Request) {
+func CreateOpUserAccessGroup(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.InsertOpUserCategorie(data); err != nil {
+	} else if id, err := fn.InsertOpUserAccessGroup(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
-		fmt.Fprintln(w, id)
+		fmt.Fprint(w, id)
 	}
 }
 
-func BatchCreateOpUserCategorie(w http.ResponseWriter, r *http.Request) {
+func BatchCreateOpUserAccessGroup(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.BatchInsertOpUserCategorie(data); err != nil {
+	} else if id, err := fn.BatchInsertOpUserAccessGroup(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
-		fmt.Fprintln(w, id)
+		fmt.Fprint(w, id)
 	}
 }
 
 
 
-func UpdateOpUserCategorieWhere(w http.ResponseWriter, r *http.Request) {
+func UpdateOpUserAccessGroupWhere(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -54,7 +54,7 @@ func UpdateOpUserCategorieWhere(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateOpUserCategorieWhere(or, and, span, data); err != nil {
+	} else if err := fn.UpdateOpUserAccessGroupWhere(or, and, span, data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -62,7 +62,7 @@ func UpdateOpUserCategorieWhere(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func FindOpUserCategorie(w http.ResponseWriter, r *http.Request) {
+func FindOpUserAccessGroup(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -73,7 +73,7 @@ func FindOpUserCategorie(w http.ResponseWriter, r *http.Request) {
 
 	if limit == "" {
 		http.Error(w, "Query param limit is mandatory", http.StatusBadRequest)
-	} else if ms, err := fn.FindOpUserCategorie(or, and, span, limit, column, order); err != nil {
+	} else if ms, err := fn.FindOpUserAccessGroup(or, and, span, limit, column, order); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {

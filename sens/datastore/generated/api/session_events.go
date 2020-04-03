@@ -27,7 +27,7 @@ func CreateSessionEvent(w http.ResponseWriter, r *http.Request) {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
-		fmt.Fprintln(w, id)
+		fmt.Fprint(w, id)
 	}
 }
 
@@ -39,7 +39,7 @@ func BatchCreateSessionEvent(w http.ResponseWriter, r *http.Request) {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
-		fmt.Fprintln(w, id)
+		fmt.Fprint(w, id)
 	}
 }
 

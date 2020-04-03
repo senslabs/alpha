@@ -7,8 +7,8 @@ SELECT
 	a.first_name,
 	a.last_name,
     --ORGS
-	o.id as id,
-	o.name as org_name
+	o.id,
+	o.org_name
 FROM
 	auths a
 JOIN orgs o on
@@ -23,7 +23,8 @@ SELECT
 	a.first_name,
 	a.last_name,
     --OPS
-	o.id as id
+	o.id,
+	o.org_id
 FROM
 	auths a
 JOIN ops o on
@@ -38,31 +39,126 @@ SELECT
 	a.first_name,
 	a.last_name,
     -- USERS
-	u.id as id,
+	u.id,
+	u.org_id
     -- DEVICES
-    d.device_id,
-	d.status,
-    d.name,
-    d.created_at
+    -- d.device_id,
+	-- d.status,
+    -- d.name,
+    -- d.created_at
 FROM
 	auths a
     -- WHERE d.user_id=u.id
 JOIN "users" u on
-	a.id = u.auth_id
-LEFT JOIN devices d on
-    d.user_id = u.id;
-
+	a.id = u.auth_id;
+-- LEFT JOIN devices d on
+-- d.user_id = u.id;
 
 CREATE VIEW device_views AS
 SELECT
-  device_id, name, org_id, user_id, created_at, status
+  device_id,
+  name,
+  org_id,
+  user_id,
+  created_at,
+  status
 FROM (
     SELECT
-      DISTINCT ON(device_id) device_id, name, org_id, user_id, created_at, status
-    from devices
+      DISTINCT ON(device_id) device_id,
+      name,
+      org_id,
+      user_id,
+      created_at,
+      status
+    FROM devices
     ORDER BY
       device_id,
       created_at desc
   ) t
 ORDER BY
   created_at DESC;
+
+CREATE VIEW user_alert_views AS
+SELECT
+  a.user_id,
+  u.org_id,
+  au.first_name,
+  au.last_name,
+  a.created_at,
+  a.alert_name,
+  a.status,
+  a.remarks
+FROM alerts a
+JOIN users u ON u.id = a.user_id
+JOIN auths au ON au.id = u.auth_id;
+
+
+CREATE VIEW sleep_views AS
+SELECT id, user_id, name, type, started_at, ended_at
+FROM
+(
+    SELECT
+    DISTINCT ON (user_id) user_id,
+    id,
+    name,
+    type,
+    started_at,
+    ended_at
+    FROM sessions WHERE type = 'Sleep'
+    ORDER BY
+    user_id,
+    ended_at DESC
+) t
+ORDER BY ended_at DESC;
+
+CREATE VIEW meditation_views AS
+SELECT id, user_id, name, type, started_at, ended_at
+FROM
+(
+    SELECT
+    DISTINCT ON (user_id) user_id,
+    id,
+    name,
+    type,
+    started_at,
+    ended_at
+    FROM sessions WHERE type = 'Meditation'
+    ORDER BY
+    user_id,
+    ended_at DESC
+) t
+ORDER BY ended_at DESC;
+
+CREATE VIEW sleep_summaries AS
+SELECT
+  sv.user_id,
+  (sv.ended_at - sv.started_at) AS duration,
+  json_build_object(sp.name, sp.value) AS properties,
+  sp.session_id
+FROM session_properties sp
+JOIN sleep_views sv ON sp.session_id = sv.id
+WHERE
+  sp.name IN (
+    'HeartRate',
+    'BreathRate',
+    'Lastsyncedat',
+    'Stress',
+    'Score'
+  )
+
+CREATE VIEW meditation_summaries AS
+SELECT
+  mv.user_id,
+  (mv.ended_at - mv.started_at) AS duration,
+  json_build_object(sp.name, sp.value) AS properties,
+  sp.session_id
+FROM session_properties sp
+JOIN meditation_views mv ON sp.session_id = mv.id
+WHERE
+  sp.name IN (
+    'HeartRate',
+    'BreathRate',
+    'Lastsyncedat',
+    'Stress',
+    'Score'
+  )

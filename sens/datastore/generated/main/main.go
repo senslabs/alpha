@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/senslabs/alpha/sens/datastore/ext"
 	"github.com/senslabs/alpha/sens/datastore/generated/api"
 	"github.com/senslabs/alpha/sens/logger"
 )
@@ -16,18 +17,16 @@ func main() {
 	api.OrgMain(r)
 	api.OpMain(r)
 	api.UserMain(r)
-	api.EndpointMain(r)
-	api.DeviceMain(r)
-	api.OrgOpMain(r)
-	api.OrgUserMain(r)
-	api.OpUserCategorieMain(r)
+	api.OpUserAccessGroupMain(r)
 	api.OpUserMain(r)
-	api.OrgEndpointCategorieMain(r)
+	api.EndpointMain(r)
+	api.OrgEndpointAccessGroupMain(r)
 	api.OrgEndpointMain(r)
-	api.OpEndpointCategorieMain(r)
+	api.OpEndpointAccessGroupMain(r)
 	api.OpEndpointMain(r)
-	api.UserEndpointCategorieMain(r)
+	api.UserEndpointAccessGroupMain(r)
 	api.UserEndpointMain(r)
+	api.DeviceMain(r)
 	api.SessionMain(r)
 	api.SessionEventMain(r)
 	api.SessionRecordMain(r)
@@ -36,7 +35,9 @@ func main() {
 	api.OpDetailViewMain(r)
 	api.UserDetailViewMain(r)
 	api.DeviceViewMain(r)
-	
+
+	ext.ExtMain(r)
+
 	http.Handle("/", r)
 	http.ListenAndServe(":9804", r)
 }
