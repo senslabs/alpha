@@ -153,7 +153,7 @@ CREATE TABLE "session_properties" (
   "session_id" uuid,
   "name" text,
   "value" text,
-  PRIMARY KEY ("session_id", "name", "value")
+  PRIMARY KEY ("session_id", "name")
 );
 
 ALTER TABLE "orgs" ADD FOREIGN KEY ("auth_id") REFERENCES "auths" ("id");

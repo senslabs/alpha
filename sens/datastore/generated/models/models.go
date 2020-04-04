@@ -281,19 +281,6 @@ func GetSessionRecordTypeMap() map[string]string {
 	return map[string]string{"Name": "*string", "Properties": "*datastore.RawMessage", "Timestamp": "*int64", "UserId": "*string", "Value": "*float64"}
 }
 
-type SessionPropertie struct {
-	SessionId *string `db:"session_id" json:",omitempty"`
-	Name      *string `db:"name" json:",omitempty"`
-	Value     *string `db:"value" json:",omitempty"`
-}
-
-func GetSessionPropertieFieldMap() map[string]string {
-	return map[string]string{"Name": "name", "SessionId": "session_id", "Value": "value"}
-}
-func GetSessionPropertieTypeMap() map[string]string {
-	return map[string]string{"Name": "*string", "SessionId": "*string", "Value": "*string"}
-}
-
 type OrgDetailView struct {
 	AuthId    *string `db:"auth_id" json:",omitempty"`
 	Email     *string `db:"email" json:",omitempty"`
@@ -414,6 +401,32 @@ func GetMeditationViewTypeMap() map[string]string {
 	return map[string]string{"EndedAt": "*int64", "Id": "*string", "Name": "*string", "StartedAt": "*int64", "Type": "*string", "UserId": "*string"}
 }
 
+type UserSessionView struct {
+	Type      *string `db:"type" json:",omitempty"`
+	Timestamp *int64  `db:"timestamp" json:",omitempty"`
+	UserId    *string `db:"user_id" json:",omitempty"`
+}
+
+func GetUserSessionViewFieldMap() map[string]string {
+	return map[string]string{"Timestamp": "timestamp", "Type": "type", "UserId": "user_id"}
+}
+func GetUserSessionViewTypeMap() map[string]string {
+	return map[string]string{"Timestamp": "*int64", "Type": "*string", "UserId": "*string"}
+}
+
+type SessionPropertie struct {
+	SessionId *string `db:"session_id" json:",omitempty"`
+	Name      *string `db:"name" json:",omitempty"`
+	Value     *string `db:"value" json:",omitempty"`
+}
+
+func GetSessionPropertieFieldMap() map[string]string {
+	return map[string]string{"Name": "name", "SessionId": "session_id", "Value": "value"}
+}
+func GetSessionPropertieTypeMap() map[string]string {
+	return map[string]string{"Name": "*string", "SessionId": "*string", "Value": "*string"}
+}
+
 type SleepSummarie struct {
 	UserId     *string               `db:"user_id" json:",omitempty"`
 	Duration   *int64                `db:"duration" json:",omitempty"`
@@ -439,5 +452,46 @@ func GetMeditationSummarieFieldMap() map[string]string {
 	return map[string]string{"Duration": "duration", "Properties": "properties", "SessionId": "session_id", "UserId": "user_id"}
 }
 func GetMeditationSummarieTypeMap() map[string]string {
+	return map[string]string{"Duration": "*int64", "Properties": "*datastore.RawMessage", "SessionId": "*string", "UserId": "*string"}
+}
+
+type UserSummaryView struct {
+	Count  *int64  `db:"count" json:",omitempty"`
+	Type   *string `db:"type" json:",omitempty"`
+	UserId *string `db:"user_id" json:",omitempty"`
+}
+
+func GetUserSummaryViewFieldMap() map[string]string {
+	return map[string]string{"Count": "count", "Type": "type", "UserId": "user_id"}
+}
+func GetUserSummaryViewTypeMap() map[string]string {
+	return map[string]string{"Count": "*int64", "Type": "*string", "UserId": "*string"}
+}
+
+type UserSleepView struct {
+	UserId     *string               `db:"user_id" json:",omitempty"`
+	Duration   *int64                `db:"duration" json:",omitempty"`
+	Properties *datastore.RawMessage `db:"properties" json:",omitempty"`
+	SessionId  *string               `db:"session_id" json:",omitempty"`
+}
+
+func GetUserSleepViewFieldMap() map[string]string {
+	return map[string]string{"Duration": "duration", "Properties": "properties", "SessionId": "session_id", "UserId": "user_id"}
+}
+func GetUserSleepViewTypeMap() map[string]string {
+	return map[string]string{"Duration": "*int64", "Properties": "*datastore.RawMessage", "SessionId": "*string", "UserId": "*string"}
+}
+
+type UserMeditationView struct {
+	UserId     *string               `db:"user_id" json:",omitempty"`
+	Duration   *int64                `db:"duration" json:",omitempty"`
+	Properties *datastore.RawMessage `db:"properties" json:",omitempty"`
+	SessionId  *string               `db:"session_id" json:",omitempty"`
+}
+
+func GetUserMeditationViewFieldMap() map[string]string {
+	return map[string]string{"Duration": "duration", "Properties": "properties", "SessionId": "session_id", "UserId": "user_id"}
+}
+func GetUserMeditationViewTypeMap() map[string]string {
 	return map[string]string{"Duration": "*int64", "Properties": "*datastore.RawMessage", "SessionId": "*string", "UserId": "*string"}
 }

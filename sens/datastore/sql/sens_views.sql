@@ -172,3 +172,48 @@ WHERE
     'Stress',
     'Score'
   )
+
+CREATE VIEW user_summary_views AS
+SELECT
+  count(type),
+  type,
+  user_id
+FROM user_session_views
+GROUP BY(type, user_id)
+
+CREATE VIEW user_sleep_views AS
+SELECT
+  s.user_id,
+  (s.ended_at - s.started_at) AS duration,
+  json_build_object(sp.name, sp.value) AS properties,
+  sp.session_id
+FROM session_properties sp
+JOIN sessions s ON sp.session_id = s.id
+WHERE
+  s.type = 'Sleep' AND
+  sp.name IN (
+    'HeartRate',
+    'BreathRate',
+    'Lastsyncedat',
+    'Stress',
+    'Score'
+  )
+
+CREATE VIEW user_meditation_views AS
+SELECT
+  s.user_id,
+  (s.ended_at - s.started_at) AS duration,
+  json_build_object(sp.name, sp.value) AS properties,
+  sp.session_id
+FROM session_properties sp
+JOIN sessions s ON sp.session_id = s.id
+WHERE
+  s.type = 'Meditation' AND
+  sp.name IN (
+    'HeartRate',
+    'BreathRate',
+    'Lastsyncedat',
+    'Stress',
+    'Score'
+  )
+  

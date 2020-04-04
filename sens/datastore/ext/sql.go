@@ -1,8 +1,8 @@
 package ext
 
 import (
-	"github.com/jmoiron/sqlx"
 	"github.com/senslabs/alpha/sens/datastore"
+	"github.com/senslabs/sqlx"
 )
 
 const (

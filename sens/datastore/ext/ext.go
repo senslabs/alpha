@@ -1,13 +1,14 @@
 package ext
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/jmoiron/sqlx"
 	"github.com/senslabs/alpha/sens/datastore"
 	"github.com/senslabs/alpha/sens/httpclient"
 	"github.com/senslabs/alpha/sens/logger"
+	"github.com/senslabs/sqlx"
 )
 
 func ExtMain(r *mux.Router) {
@@ -38,7 +39,12 @@ func GetOrgActivites(w http.ResponseWriter, r *http.Request) {
 		query = db.Rebind(query)
 		logger.Debug(query, args)
 		var dest []Activity
-		logger.Error(db.Select(&dest, query, args...))
-		logger.Debug(dest)
+		if err := db.Select(&dest, query, args...); err != nil {
+			logger.Error(err)
+			httpclient.WriteError(w, http.StatusInternalServerError, err)
+		} else if err := json.NewEncoder(w).Encode(dest); err != nil {
+			logger.Error(err)
+			httpclient.WriteError(w, http.StatusInternalServerError, err)
+		}
 	}
 }

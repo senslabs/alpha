@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/senslabs/alpha/sens/datastore"
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
@@ -11,13 +12,13 @@ import (
 	"github.com/senslabs/alpha/sens/logger"
 )
 
-func InsertSessionRecord(data []byte) (string, error) {
+func InsertUserSummaryView(data []byte) (string, error) {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.SessionRecord
+	var m models.UserSummaryView
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
@@ -26,8 +27,8 @@ func InsertSessionRecord(data []byte) (string, error) {
 	logger.Debug(m)
 
 	comma := ""
-	fieldMap := models.GetSessionRecordFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO session_records(")
+	fieldMap := models.GetUserSummaryViewFieldMap()
+	insert := bytes.NewBufferString("INSERT INTO user_summary_views(")
 	values := bytes.NewBufferString("VALUES(")
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -38,82 +39,85 @@ func InsertSessionRecord(data []byte) (string, error) {
 	}
 	fmt.Fprint(insert, ") ")
 	fmt.Fprint(insert, values, ")")
-
+	
 	db := datastore.GetConnection()
 
 	logger.Debug(insert.String())
-	logger.Debugf("%#v", m)
-
+	
 	stmt, err := db.PrepareNamed(insert.String())
 	if err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.DB_ERROR, err)
 	}
-
+	
 	if _, err := stmt.Exec(m); err != nil {
 		logger.Errorf("Received error %s while inserting values\n\t %#v", err, values)
 		return "", errors.FromError(errors.DB_ERROR, err)
 	} else {
 		return "", nil
 	}
-
+	
 }
 
-func BatchInsertSessionRecord(data []byte) ([]string, error) {
+func BatchInsertUserSummaryView(data []byte) ([]string, error) {
 	var j []map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
-		logger.Error(err)
-		return nil, errors.FromError(errors.GO_ERROR, err)
-	}
-	var m []*models.SessionRecord
-	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return nil, errors.FromError(errors.GO_ERROR, err)
 	}
 
 	comma := ""
 	var keys []string
-	fieldMap := models.GetSessionRecordFieldMap()
-	insert := bytes.NewBufferString("UPSERT INTO session_records(")
-	ph := bytes.NewBufferString("(")
+	fieldMap := models.GetUserSummaryViewFieldMap()
+	insert := bytes.NewBufferString("UPSERT INTO user_summary_views(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
-			fmt.Fprint(ph, comma, ":", f)
 			keys = append(keys, k)
 			comma = ", "
 		}
 	}
-	fmt.Fprint(ph, ")")
 
-	fmt.Fprint(insert, ") VALUES ")
+	ph := bytes.NewBufferString(") VALUES (")
+	phidx := 1
+	var values []interface{}
+	for _, v := range j {
+		comma = ""
+		for _, k := range keys {
+			fmt.Fprint(ph, comma, "$", phidx)
+			phidx++
+			values = append(values, v[k])
+			comma = ", "
+		}
+		fmt.Fprint(ph, "), (")
+	}
 
-	// comma = ""
-	// for range j {
-	fmt.Fprint(insert, ph.String())
-	// comma = ","
-	// }
+	fmt.Fprint(insert, strings.TrimRight(ph.String(), ", ("))
 
 	logger.Debug(insert.String())
+
 	db := datastore.GetConnection()
-	if _, err := db.NamedExec(insert.String(), m); err != nil {
-		logger.Errorf("Received error %s while inserting values\n\t %#v", err, m)
+	_, err := db.Exec(insert.String(), values...)
+	if err != nil {
+		logger.Errorf("Received error %s while inserting values\n\t %#v", err, values)
 		return nil, errors.FromError(errors.DB_ERROR, err)
 	}
 	return nil, nil
 }
 
-func buildSessionRecordWhereClause(query *bytes.Buffer, or []string, and []string, span []string, values map[string]interface{}) {
+
+
+func buildUserSummaryViewWhereClause(query *bytes.Buffer, or []string, and []string, span []string, values map[string]interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
-	fieldMap := models.GetSessionRecordFieldMap()
+	fieldMap := models.GetUserSummaryViewFieldMap()
 
 	cond := ""
 	for _, o := range ors {
 		if f, ok := fieldMap[o.Column]; ok {
 			fmt.Fprint(query, cond, fmt.Sprintf("%s = :%s ", f, f))
-			values[f] = getSessionRecordFieldValue(o.Column, o.Value)
+			values[f] = getUserSummaryViewFieldValue(o.Column, o.Value)
 			cond = "OR "
 		}
 	}
@@ -125,32 +129,29 @@ func buildSessionRecordWhereClause(query *bytes.Buffer, or []string, and []strin
 	for _, a := range ands {
 		if f, ok := fieldMap[a.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s AND ", f, f))
-			values[f] = getSessionRecordFieldValue(a.Column, a.Value)
+			values[f] = getUserSummaryViewFieldValue(a.Column, a.Value)
 		}
 	}
 	for _, s := range spans {
 		if f, ok := fieldMap[s.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
-			values["from_"+f] = getSessionRecordFieldValue(s.Column, s.From)
-			values["to_"+f] = getSessionRecordFieldValue(s.Column, s.To)
+			values["from_"+f] = getUserSummaryViewFieldValue(s.Column, s.From)
+			values["to_"+f] = getUserSummaryViewFieldValue(s.Column, s.To)
 		}
 	}
 	fmt.Fprint(query, "1 = 1)")
 }
 
-func getSessionRecordFieldValue(c string, v interface{}) interface{} {
-	typeMap := models.GetSessionRecordTypeMap()
-	if typeMap[c] == "*datastore.RawMessage" {
-		v, _ = json.Marshal(v)
-	}
+func getUserSummaryViewFieldValue(c string, v interface{}) interface{} {
+	// typeMap := models.GetAuthTypeMap()
 	return v
 }
 
-func FindSessionRecord(or []string, and []string, span []string, limit string, column string, order string) ([]models.SessionRecord, *errors.SensError) {
-	query := bytes.NewBufferString("SELECT * FROM session_records WHERE ")
-	fieldMap := models.GetSessionRecordFieldMap()
+func FindUserSummaryView(or []string, and []string, span []string, limit string, column string, order string) ([]models.UserSummaryView, *errors.SensError) {
+	query := bytes.NewBufferString("SELECT * FROM user_summary_views WHERE ")
+	fieldMap := models.GetUserSummaryViewFieldMap()
 	values := make(map[string]interface{})
-	buildSessionRecordWhereClause(query, or, and, span, values)
+	buildUserSummaryViewWhereClause(query, or, and, span, values)
 	if column != "" {
 		if f, ok := fieldMap[column]; ok {
 			if order == "" {
@@ -164,7 +165,7 @@ func FindSessionRecord(or []string, and []string, span []string, limit string, c
 	logger.Debug(query.String())
 	logger.Debugf("Values: %#v", values)
 
-	m := []models.SessionRecord{}
+	m := []models.UserSummaryView{}
 	db := datastore.GetConnection()
 	if stmt, err := db.PrepareNamed(query.String()); err != nil {
 		logger.Error(err.Error())
@@ -176,10 +177,10 @@ func FindSessionRecord(or []string, and []string, span []string, limit string, c
 	return m, nil
 }
 
-func UpdateSessionRecordWhere(or []string, and []string, span []string, data []byte) *errors.SensError {
-	fieldMap := models.GetSessionRecordFieldMap()
+func UpdateUserSummaryViewWhere(or []string, and []string, span []string, data []byte) *errors.SensError {
+	fieldMap := models.GetUserSummaryViewFieldMap()
 	values := make(map[string]interface{})
-	update := bytes.NewBufferString("UPDATE session_records SET ")
+	update := bytes.NewBufferString("UPDATE user_summary_views SET ")
 
 	//SET FIELD VALUES
 	var j map[string]interface{}
@@ -187,7 +188,7 @@ func UpdateSessionRecordWhere(or []string, and []string, span []string, data []b
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.SessionRecord
+	var m models.UserSummaryView
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
@@ -197,14 +198,14 @@ func UpdateSessionRecordWhere(or []string, and []string, span []string, data []b
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(update, comma, f, " = :set_", f)
-			values["set_"+f] = getSessionRecordFieldValue(k, j[k])
+			values["set_"+f] = j[k]
 			comma = ", "
 		}
 	}
 	//SET ENDS
 
 	fmt.Fprint(update, " WHERE ")
-	buildSessionRecordWhereClause(update, or, and, span, values)
+	buildUserSummaryViewWhereClause(update, or, and, span, values)
 
 	logger.Debug(update.String())
 	logger.Debugf("Values: %#v", values)

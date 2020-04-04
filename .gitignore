@@ -6,3 +6,6 @@ sens/datastore/generated/api/rest/main/datastore
 sens/datastore/datastore
 sens/datastore/generated/api/rest/main/main
 sens/datastore/generated/main/main
+*.test
+sens/.DS_Store
+sens/.DS_Store

@@ -10,8 +10,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/senslabs/alpha/sens/types"
+	"github.com/senslabs/sqlx"
 
 	_ "github.com/lib/pq"
 )

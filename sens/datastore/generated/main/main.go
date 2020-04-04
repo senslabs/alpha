@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -32,7 +33,6 @@ func main() {
 	api.SessionMain(r)
 	api.SessionEventMain(r)
 	api.SessionRecordMain(r)
-	api.SessionPropertieMain(r)
 	api.OrgDetailViewMain(r)
 	api.OpDetailViewMain(r)
 	api.UserDetailViewMain(r)
@@ -40,11 +40,16 @@ func main() {
 	api.UserAlertViewMain(r)
 	api.SleepViewMain(r)
 	api.MeditationViewMain(r)
+	api.UserSessionViewMain(r)
+	api.SessionPropertieMain(r)
 	api.SleepSummarieMain(r)
 	api.MeditationSummarieMain(r)
-	
+	api.UserSummaryViewMain(r)
+	api.UserSleepViewMain(r)
+	api.UserMeditationViewMain(r)
+
 	ext.ExtMain(r)
 
 	http.Handle("/", r)
-	http.ListenAndServe(":9804", r)
+	log.Println(http.ListenAndServe(":9804", r))
 }
