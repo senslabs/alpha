@@ -15,9 +15,6 @@ func UserDetailViewMain(r *mux.Router) {
 	r.HandleFunc("/api/user-detail-views/create", CreateUserDetailView)
 	r.HandleFunc("/api/user-detail-views/batch/create", BatchCreateUserDetailView)
 	
-	r.HandleFunc("/api/user-detail-views/{id}/update", UpdateUserDetailView)
-	r.HandleFunc("/api/user-detail-views/{id}/get", GetUserDetailView)
-	
 	r.HandleFunc("/api/user-detail-views/update", UpdateUserDetailViewWhere)
 	r.HandleFunc("/api/user-detail-views/find", FindUserDetailView)
 }
@@ -46,32 +43,6 @@ func BatchCreateUserDetailView(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
-func UpdateUserDetailView(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateUserDetailView(id, data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
-}
-
-func GetUserDetailView(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if m, err := fn.SelectUserDetailView(id); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
 
 
 func UpdateUserDetailViewWhere(w http.ResponseWriter, r *http.Request) {

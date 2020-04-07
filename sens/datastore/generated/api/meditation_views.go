@@ -15,9 +15,6 @@ func MeditationViewMain(r *mux.Router) {
 	r.HandleFunc("/api/meditation-views/create", CreateMeditationView)
 	r.HandleFunc("/api/meditation-views/batch/create", BatchCreateMeditationView)
 	
-	r.HandleFunc("/api/meditation-views/{id}/update", UpdateMeditationView)
-	r.HandleFunc("/api/meditation-views/{id}/get", GetMeditationView)
-	
 	r.HandleFunc("/api/meditation-views/update", UpdateMeditationViewWhere)
 	r.HandleFunc("/api/meditation-views/find", FindMeditationView)
 }
@@ -46,32 +43,6 @@ func BatchCreateMeditationView(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
-func UpdateMeditationView(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateMeditationView(id, data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
-}
-
-func GetMeditationView(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if m, err := fn.SelectMeditationView(id); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
 
 
 func UpdateMeditationViewWhere(w http.ResponseWriter, r *http.Request) {

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/senslabs/alpha/sens/datastore"
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
@@ -40,12 +39,13 @@ func InsertEndpoint(data []byte) (string, error) {
 	fmt.Fprint(insert, ") ")
 	fmt.Fprint(insert, values, ")")
 	
-	fmt.Fprint(insert, " returning id")
+	fmt.Fprint(insert, " returning endpoint_id")
 	
 	db := datastore.GetConnection()
 
 	logger.Debug(insert.String())
-	
+	logger.Debugf("%#v", m)
+
 	stmt, err := db.PrepareNamed(insert.String())
 	if err != nil {
 		logger.Error(err)
@@ -68,41 +68,35 @@ func BatchInsertEndpoint(data []byte) ([]string, error) {
 		logger.Error(err)
 		return nil, errors.FromError(errors.GO_ERROR, err)
 	}
+	var m []*models.SessionRecord
+	if err := json.Unmarshal(data, &m); err != nil {
+		logger.Error(err)
+		return nil, errors.FromError(errors.GO_ERROR, err)
+	}
 
 	comma := ""
 	var keys []string
 	fieldMap := models.GetEndpointFieldMap()
 	insert := bytes.NewBufferString("UPSERT INTO endpoints(")
+	ph := bytes.NewBufferString("(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
+			fmt.Fprint(ph, comma, ":", f)
 			keys = append(keys, k)
 			comma = ", "
 		}
 	}
+	fmt.Fprint(ph, ")")
+	fmt.Fprint(insert, ") VALUES ")
 
-	ph := bytes.NewBufferString(") VALUES (")
-	phidx := 1
-	var values []interface{}
-	for _, v := range j {
-		comma = ""
-		for _, k := range keys {
-			fmt.Fprint(ph, comma, "$", phidx)
-			phidx++
-			values = append(values, v[k])
-			comma = ", "
-		}
-		fmt.Fprint(ph, "), (")
-	}
-
-	fmt.Fprint(insert, strings.TrimRight(ph.String(), ", ("))
+	fmt.Fprint(insert, ph.String())
 
 	logger.Debug(insert.String())
 
 	db := datastore.GetConnection()
-	_, err := db.Exec(insert.String(), values...)
-	if err != nil {
-		logger.Errorf("Received error %s while inserting values\n\t %#v", err, values)
+	if _, err := db.NamedExec(insert.String(), m); err != nil {
+		logger.Errorf("Received error %s while inserting values\n\t %#v", err, m)
 		return nil, errors.FromError(errors.DB_ERROR, err)
 	}
 	return nil, nil
@@ -132,7 +126,7 @@ func UpdateEndpoint(id string, data []byte) error {
 			comma = ", "
 		}
 	}
-	fmt.Fprint(update, " WHERE id = :id")
+	fmt.Fprint(update, " WHERE endpoint_id = :endpoint_id")
 
 	logger.Debug(update.String())
 
@@ -143,7 +137,7 @@ func UpdateEndpoint(id string, data []byte) error {
 		return errors.FromError(errors.GO_ERROR, err)
 	}
 	//<no value>
-	m.Id = &id
+	m.EndpointId = &id
 	_, err = stmt.Exec(m)
 	if err != nil {
 		logger.Error(err)
@@ -155,7 +149,7 @@ func UpdateEndpoint(id string, data []byte) error {
 func SelectEndpoint(id string) (models.Endpoint, *errors.SensError) {
 	db := datastore.GetConnection()
 	m := models.Endpoint{}
-	if err := db.Get(&m, "SELECT * FROM endpoints WHERE id = $1", id); err != nil {
+	if err := db.Get(&m, "SELECT * FROM endpoints WHERE endpoint_id = $1", id); err != nil {
 		logger.Error(err)
 		return m, errors.FromError(errors.DB_ERROR, err)
 	}

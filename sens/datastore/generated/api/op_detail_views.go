@@ -15,9 +15,6 @@ func OpDetailViewMain(r *mux.Router) {
 	r.HandleFunc("/api/op-detail-views/create", CreateOpDetailView)
 	r.HandleFunc("/api/op-detail-views/batch/create", BatchCreateOpDetailView)
 	
-	r.HandleFunc("/api/op-detail-views/{id}/update", UpdateOpDetailView)
-	r.HandleFunc("/api/op-detail-views/{id}/get", GetOpDetailView)
-	
 	r.HandleFunc("/api/op-detail-views/update", UpdateOpDetailViewWhere)
 	r.HandleFunc("/api/op-detail-views/find", FindOpDetailView)
 }
@@ -46,32 +43,6 @@ func BatchCreateOpDetailView(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
-func UpdateOpDetailView(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateOpDetailView(id, data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
-}
-
-func GetOpDetailView(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if m, err := fn.SelectOpDetailView(id); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
 
 
 func UpdateOpDetailViewWhere(w http.ResponseWriter, r *http.Request) {

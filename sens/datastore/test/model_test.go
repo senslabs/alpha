@@ -29,19 +29,27 @@ func TestBatchInsert(t *testing.T) {
 	os.Setenv("LOG_LEVEL", "DEBUG")
 	body := `[
 		{
-			"Name": "Points",
-			"UserId": "eb226cda-3d90-4cad-b325-2125d371783d",
+			"Key": "Points",
+			"UserId": "30783287-6cc8-4cc6-acca-47fb372d6908",
 			"Timestamp": 1528236411,
 			"Properties": {
-				"heart": 10
+				"heart": 110
 			}
 		},
 		{
-			"Name": "Points",
-			"UserId": "eb226cda-3d90-4cad-b325-2125d371783d",
+			"Key": "Points",
+			"UserId": "30783287-6cc8-4cc6-acca-47fb372d6908",
 			"Timestamp": 1528236412,
 			"Properties": {
-				"heart": 20
+				"heart": 22
+			}
+		},
+		{
+			"Key": "Points",
+			"UserId": "30783287-6cc8-4cc6-acca-47fb372d6908",
+			"Timestamp": 1528236413,
+			"Properties": {
+				"heart": 25
 			}
 		}
 	]`

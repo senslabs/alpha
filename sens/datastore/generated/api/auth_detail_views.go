@@ -11,19 +11,19 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func SleepViewMain(r *mux.Router) {
-	r.HandleFunc("/api/sleep-views/create", CreateSleepView)
-	r.HandleFunc("/api/sleep-views/batch/create", BatchCreateSleepView)
+func AuthDetailViewMain(r *mux.Router) {
+	r.HandleFunc("/api/auth-detail-views/create", CreateAuthDetailView)
+	r.HandleFunc("/api/auth-detail-views/batch/create", BatchCreateAuthDetailView)
 	
-	r.HandleFunc("/api/sleep-views/update", UpdateSleepViewWhere)
-	r.HandleFunc("/api/sleep-views/find", FindSleepView)
+	r.HandleFunc("/api/auth-detail-views/update", UpdateAuthDetailViewWhere)
+	r.HandleFunc("/api/auth-detail-views/find", FindAuthDetailView)
 }
 
-func CreateSleepView(w http.ResponseWriter, r *http.Request) {
+func CreateAuthDetailView(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.InsertSleepView(data); err != nil {
+	} else if id, err := fn.InsertAuthDetailView(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -31,11 +31,11 @@ func CreateSleepView(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func BatchCreateSleepView(w http.ResponseWriter, r *http.Request) {
+func BatchCreateAuthDetailView(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.BatchInsertSleepView(data); err != nil {
+	} else if id, err := fn.BatchInsertAuthDetailView(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -45,7 +45,7 @@ func BatchCreateSleepView(w http.ResponseWriter, r *http.Request) {
 
 
 
-func UpdateSleepViewWhere(w http.ResponseWriter, r *http.Request) {
+func UpdateAuthDetailViewWhere(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -54,7 +54,7 @@ func UpdateSleepViewWhere(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateSleepViewWhere(or, and, span, data); err != nil {
+	} else if err := fn.UpdateAuthDetailViewWhere(or, and, span, data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -62,7 +62,7 @@ func UpdateSleepViewWhere(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func FindSleepView(w http.ResponseWriter, r *http.Request) {
+func FindAuthDetailView(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -73,7 +73,7 @@ func FindSleepView(w http.ResponseWriter, r *http.Request) {
 
 	if limit == "" {
 		http.Error(w, "Query param limit is mandatory", http.StatusBadRequest)
-	} else if ms, err := fn.FindSleepView(or, and, span, limit, column, order); err != nil {
+	} else if ms, err := fn.FindAuthDetailView(or, and, span, limit, column, order); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {

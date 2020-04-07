@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/senslabs/alpha/sens/datastore"
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
@@ -43,7 +42,8 @@ func InsertUserMeditationView(data []byte) (string, error) {
 	db := datastore.GetConnection()
 
 	logger.Debug(insert.String())
-	
+	logger.Debugf("%#v", m)
+
 	stmt, err := db.PrepareNamed(insert.String())
 	if err != nil {
 		logger.Error(err)
@@ -65,41 +65,35 @@ func BatchInsertUserMeditationView(data []byte) ([]string, error) {
 		logger.Error(err)
 		return nil, errors.FromError(errors.GO_ERROR, err)
 	}
+	var m []*models.SessionRecord
+	if err := json.Unmarshal(data, &m); err != nil {
+		logger.Error(err)
+		return nil, errors.FromError(errors.GO_ERROR, err)
+	}
 
 	comma := ""
 	var keys []string
 	fieldMap := models.GetUserMeditationViewFieldMap()
 	insert := bytes.NewBufferString("UPSERT INTO user_meditation_views(")
+	ph := bytes.NewBufferString("(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
+			fmt.Fprint(ph, comma, ":", f)
 			keys = append(keys, k)
 			comma = ", "
 		}
 	}
+	fmt.Fprint(ph, ")")
+	fmt.Fprint(insert, ") VALUES ")
 
-	ph := bytes.NewBufferString(") VALUES (")
-	phidx := 1
-	var values []interface{}
-	for _, v := range j {
-		comma = ""
-		for _, k := range keys {
-			fmt.Fprint(ph, comma, "$", phidx)
-			phidx++
-			values = append(values, v[k])
-			comma = ", "
-		}
-		fmt.Fprint(ph, "), (")
-	}
-
-	fmt.Fprint(insert, strings.TrimRight(ph.String(), ", ("))
+	fmt.Fprint(insert, ph.String())
 
 	logger.Debug(insert.String())
 
 	db := datastore.GetConnection()
-	_, err := db.Exec(insert.String(), values...)
-	if err != nil {
-		logger.Errorf("Received error %s while inserting values\n\t %#v", err, values)
+	if _, err := db.NamedExec(insert.String(), m); err != nil {
+		logger.Errorf("Received error %s while inserting values\n\t %#v", err, m)
 		return nil, errors.FromError(errors.DB_ERROR, err)
 	}
 	return nil, nil

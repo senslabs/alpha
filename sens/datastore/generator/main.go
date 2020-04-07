@@ -18,7 +18,7 @@ import (
 
 const (
 	host     = "localhost"
-	port     = 26257
+	port     = 26256
 	user     = "root"
 	password = "nahinhai"
 	dbname   = "postgres"
@@ -89,6 +89,27 @@ func GetTableFields(db *sqlx.DB, schema string, mi ModelInfo) []FieldInfo {
 	return fields
 }
 
+type FieldConstraint struct {
+	TableName      string `db:"table_name"`
+	ColumnName     string `db:"column_name"`
+	ConstraintName string `db:"constraint_name"`
+}
+
+//Update if a model has id or nit
+func GetConstraintMap(db *sqlx.DB) map[string][]string {
+	var constraints []FieldConstraint
+	query := `SELECT table_name, column_name, constraint_name FROM information_schema.constraint_column_usage WHERE table_catalog = 'postgres' AND constraint_name ='primary'`
+	err := db.Select(&constraints, query)
+	if err != nil {
+		log.Fatal(err)
+	}
+	constraintMap := make(map[string][]string)
+	for _, c := range constraints {
+		constraintMap[c.TableName] = append(constraintMap[c.TableName], c.ColumnName)
+	}
+	return constraintMap
+}
+
 //Generate and return struct for one table
 func GenerateModel(db *sqlx.DB, schema string, mi *ModelInfo) string {
 	fields := GetTableFields(db, schema, *mi)
@@ -96,7 +117,7 @@ func GenerateModel(db *sqlx.DB, schema string, mi *ModelInfo) string {
 	fieldMap := map[string]string{}
 	typeMap := map[string]string{}
 	for _, f := range fields {
-		mi.HasId = mi.HasId || f.TableField == "id"
+		// mi.HasId = mi.HasId || f.TableField == "id"
 		member := fmt.Sprintf("%s %s `db:\"%s\" json:\",omitempty\"`", f.ModelField, f.Type, f.TableField)
 		members = append(members, member)
 		fieldMap[f.ModelField] = f.TableField
@@ -125,10 +146,17 @@ func GenerateModel(db *sqlx.DB, schema string, mi *ModelInfo) string {
 		`, mi.Model, tm)
 }
 
+func UpdateIdInfo(db *sqlx.DB, constraintsMap map[string][]string, mi *ModelInfo) {
+	mi.HasId = len(constraintsMap[mi.Table]) == 1
+}
+
 //Generate for all tables
 func GenerateModels(db *sqlx.DB, schema string, mis []*ModelInfo) {
 	ms := []string{}
+	constraintsMap := GetConstraintMap(db)
 	for _, mi := range mis {
+		UpdateIdInfo(db, constraintsMap, mi)
+		fmt.Printf("Table: %s, HasId: %t\n", mi.Table, mi.HasId)
 		m := GenerateModel(db, schema, mi)
 		ms = append(ms, m)
 	}
@@ -152,7 +180,12 @@ func GenerateModels(db *sqlx.DB, schema string, mis []*ModelInfo) {
 
 //Generate functions for one table
 func GenerateFunction(schema string, mi *ModelInfo) {
-	t, err := template.ParseFiles("templates/fn.tpl")
+	t, err := template.New("fn.tpl").Funcs(template.FuncMap{
+		"singular": func(s string) string {
+			return strings.TrimSuffix(s, "s")
+		},
+	}).ParseFiles("templates/fn.tpl")
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -249,6 +282,7 @@ func Generate(schema string) {
 }
 
 func main() {
+	log.SetFlags(log.Lshortfile)
 	schema := os.Args[1]
 	os.Mkdir("generated/api", 0777)
 	os.Mkdir("generated/main", 0777)

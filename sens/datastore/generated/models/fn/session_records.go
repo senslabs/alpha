@@ -38,7 +38,7 @@ func InsertSessionRecord(data []byte) (string, error) {
 	}
 	fmt.Fprint(insert, ") ")
 	fmt.Fprint(insert, values, ")")
-
+	
 	db := datastore.GetConnection()
 
 	logger.Debug(insert.String())
@@ -49,14 +49,14 @@ func InsertSessionRecord(data []byte) (string, error) {
 		logger.Error(err)
 		return "", errors.FromError(errors.DB_ERROR, err)
 	}
-
+	
 	if _, err := stmt.Exec(m); err != nil {
 		logger.Errorf("Received error %s while inserting values\n\t %#v", err, values)
 		return "", errors.FromError(errors.DB_ERROR, err)
 	} else {
 		return "", nil
 	}
-
+	
 }
 
 func BatchInsertSessionRecord(data []byte) ([]string, error) {
@@ -85,16 +85,12 @@ func BatchInsertSessionRecord(data []byte) ([]string, error) {
 		}
 	}
 	fmt.Fprint(ph, ")")
-
 	fmt.Fprint(insert, ") VALUES ")
 
-	// comma = ""
-	// for range j {
 	fmt.Fprint(insert, ph.String())
-	// comma = ","
-	// }
 
 	logger.Debug(insert.String())
+
 	db := datastore.GetConnection()
 	if _, err := db.NamedExec(insert.String(), m); err != nil {
 		logger.Errorf("Received error %s while inserting values\n\t %#v", err, m)
@@ -102,6 +98,8 @@ func BatchInsertSessionRecord(data []byte) ([]string, error) {
 	}
 	return nil, nil
 }
+
+
 
 func buildSessionRecordWhereClause(query *bytes.Buffer, or []string, and []string, span []string, values map[string]interface{}) {
 	ors := datastore.ParseOrParams(or)
@@ -139,10 +137,7 @@ func buildSessionRecordWhereClause(query *bytes.Buffer, or []string, and []strin
 }
 
 func getSessionRecordFieldValue(c string, v interface{}) interface{} {
-	typeMap := models.GetSessionRecordTypeMap()
-	if typeMap[c] == "*datastore.RawMessage" {
-		v, _ = json.Marshal(v)
-	}
+	// typeMap := models.GetAuthTypeMap()
 	return v
 }
 
@@ -197,7 +192,7 @@ func UpdateSessionRecordWhere(or []string, and []string, span []string, data []b
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(update, comma, f, " = :set_", f)
-			values["set_"+f] = getSessionRecordFieldValue(k, j[k])
+			values["set_"+f] = j[k]
 			comma = ", "
 		}
 	}

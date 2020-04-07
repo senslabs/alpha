@@ -45,4 +45,6 @@ http://35.238.76.35/test/ds
 http://34.71.80.240/api/users/find?limit=2
 
 #------------ datastore APIs
-curl -v -H 'Content-Type: application/json' -d '{"Email": "emayank@gmail.com", "Mobile": "+917032806003", "FirstName":"Mayank", "LastName":"Joshi","Social": "FB"}' http://localhost:9804/api/auths/create
+curl -v -H 'Content-Type: application/json' -d '{"Email": "emayank1@gmail.com", "Mobile": "+917032806009", "FirstName":"MayankT", "LastName":"JoshiT","Social": "FBT"}' http://localhost:9804/api/auths/create
+
+curl -v -H 'Content-Type: application/json' -d '{"Social": "FBT2"}' http://localhost:9804/api/auths/e4ade338-4c7b-4fd6-8564-5584d1c753bf/update

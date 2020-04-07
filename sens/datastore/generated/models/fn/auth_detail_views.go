@@ -11,13 +11,13 @@ import (
 	"github.com/senslabs/alpha/sens/logger"
 )
 
-func InsertSleepSummarie(data []byte) (string, error) {
+func InsertAuthDetailView(data []byte) (string, error) {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.SleepSummarie
+	var m models.AuthDetailView
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
@@ -26,8 +26,8 @@ func InsertSleepSummarie(data []byte) (string, error) {
 	logger.Debug(m)
 
 	comma := ""
-	fieldMap := models.GetSleepSummarieFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO sleep_summaries(")
+	fieldMap := models.GetAuthDetailViewFieldMap()
+	insert := bytes.NewBufferString("INSERT INTO auth_detail_views(")
 	values := bytes.NewBufferString("VALUES(")
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -59,7 +59,7 @@ func InsertSleepSummarie(data []byte) (string, error) {
 	
 }
 
-func BatchInsertSleepSummarie(data []byte) ([]string, error) {
+func BatchInsertAuthDetailView(data []byte) ([]string, error) {
 	var j []map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
@@ -73,8 +73,8 @@ func BatchInsertSleepSummarie(data []byte) ([]string, error) {
 
 	comma := ""
 	var keys []string
-	fieldMap := models.GetSleepSummarieFieldMap()
-	insert := bytes.NewBufferString("UPSERT INTO sleep_summaries(")
+	fieldMap := models.GetAuthDetailViewFieldMap()
+	insert := bytes.NewBufferString("UPSERT INTO auth_detail_views(")
 	ph := bytes.NewBufferString("(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
@@ -101,17 +101,17 @@ func BatchInsertSleepSummarie(data []byte) ([]string, error) {
 
 
 
-func buildSleepSummarieWhereClause(query *bytes.Buffer, or []string, and []string, span []string, values map[string]interface{}) {
+func buildAuthDetailViewWhereClause(query *bytes.Buffer, or []string, and []string, span []string, values map[string]interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
-	fieldMap := models.GetSleepSummarieFieldMap()
+	fieldMap := models.GetAuthDetailViewFieldMap()
 
 	cond := ""
 	for _, o := range ors {
 		if f, ok := fieldMap[o.Column]; ok {
 			fmt.Fprint(query, cond, fmt.Sprintf("%s = :%s ", f, f))
-			values[f] = getSleepSummarieFieldValue(o.Column, o.Value)
+			values[f] = getAuthDetailViewFieldValue(o.Column, o.Value)
 			cond = "OR "
 		}
 	}
@@ -123,29 +123,29 @@ func buildSleepSummarieWhereClause(query *bytes.Buffer, or []string, and []strin
 	for _, a := range ands {
 		if f, ok := fieldMap[a.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s AND ", f, f))
-			values[f] = getSleepSummarieFieldValue(a.Column, a.Value)
+			values[f] = getAuthDetailViewFieldValue(a.Column, a.Value)
 		}
 	}
 	for _, s := range spans {
 		if f, ok := fieldMap[s.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
-			values["from_"+f] = getSleepSummarieFieldValue(s.Column, s.From)
-			values["to_"+f] = getSleepSummarieFieldValue(s.Column, s.To)
+			values["from_"+f] = getAuthDetailViewFieldValue(s.Column, s.From)
+			values["to_"+f] = getAuthDetailViewFieldValue(s.Column, s.To)
 		}
 	}
 	fmt.Fprint(query, "1 = 1)")
 }
 
-func getSleepSummarieFieldValue(c string, v interface{}) interface{} {
+func getAuthDetailViewFieldValue(c string, v interface{}) interface{} {
 	// typeMap := models.GetAuthTypeMap()
 	return v
 }
 
-func FindSleepSummarie(or []string, and []string, span []string, limit string, column string, order string) ([]models.SleepSummarie, *errors.SensError) {
-	query := bytes.NewBufferString("SELECT * FROM sleep_summaries WHERE ")
-	fieldMap := models.GetSleepSummarieFieldMap()
+func FindAuthDetailView(or []string, and []string, span []string, limit string, column string, order string) ([]models.AuthDetailView, *errors.SensError) {
+	query := bytes.NewBufferString("SELECT * FROM auth_detail_views WHERE ")
+	fieldMap := models.GetAuthDetailViewFieldMap()
 	values := make(map[string]interface{})
-	buildSleepSummarieWhereClause(query, or, and, span, values)
+	buildAuthDetailViewWhereClause(query, or, and, span, values)
 	if column != "" {
 		if f, ok := fieldMap[column]; ok {
 			if order == "" {
@@ -159,7 +159,7 @@ func FindSleepSummarie(or []string, and []string, span []string, limit string, c
 	logger.Debug(query.String())
 	logger.Debugf("Values: %#v", values)
 
-	m := []models.SleepSummarie{}
+	m := []models.AuthDetailView{}
 	db := datastore.GetConnection()
 	if stmt, err := db.PrepareNamed(query.String()); err != nil {
 		logger.Error(err.Error())
@@ -171,10 +171,10 @@ func FindSleepSummarie(or []string, and []string, span []string, limit string, c
 	return m, nil
 }
 
-func UpdateSleepSummarieWhere(or []string, and []string, span []string, data []byte) *errors.SensError {
-	fieldMap := models.GetSleepSummarieFieldMap()
+func UpdateAuthDetailViewWhere(or []string, and []string, span []string, data []byte) *errors.SensError {
+	fieldMap := models.GetAuthDetailViewFieldMap()
 	values := make(map[string]interface{})
-	update := bytes.NewBufferString("UPDATE sleep_summaries SET ")
+	update := bytes.NewBufferString("UPDATE auth_detail_views SET ")
 
 	//SET FIELD VALUES
 	var j map[string]interface{}
@@ -182,7 +182,7 @@ func UpdateSleepSummarieWhere(or []string, and []string, span []string, data []b
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.SleepSummarie
+	var m models.AuthDetailView
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
@@ -199,7 +199,7 @@ func UpdateSleepSummarieWhere(or []string, and []string, span []string, data []b
 	//SET ENDS
 
 	fmt.Fprint(update, " WHERE ")
-	buildSleepSummarieWhereClause(update, or, and, span, values)
+	buildAuthDetailViewWhereClause(update, or, and, span, values)
 
 	logger.Debug(update.String())
 	logger.Debugf("Values: %#v", values)
