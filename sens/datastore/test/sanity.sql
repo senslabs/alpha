@@ -1,7 +1,8 @@
 -- Insert Sens Auth
 INSERT INTO public.auths
 (auth_id, email, mobile, social, first_name, last_name, created_at, updated_at, is_sens)
-VALUES(gen_random_uuid(), 'emayank@gmail.com', '+917032806003', 'Mayank', 'Joshi', 'NA', now()::INT8, 0, false);
+VALUES(gen_random_uuid(), 'emayank@gmail.com', '+917032806003', 'Mayank', 'Joshi', 'NA', now()::INT8, 0, true);
+
 
 -- create 7 auths
 INSERT INTO public.auths
@@ -11,7 +12,6 @@ INSERT INTO public.auths
 (auth_id, email, mobile, social, first_name, last_name, created_at, updated_at, is_sens)
 VALUES('3a7f319b-7cad-4a75-81fd-d9536c63ff75', 'e3@gmail.com', '+919876543213', 'S3', 'F3', 'L3', 1586288496, 0, false);
 INSERT INTO public.auths
-(auth_id, email, mobile, social, first_name, last_name, created_at, updated_at, is_sens)
 VALUES('66428ee6-f10d-44de-9618-5f605f50403b', 'e1@gmail.com', '+919876543211', 'S1', 'F1', 'L1', 1586288496, 0, false);
 INSERT INTO public.auths
 (auth_id, email, mobile, social, first_name, last_name, created_at, updated_at, is_sens)
@@ -58,7 +58,7 @@ VALUES('98a798a0-4e38-46ef-9b12-95c01c8e96ed', 'bab09cb2-6605-45a7-a581-5876d921
 
 INSERT INTO public."users"
 (user_id, auth_id, org_id, access_group, created_at, updated_at, age, "status")
-VALUES('208cf5c8-0fa9-47d6-9ed8-ef5cdd2cb5d6', 'ddf0529e-d0f1-416b-9e96-6522813f0113', '83632c67-5208-4949-9216-0b809a4ed1cb', 'DEFAULT'::STRING, now()::INT8, 0, 0, 'APPROVED');
+VALUES('dce42705-73cf-4c28-8940-f7228ec506eb', 'ddf0529e-d0f1-416b-9e96-6522813f0113', '83632c67-5208-4949-9216-0b809a4ed1cb', 'DEFAULT'::STRING, now()::INT8, 0, 0, 'APPROVED');
 
 -- create 8 devices
 
@@ -76,16 +76,17 @@ INSERT INTO public.devices
 VALUES('31123680-e2c1-47b4-9092-b22e56bc0fbd', '711c0ca3-1a25-415c-bb4e-39d52e7ad8a9', 'Device4', '83632c67-5208-4949-9216-0b809a4ed1cb', '98a798a0-4e38-46ef-9b12-95c01c8e96ed', 1586341220, 'PAIRED');
 INSERT INTO public.devices
 (row_id, device_id, device_name, org_id, user_id, created_at, "status")
-VALUES('321e55a8-4b03-4167-82d3-9f4fe0310c13', 'c3f4c2f7-c5cd-48aa-b4c5-a92b520a66ee', 'Device5', '83632c67-5208-4949-9216-0b809a4ed1cb', '208cf5c8-0fa9-47d6-9ed8-ef5cdd2cb5d6', 1586341220, 'PAIRED');
+VALUES('321e55a8-4b03-4167-82d3-9f4fe0310c13', 'c3f4c2f7-c5cd-48aa-b4c5-a92b520a66ee', 'Device5', '83632c67-5208-4949-9216-0b809a4ed1cb', 'dce42705-73cf-4c28-8940-f7228ec506eb', 1586341220, 'PAIRED');
 INSERT INTO public.devices
 (row_id, device_id, device_name, org_id, user_id, created_at, "status")
 VALUES('48fc2850-e3a8-4918-bcc3-8d1ccced985a', 'ad7f7218-5d34-4510-8382-46ec8237be54', 'Device6', '83632c67-5208-4949-9216-0b809a4ed1cb', NULL, 1586341220, 'REGISTERED');
 INSERT INTO public.devices
 (row_id, device_id, device_name, org_id, user_id, created_at, "status")
-VALUES('48fc2850-e3a8-4918-bcc3-8d1ccced985a', 'ad7f7218-5d34-4510-8382-46ec8237qe54', 'Device7', '83632c67-5208-4949-9216-0b809a4ed1cb', NULL, 1586341220, 'REGISTERED');
+VALUES('c8ed8c76-ed68-472c-ba16-491c3a794b3a', 'e0fb8e1d-7cf7-495f-ae68-31b0ea1af920', 'Device7', '83632c67-5208-4949-9216-0b809a4ed1cb', NULL, 1586341220, 'REGISTERED');
 INSERT INTO public.devices
 (row_id, device_id, device_name, org_id, user_id, created_at, "status")
-VALUES('48fc2850-e3a8-4918-bcc3-8d1ccced985a', 'ad7f7218-5d34-4510-8382-46ec8237re54', 'Device8', '83632c67-5208-4949-9216-0b809a4ed1cb', NULL, 1586341220, 'REGISTERED');
+VALUES('0e81dfa8-9617-4c5d-8555-e56ccc6cb315', '0b2746b7-44ff-43a8-8676-9173fd3acfaf', 'Device8', '83632c67-5208-4949-9216-0b809a4ed1cb', NULL, 1586341220, 'REGISTERED');
+
 
 
 -- for each user create 2 sleeps and 2 meditations

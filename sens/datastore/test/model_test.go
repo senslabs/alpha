@@ -68,5 +68,5 @@ func TestUpdate(t *testing.T) {
 	// 	"Name":"Breath",
 	// 	"Properties":
 	// }
-	fn.UpdateSessionRecordWhere(nil, []string{"Name^Points", "Timestamp^1528236411"}, nil, []byte(b))
+	fn.UpdateSessionRecordWhere(nil, []string{"Name^Points", "Timestamp^1528236411"}, "", nil, []byte(b))
 }
