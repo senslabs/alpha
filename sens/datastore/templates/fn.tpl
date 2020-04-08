@@ -9,6 +9,7 @@ import (
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
 	"github.com/senslabs/alpha/sens/errors"
 	"github.com/senslabs/alpha/sens/logger"
+	"github.com/senslabs/sqlx"
 )
 
 func Insert{{.Model}}(data []byte) (string, error) {
@@ -164,10 +165,11 @@ func Select{{.Model}}(id string) (models.{{.Model}}, *errors.SensError) {
 }
 {{end}}
 
-func build{{.Model}}WhereClause(query *bytes.Buffer, or []string, and []string, span []string, values map[string]interface{}) {
+func build{{.Model}}WhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values map[string]interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
+	ins := datastore.ParseInParams(in)
 	fieldMap := models.Get{{.Model}}FieldMap()
 
 	cond := ""
@@ -189,6 +191,14 @@ func build{{.Model}}WhereClause(query *bytes.Buffer, or []string, and []string, 
 			values[f] = get{{.Model}}FieldValue(a.Column, a.Value)
 		}
 	}
+
+	if len(ins.Value) > 0 {
+		if f, ok := fieldMap[ins.Column]; ok {
+			fmt.Fprint(query, f, " in (:", f, ") AND ")
+			values[f] = ins.Value
+		}
+	}
+
 	for _, s := range spans {
 		if f, ok := fieldMap[s.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
@@ -200,15 +210,18 @@ func build{{.Model}}WhereClause(query *bytes.Buffer, or []string, and []string, 
 }
 
 func get{{.Model}}FieldValue(c string, v interface{}) interface{} {
-	// typeMap := models.GetAuthTypeMap()
+	typeMap := models.Get{{.Model}}TypeMap()
+	if typeMap[c] == "*datastore.RawMessage" {
+		v, _ = json.Marshal(v)
+	}
 	return v
 }
 
-func Find{{.Model}}(or []string, and []string, span []string, limit string, column string, order string) ([]models.{{.Model}}, *errors.SensError) {
+func Find{{.Model}}(or []string, and []string, in string, span []string, limit string, column string, order string) ([]models.{{.Model}}, *errors.SensError) {
 	query := bytes.NewBufferString("SELECT * FROM {{.Table}} WHERE ")
 	fieldMap := models.Get{{.Model}}FieldMap()
 	values := make(map[string]interface{})
-	build{{.Model}}WhereClause(query, or, and, span, values)
+	build{{.Model}}WhereClause(query, or, and, in, span, values)
 	if column != "" {
 		if f, ok := fieldMap[column]; ok {
 			if order == "" {
@@ -220,21 +233,27 @@ func Find{{.Model}}(or []string, and []string, span []string, limit string, colu
 	fmt.Fprint(query, " LIMIT ", limit)
 
 	logger.Debug(query.String())
-	logger.Debugf("Values: %#v", values)
-
-	m := []models.{{.Model}}{}
-	db := datastore.GetConnection()
-	if stmt, err := db.PrepareNamed(query.String()); err != nil {
+	if q, a, err := sqlx.Named(query.String(), values); err != nil {
 		logger.Error(err.Error())
-		return m, errors.New(errors.DB_ERROR, err.Error())
-	} else if err := stmt.Select(&m, values); err != nil {
-		logger.Error(err)
-		return m, errors.New(errors.DB_ERROR, err.Error())
+		return nil, errors.New(errors.DB_ERROR, err.Error())
+	} else if q, a, err := sqlx.In(q, a...); err != nil {
+		logger.Error(err.Error())
+		return nil, errors.New(errors.DB_ERROR, err.Error())
+	} else {
+		db := datastore.GetConnection()
+		q = db.Rebind(q)
+		logger.Debug(q)
+		logger.Debugf("Values: %#v", a)
+		m := []models.{{.Model}}{}
+		if err := db.Select(&m, q, a...); err != nil {
+			logger.Error(err)
+			return m, errors.New(errors.DB_ERROR, err.Error())
+		}
+		return m, nil
 	}
-	return m, nil
 }
 
-func Update{{.Model}}Where(or []string, and []string, span []string, data []byte) *errors.SensError {
+func Update{{.Model}}Where(or []string, and []string, in string, span []string, data []byte) *errors.SensError {
 	fieldMap := models.Get{{.Model}}FieldMap()
 	values := make(map[string]interface{})
 	update := bytes.NewBufferString("UPDATE {{.Table}} SET ")
@@ -262,7 +281,7 @@ func Update{{.Model}}Where(or []string, and []string, span []string, data []byte
 	//SET ENDS
 
 	fmt.Fprint(update, " WHERE ")
-	build{{.Model}}WhereClause(update, or, and, span, values)
+	build{{.Model}}WhereClause(update, or, and, in, span, values)
 
 	logger.Debug(update.String())
 	logger.Debugf("Values: %#v", values)

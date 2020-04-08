@@ -17,9 +17,9 @@ const (
   ) WHERE timestamp > :when
   GROUP BY (type)`
 
-	ACTIVITY_DASHBOARD_QUERY = `SELECT count(type), type FROM
+	ACTIVITY_DASHBOARD_QUERY = `SELECT count(activity_type), activity_type FROM
 		user_session_views
-		WHERE timestamp > :when and user_id in(:user_ids) GROUP BY (type)`
+		WHERE timestamp > :when and user_id in(:user_ids) GROUP BY (activity_type)`
 )
 
 func GetPrepared(name string) (*sqlx.NamedStmt, error) {

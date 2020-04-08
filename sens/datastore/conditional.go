@@ -1,6 +1,10 @@
 package datastore
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/senslabs/alpha/sens/logger"
+)
 
 type Or struct {
 	Column string
@@ -16,6 +20,11 @@ type Span struct {
 	Column string
 	From   string
 	To     string
+}
+
+type In struct {
+	Column string
+	Value  []string
 }
 
 func ParseOrParams(ors []string) []Or {
@@ -52,4 +61,13 @@ func ParseSpanParams(spans []string) []Span {
 		result = append(result, Span{tokens[0], tokens[1], tokens[2]})
 	}
 	return result
+}
+
+func ParseInParams(in string) In {
+	tokens := strings.Split(in, "^")
+	logger.Debugf("Tokens: %s %#v", in, tokens)
+	if len(tokens) >= 2 {
+		return In{tokens[0], tokens[1:]}
+	}
+	return In{}
 }

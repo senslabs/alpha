@@ -9,6 +9,7 @@ import (
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
 	"github.com/senslabs/alpha/sens/errors"
 	"github.com/senslabs/alpha/sens/logger"
+	"github.com/senslabs/sqlx"
 )
 
 func InsertOrgEndpoint(data []byte) (string, error) {
@@ -101,10 +102,11 @@ func BatchInsertOrgEndpoint(data []byte) ([]string, error) {
 
 
 
-func buildOrgEndpointWhereClause(query *bytes.Buffer, or []string, and []string, span []string, values map[string]interface{}) {
+func buildOrgEndpointWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values map[string]interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
+	ins := datastore.ParseInParams(in)
 	fieldMap := models.GetOrgEndpointFieldMap()
 
 	cond := ""
@@ -126,6 +128,14 @@ func buildOrgEndpointWhereClause(query *bytes.Buffer, or []string, and []string,
 			values[f] = getOrgEndpointFieldValue(a.Column, a.Value)
 		}
 	}
+
+	if len(ins.Value) > 0 {
+		if f, ok := fieldMap[ins.Column]; ok {
+			fmt.Fprint(query, f, " in (:", f, ") AND ")
+			values[f] = ins.Value
+		}
+	}
+
 	for _, s := range spans {
 		if f, ok := fieldMap[s.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
@@ -137,15 +147,18 @@ func buildOrgEndpointWhereClause(query *bytes.Buffer, or []string, and []string,
 }
 
 func getOrgEndpointFieldValue(c string, v interface{}) interface{} {
-	// typeMap := models.GetAuthTypeMap()
+	typeMap := models.GetOrgEndpointTypeMap()
+	if typeMap[c] == "*datastore.RawMessage" {
+		v, _ = json.Marshal(v)
+	}
 	return v
 }
 
-func FindOrgEndpoint(or []string, and []string, span []string, limit string, column string, order string) ([]models.OrgEndpoint, *errors.SensError) {
+func FindOrgEndpoint(or []string, and []string, in string, span []string, limit string, column string, order string) ([]models.OrgEndpoint, *errors.SensError) {
 	query := bytes.NewBufferString("SELECT * FROM org_endpoints WHERE ")
 	fieldMap := models.GetOrgEndpointFieldMap()
 	values := make(map[string]interface{})
-	buildOrgEndpointWhereClause(query, or, and, span, values)
+	buildOrgEndpointWhereClause(query, or, and, in, span, values)
 	if column != "" {
 		if f, ok := fieldMap[column]; ok {
 			if order == "" {
@@ -157,21 +170,27 @@ func FindOrgEndpoint(or []string, and []string, span []string, limit string, col
 	fmt.Fprint(query, " LIMIT ", limit)
 
 	logger.Debug(query.String())
-	logger.Debugf("Values: %#v", values)
-
-	m := []models.OrgEndpoint{}
-	db := datastore.GetConnection()
-	if stmt, err := db.PrepareNamed(query.String()); err != nil {
+	if q, a, err := sqlx.Named(query.String(), values); err != nil {
 		logger.Error(err.Error())
-		return m, errors.New(errors.DB_ERROR, err.Error())
-	} else if err := stmt.Select(&m, values); err != nil {
-		logger.Error(err)
-		return m, errors.New(errors.DB_ERROR, err.Error())
+		return nil, errors.New(errors.DB_ERROR, err.Error())
+	} else if q, a, err := sqlx.In(q, a...); err != nil {
+		logger.Error(err.Error())
+		return nil, errors.New(errors.DB_ERROR, err.Error())
+	} else {
+		db := datastore.GetConnection()
+		q = db.Rebind(q)
+		logger.Debug(q)
+		logger.Debugf("Values: %#v", a)
+		m := []models.OrgEndpoint{}
+		if err := db.Select(&m, q, a...); err != nil {
+			logger.Error(err)
+			return m, errors.New(errors.DB_ERROR, err.Error())
+		}
+		return m, nil
 	}
-	return m, nil
 }
 
-func UpdateOrgEndpointWhere(or []string, and []string, span []string, data []byte) *errors.SensError {
+func UpdateOrgEndpointWhere(or []string, and []string, in string, span []string, data []byte) *errors.SensError {
 	fieldMap := models.GetOrgEndpointFieldMap()
 	values := make(map[string]interface{})
 	update := bytes.NewBufferString("UPDATE org_endpoints SET ")
@@ -199,7 +218,7 @@ func UpdateOrgEndpointWhere(or []string, and []string, span []string, data []byt
 	//SET ENDS
 
 	fmt.Fprint(update, " WHERE ")
-	buildOrgEndpointWhereClause(update, or, and, span, values)
+	buildOrgEndpointWhereClause(update, or, and, in, span, values)
 
 	logger.Debug(update.String())
 	logger.Debugf("Values: %#v", values)

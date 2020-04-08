@@ -9,6 +9,7 @@ import (
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
 	"github.com/senslabs/alpha/sens/errors"
 	"github.com/senslabs/alpha/sens/logger"
+	"github.com/senslabs/sqlx"
 )
 
 func InsertSessionRecord(data []byte) (string, error) {
@@ -101,10 +102,11 @@ func BatchInsertSessionRecord(data []byte) ([]string, error) {
 
 
 
-func buildSessionRecordWhereClause(query *bytes.Buffer, or []string, and []string, span []string, values map[string]interface{}) {
+func buildSessionRecordWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values map[string]interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
+	ins := datastore.ParseInParams(in)
 	fieldMap := models.GetSessionRecordFieldMap()
 
 	cond := ""
@@ -126,6 +128,14 @@ func buildSessionRecordWhereClause(query *bytes.Buffer, or []string, and []strin
 			values[f] = getSessionRecordFieldValue(a.Column, a.Value)
 		}
 	}
+
+	if len(ins.Value) > 0 {
+		if f, ok := fieldMap[ins.Column]; ok {
+			fmt.Fprint(query, f, " in (:", f, ") AND ")
+			values[f] = ins.Value
+		}
+	}
+
 	for _, s := range spans {
 		if f, ok := fieldMap[s.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
@@ -137,15 +147,18 @@ func buildSessionRecordWhereClause(query *bytes.Buffer, or []string, and []strin
 }
 
 func getSessionRecordFieldValue(c string, v interface{}) interface{} {
-	// typeMap := models.GetAuthTypeMap()
+	typeMap := models.GetSessionRecordTypeMap()
+	if typeMap[c] == "*datastore.RawMessage" {
+		v, _ = json.Marshal(v)
+	}
 	return v
 }
 
-func FindSessionRecord(or []string, and []string, span []string, limit string, column string, order string) ([]models.SessionRecord, *errors.SensError) {
+func FindSessionRecord(or []string, and []string, in string, span []string, limit string, column string, order string) ([]models.SessionRecord, *errors.SensError) {
 	query := bytes.NewBufferString("SELECT * FROM session_records WHERE ")
 	fieldMap := models.GetSessionRecordFieldMap()
 	values := make(map[string]interface{})
-	buildSessionRecordWhereClause(query, or, and, span, values)
+	buildSessionRecordWhereClause(query, or, and, in, span, values)
 	if column != "" {
 		if f, ok := fieldMap[column]; ok {
 			if order == "" {
@@ -157,21 +170,27 @@ func FindSessionRecord(or []string, and []string, span []string, limit string, c
 	fmt.Fprint(query, " LIMIT ", limit)
 
 	logger.Debug(query.String())
-	logger.Debugf("Values: %#v", values)
-
-	m := []models.SessionRecord{}
-	db := datastore.GetConnection()
-	if stmt, err := db.PrepareNamed(query.String()); err != nil {
+	if q, a, err := sqlx.Named(query.String(), values); err != nil {
 		logger.Error(err.Error())
-		return m, errors.New(errors.DB_ERROR, err.Error())
-	} else if err := stmt.Select(&m, values); err != nil {
-		logger.Error(err)
-		return m, errors.New(errors.DB_ERROR, err.Error())
+		return nil, errors.New(errors.DB_ERROR, err.Error())
+	} else if q, a, err := sqlx.In(q, a...); err != nil {
+		logger.Error(err.Error())
+		return nil, errors.New(errors.DB_ERROR, err.Error())
+	} else {
+		db := datastore.GetConnection()
+		q = db.Rebind(q)
+		logger.Debug(q)
+		logger.Debugf("Values: %#v", a)
+		m := []models.SessionRecord{}
+		if err := db.Select(&m, q, a...); err != nil {
+			logger.Error(err)
+			return m, errors.New(errors.DB_ERROR, err.Error())
+		}
+		return m, nil
 	}
-	return m, nil
 }
 
-func UpdateSessionRecordWhere(or []string, and []string, span []string, data []byte) *errors.SensError {
+func UpdateSessionRecordWhere(or []string, and []string, in string, span []string, data []byte) *errors.SensError {
 	fieldMap := models.GetSessionRecordFieldMap()
 	values := make(map[string]interface{})
 	update := bytes.NewBufferString("UPDATE session_records SET ")
@@ -199,7 +218,7 @@ func UpdateSessionRecordWhere(or []string, and []string, span []string, data []b
 	//SET ENDS
 
 	fmt.Fprint(update, " WHERE ")
-	buildSessionRecordWhereClause(update, or, and, span, values)
+	buildSessionRecordWhereClause(update, or, and, in, span, values)
 
 	logger.Debug(update.String())
 	logger.Debugf("Values: %#v", values)

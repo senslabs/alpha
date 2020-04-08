@@ -79,11 +79,12 @@ func UpdateDeviceWhere(w http.ResponseWriter, r *http.Request) {
 	span := values["span"]
 	or := values["or"]
 	and := values["and"]
+	in := values.Get("in")
 
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateDeviceWhere(or, and, span, data); err != nil {
+	} else if err := fn.UpdateDeviceWhere(or, and, in, span, data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -96,13 +97,14 @@ func FindDevice(w http.ResponseWriter, r *http.Request) {
 	span := values["span"]
 	or := values["or"]
 	and := values["and"]
+	in := values.Get("in")
 	limit := values.Get("limit")
 	column := values.Get("column")
 	order := values.Get("order")
 
 	if limit == "" {
 		http.Error(w, "Query param limit is mandatory", http.StatusBadRequest)
-	} else if ms, err := fn.FindDevice(or, and, span, limit, column, order); err != nil {
+	} else if ms, err := fn.FindDevice(or, and, in, span, limit, column, order); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {

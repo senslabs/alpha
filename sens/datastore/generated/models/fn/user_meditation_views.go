@@ -9,6 +9,7 @@ import (
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
 	"github.com/senslabs/alpha/sens/errors"
 	"github.com/senslabs/alpha/sens/logger"
+	"github.com/senslabs/sqlx"
 )
 
 func InsertUserMeditationView(data []byte) (string, error) {
@@ -101,10 +102,11 @@ func BatchInsertUserMeditationView(data []byte) ([]string, error) {
 
 
 
-func buildUserMeditationViewWhereClause(query *bytes.Buffer, or []string, and []string, span []string, values map[string]interface{}) {
+func buildUserMeditationViewWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values map[string]interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
+	ins := datastore.ParseInParams(in)
 	fieldMap := models.GetUserMeditationViewFieldMap()
 
 	cond := ""
@@ -126,6 +128,14 @@ func buildUserMeditationViewWhereClause(query *bytes.Buffer, or []string, and []
 			values[f] = getUserMeditationViewFieldValue(a.Column, a.Value)
 		}
 	}
+
+	if len(ins.Value) > 0 {
+		if f, ok := fieldMap[ins.Column]; ok {
+			fmt.Fprint(query, f, " in (:", f, ") AND ")
+			values[f] = ins.Value
+		}
+	}
+
 	for _, s := range spans {
 		if f, ok := fieldMap[s.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
@@ -137,15 +147,18 @@ func buildUserMeditationViewWhereClause(query *bytes.Buffer, or []string, and []
 }
 
 func getUserMeditationViewFieldValue(c string, v interface{}) interface{} {
-	// typeMap := models.GetAuthTypeMap()
+	typeMap := models.GetUserMeditationViewTypeMap()
+	if typeMap[c] == "*datastore.RawMessage" {
+		v, _ = json.Marshal(v)
+	}
 	return v
 }
 
-func FindUserMeditationView(or []string, and []string, span []string, limit string, column string, order string) ([]models.UserMeditationView, *errors.SensError) {
+func FindUserMeditationView(or []string, and []string, in string, span []string, limit string, column string, order string) ([]models.UserMeditationView, *errors.SensError) {
 	query := bytes.NewBufferString("SELECT * FROM user_meditation_views WHERE ")
 	fieldMap := models.GetUserMeditationViewFieldMap()
 	values := make(map[string]interface{})
-	buildUserMeditationViewWhereClause(query, or, and, span, values)
+	buildUserMeditationViewWhereClause(query, or, and, in, span, values)
 	if column != "" {
 		if f, ok := fieldMap[column]; ok {
 			if order == "" {
@@ -157,21 +170,27 @@ func FindUserMeditationView(or []string, and []string, span []string, limit stri
 	fmt.Fprint(query, " LIMIT ", limit)
 
 	logger.Debug(query.String())
-	logger.Debugf("Values: %#v", values)
-
-	m := []models.UserMeditationView{}
-	db := datastore.GetConnection()
-	if stmt, err := db.PrepareNamed(query.String()); err != nil {
+	if q, a, err := sqlx.Named(query.String(), values); err != nil {
 		logger.Error(err.Error())
-		return m, errors.New(errors.DB_ERROR, err.Error())
-	} else if err := stmt.Select(&m, values); err != nil {
-		logger.Error(err)
-		return m, errors.New(errors.DB_ERROR, err.Error())
+		return nil, errors.New(errors.DB_ERROR, err.Error())
+	} else if q, a, err := sqlx.In(q, a...); err != nil {
+		logger.Error(err.Error())
+		return nil, errors.New(errors.DB_ERROR, err.Error())
+	} else {
+		db := datastore.GetConnection()
+		q = db.Rebind(q)
+		logger.Debug(q)
+		logger.Debugf("Values: %#v", a)
+		m := []models.UserMeditationView{}
+		if err := db.Select(&m, q, a...); err != nil {
+			logger.Error(err)
+			return m, errors.New(errors.DB_ERROR, err.Error())
+		}
+		return m, nil
 	}
-	return m, nil
 }
 
-func UpdateUserMeditationViewWhere(or []string, and []string, span []string, data []byte) *errors.SensError {
+func UpdateUserMeditationViewWhere(or []string, and []string, in string, span []string, data []byte) *errors.SensError {
 	fieldMap := models.GetUserMeditationViewFieldMap()
 	values := make(map[string]interface{})
 	update := bytes.NewBufferString("UPDATE user_meditation_views SET ")
@@ -199,7 +218,7 @@ func UpdateUserMeditationViewWhere(or []string, and []string, span []string, dat
 	//SET ENDS
 
 	fmt.Fprint(update, " WHERE ")
-	buildUserMeditationViewWhereClause(update, or, and, span, values)
+	buildUserMeditationViewWhereClause(update, or, and, in, span, values)
 
 	logger.Debug(update.String())
 	logger.Debugf("Values: %#v", values)

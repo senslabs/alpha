@@ -9,6 +9,7 @@ import (
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
 	"github.com/senslabs/alpha/sens/errors"
 	"github.com/senslabs/alpha/sens/logger"
+	"github.com/senslabs/sqlx"
 )
 
 func InsertOpUser(data []byte) (string, error) {
@@ -101,10 +102,11 @@ func BatchInsertOpUser(data []byte) ([]string, error) {
 
 
 
-func buildOpUserWhereClause(query *bytes.Buffer, or []string, and []string, span []string, values map[string]interface{}) {
+func buildOpUserWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values map[string]interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
+	ins := datastore.ParseInParams(in)
 	fieldMap := models.GetOpUserFieldMap()
 
 	cond := ""
@@ -126,6 +128,14 @@ func buildOpUserWhereClause(query *bytes.Buffer, or []string, and []string, span
 			values[f] = getOpUserFieldValue(a.Column, a.Value)
 		}
 	}
+
+	if len(ins.Value) > 0 {
+		if f, ok := fieldMap[ins.Column]; ok {
+			fmt.Fprint(query, f, " in (:", f, ") AND ")
+			values[f] = ins.Value
+		}
+	}
+
 	for _, s := range spans {
 		if f, ok := fieldMap[s.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
@@ -137,15 +147,18 @@ func buildOpUserWhereClause(query *bytes.Buffer, or []string, and []string, span
 }
 
 func getOpUserFieldValue(c string, v interface{}) interface{} {
-	// typeMap := models.GetAuthTypeMap()
+	typeMap := models.GetOpUserTypeMap()
+	if typeMap[c] == "*datastore.RawMessage" {
+		v, _ = json.Marshal(v)
+	}
 	return v
 }
 
-func FindOpUser(or []string, and []string, span []string, limit string, column string, order string) ([]models.OpUser, *errors.SensError) {
+func FindOpUser(or []string, and []string, in string, span []string, limit string, column string, order string) ([]models.OpUser, *errors.SensError) {
 	query := bytes.NewBufferString("SELECT * FROM op_users WHERE ")
 	fieldMap := models.GetOpUserFieldMap()
 	values := make(map[string]interface{})
-	buildOpUserWhereClause(query, or, and, span, values)
+	buildOpUserWhereClause(query, or, and, in, span, values)
 	if column != "" {
 		if f, ok := fieldMap[column]; ok {
 			if order == "" {
@@ -157,21 +170,27 @@ func FindOpUser(or []string, and []string, span []string, limit string, column s
 	fmt.Fprint(query, " LIMIT ", limit)
 
 	logger.Debug(query.String())
-	logger.Debugf("Values: %#v", values)
-
-	m := []models.OpUser{}
-	db := datastore.GetConnection()
-	if stmt, err := db.PrepareNamed(query.String()); err != nil {
+	if q, a, err := sqlx.Named(query.String(), values); err != nil {
 		logger.Error(err.Error())
-		return m, errors.New(errors.DB_ERROR, err.Error())
-	} else if err := stmt.Select(&m, values); err != nil {
-		logger.Error(err)
-		return m, errors.New(errors.DB_ERROR, err.Error())
+		return nil, errors.New(errors.DB_ERROR, err.Error())
+	} else if q, a, err := sqlx.In(q, a...); err != nil {
+		logger.Error(err.Error())
+		return nil, errors.New(errors.DB_ERROR, err.Error())
+	} else {
+		db := datastore.GetConnection()
+		q = db.Rebind(q)
+		logger.Debug(q)
+		logger.Debugf("Values: %#v", a)
+		m := []models.OpUser{}
+		if err := db.Select(&m, q, a...); err != nil {
+			logger.Error(err)
+			return m, errors.New(errors.DB_ERROR, err.Error())
+		}
+		return m, nil
 	}
-	return m, nil
 }
 
-func UpdateOpUserWhere(or []string, and []string, span []string, data []byte) *errors.SensError {
+func UpdateOpUserWhere(or []string, and []string, in string, span []string, data []byte) *errors.SensError {
 	fieldMap := models.GetOpUserFieldMap()
 	values := make(map[string]interface{})
 	update := bytes.NewBufferString("UPDATE op_users SET ")
@@ -199,7 +218,7 @@ func UpdateOpUserWhere(or []string, and []string, span []string, data []byte) *e
 	//SET ENDS
 
 	fmt.Fprint(update, " WHERE ")
-	buildOpUserWhereClause(update, or, and, span, values)
+	buildOpUserWhereClause(update, or, and, in, span, values)
 
 	logger.Debug(update.String())
 	logger.Debugf("Values: %#v", values)
