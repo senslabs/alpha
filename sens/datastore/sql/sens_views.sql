@@ -90,11 +90,11 @@ FROM (
 ORDER BY
   created_at DESC;
 
--- The user_session_views is meant to view the activity type and timestamp of a user
+-- The user_session_views is meant to view the activity session_type and timestamp of a user
 CREATE VIEW user_session_views AS 
-SELECT type AS activity_type, ended_at AS timestamp, user_id FROM sessions WHERE type = 'Sleep'
+SELECT session_type AS activity_type, ended_at AS timestamp, user_id FROM sessions WHERE session_type = 'Sleep'
 UNION
-SELECT type AS activity_type, ended_at AS timestamp, user_id FROM sessions WHERE type = 'Meditation'
+SELECT session_type AS activity_type, ended_at AS timestamp, user_id FROM sessions WHERE session_type = 'Meditation'
 UNION
 SELECT 'Alert' AS activity_type, created_at AS timestamp, user_id FROM alerts
 UNION
@@ -116,17 +116,17 @@ JOIN auths au ON au.auth_id = u.auth_id;
 
 
 CREATE VIEW sleep_views AS
-SELECT session_id, user_id, session_name, type, started_at, ended_at
+SELECT session_id, user_id, session_name, session_type, started_at, ended_at
 FROM
 (
     SELECT
     DISTINCT ON (user_id) user_id,
     session_id,
     session_name,
-    type,
+    session_type,
     started_at,
     ended_at
-    FROM sessions WHERE type = 'Sleep'
+    FROM sessions WHERE session_type = 'Sleep'
     ORDER BY
     user_id,
     ended_at DESC
@@ -134,17 +134,17 @@ FROM
 ORDER BY ended_at DESC;
 
 CREATE VIEW meditation_views AS
-SELECT session_id, user_id, session_name, type, started_at, ended_at
+SELECT session_id, user_id, session_name, session_type, started_at, ended_at
 FROM
 (
     SELECT
     DISTINCT ON (user_id) user_id,
     session_id,
     session_name,
-    type,
+    session_type,
     started_at,
     ended_at
-    FROM sessions WHERE type = 'Meditation'
+    FROM sessions WHERE session_type = 'Meditation'
     ORDER BY
     user_id,
     ended_at DESC
@@ -202,7 +202,7 @@ SELECT
 FROM session_properties sp
 JOIN sessions s ON sp.session_id = s.session_id
 WHERE
-  s.type = 'Sleep' AND
+  s.session_type = 'Sleep' AND
   sp.key IN (
     'HeartRate',
     'BreathRate',
@@ -220,7 +220,7 @@ SELECT
 FROM session_properties sp
 JOIN sessions s ON sp.session_id = s.session_id
 WHERE
-  s.type = 'Meditation' AND
+  s.session_type = 'Meditation' AND
   sp.key IN (
     'HeartRate',
     'BreathRate',

@@ -11,19 +11,19 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func DeviceMain(r *mux.Router) {
-	r.HandleFunc("/api/devices/create", CreateDevice)
-	r.HandleFunc("/api/devices/batch/create", BatchCreateDevice)
+func UserSettingMain(r *mux.Router) {
+	r.HandleFunc("/api/user-settings/create", CreateUserSetting)
+	r.HandleFunc("/api/user-settings/batch/create", BatchCreateUserSetting)
 	
-	r.HandleFunc("/api/devices/update", UpdateDeviceWhere)
-	r.HandleFunc("/api/devices/find", FindDevice)
+	r.HandleFunc("/api/user-settings/update", UpdateUserSettingWhere)
+	r.HandleFunc("/api/user-settings/find", FindUserSetting)
 }
 
-func CreateDevice(w http.ResponseWriter, r *http.Request) {
+func CreateUserSetting(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.InsertDevice(data); err != nil {
+	} else if id, err := fn.InsertUserSetting(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -31,11 +31,11 @@ func CreateDevice(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func BatchCreateDevice(w http.ResponseWriter, r *http.Request) {
+func BatchCreateUserSetting(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.BatchInsertDevice(data); err != nil {
+	} else if id, err := fn.BatchInsertUserSetting(data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -45,7 +45,7 @@ func BatchCreateDevice(w http.ResponseWriter, r *http.Request) {
 
 
 
-func UpdateDeviceWhere(w http.ResponseWriter, r *http.Request) {
+func UpdateUserSettingWhere(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -55,7 +55,7 @@ func UpdateDeviceWhere(w http.ResponseWriter, r *http.Request) {
 	if data, err := ioutil.ReadAll(r.Body); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateDeviceWhere(or, and, in, span, data); err != nil {
+	} else if err := fn.UpdateUserSettingWhere(or, and, in, span, data); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -63,7 +63,7 @@ func UpdateDeviceWhere(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func FindDevice(w http.ResponseWriter, r *http.Request) {
+func FindUserSetting(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -75,7 +75,7 @@ func FindDevice(w http.ResponseWriter, r *http.Request) {
 
 	if limit == "" {
 		http.Error(w, "Query param limit is mandatory", http.StatusBadRequest)
-	} else if ms, err := fn.FindDevice(or, and, in, span, limit, column, order); err != nil {
+	} else if ms, err := fn.FindUserSetting(or, and, in, span, limit, column, order); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {

@@ -12,13 +12,13 @@ import (
 	"github.com/senslabs/sqlx"
 )
 
-func InsertDevice(data []byte) (string, error) {
+func InsertUserSetting(data []byte) (string, error) {
 	var j map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.Device
+	var m models.UserSetting
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return "", errors.FromError(errors.GO_ERROR, err)
@@ -27,8 +27,8 @@ func InsertDevice(data []byte) (string, error) {
 	logger.Debug(m)
 
 	comma := ""
-	fieldMap := models.GetDeviceFieldMap()
-	insert := bytes.NewBufferString("INSERT INTO devices(")
+	fieldMap := models.GetUserSettingFieldMap()
+	insert := bytes.NewBufferString("INSERT INTO user_settings(")
 	values := bytes.NewBufferString("VALUES(")
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -60,7 +60,7 @@ func InsertDevice(data []byte) (string, error) {
 	
 }
 
-func BatchInsertDevice(data []byte) ([]string, error) {
+func BatchInsertUserSetting(data []byte) ([]string, error) {
 	var j []map[string]interface{}
 	if err := json.Unmarshal(data, &j); err != nil {
 		logger.Error(err)
@@ -74,8 +74,8 @@ func BatchInsertDevice(data []byte) ([]string, error) {
 
 	comma := ""
 	var keys []string
-	fieldMap := models.GetDeviceFieldMap()
-	insert := bytes.NewBufferString("UPSERT INTO devices(")
+	fieldMap := models.GetUserSettingFieldMap()
+	insert := bytes.NewBufferString("UPSERT INTO user_settings(")
 	ph := bytes.NewBufferString("(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
@@ -102,18 +102,18 @@ func BatchInsertDevice(data []byte) ([]string, error) {
 
 
 
-func buildDeviceWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values map[string]interface{}) {
+func buildUserSettingWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values map[string]interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
 	ins := datastore.ParseInParams(in)
-	fieldMap := models.GetDeviceFieldMap()
+	fieldMap := models.GetUserSettingFieldMap()
 
 	cond := ""
 	for _, o := range ors {
 		if f, ok := fieldMap[o.Column]; ok {
 			fmt.Fprint(query, cond, fmt.Sprintf("%s = :%s ", f, f))
-			values[f] = getDeviceFieldValue(o.Column, o.Value)
+			values[f] = getUserSettingFieldValue(o.Column, o.Value)
 			cond = "OR "
 		}
 	}
@@ -125,7 +125,7 @@ func buildDeviceWhereClause(query *bytes.Buffer, or []string, and []string, in s
 	for _, a := range ands {
 		if f, ok := fieldMap[a.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s = :%s AND ", f, f))
-			values[f] = getDeviceFieldValue(a.Column, a.Value)
+			values[f] = getUserSettingFieldValue(a.Column, a.Value)
 		}
 	}
 
@@ -139,26 +139,26 @@ func buildDeviceWhereClause(query *bytes.Buffer, or []string, and []string, in s
 	for _, s := range spans {
 		if f, ok := fieldMap[s.Column]; ok {
 			fmt.Fprint(query, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
-			values["from_"+f] = getDeviceFieldValue(s.Column, s.From)
-			values["to_"+f] = getDeviceFieldValue(s.Column, s.To)
+			values["from_"+f] = getUserSettingFieldValue(s.Column, s.From)
+			values["to_"+f] = getUserSettingFieldValue(s.Column, s.To)
 		}
 	}
 	fmt.Fprint(query, "1 = 1)")
 }
 
-func getDeviceFieldValue(c string, v interface{}) interface{} {
-	typeMap := models.GetDeviceTypeMap()
+func getUserSettingFieldValue(c string, v interface{}) interface{} {
+	typeMap := models.GetUserSettingTypeMap()
 	if typeMap[c] == "*datastore.RawMessage" {
 		v, _ = json.Marshal(v)
 	}
 	return v
 }
 
-func FindDevice(or []string, and []string, in string, span []string, limit string, column string, order string) ([]models.Device, *errors.SensError) {
-	query := bytes.NewBufferString("SELECT * FROM devices WHERE ")
-	fieldMap := models.GetDeviceFieldMap()
+func FindUserSetting(or []string, and []string, in string, span []string, limit string, column string, order string) ([]models.UserSetting, *errors.SensError) {
+	query := bytes.NewBufferString("SELECT * FROM user_settings WHERE ")
+	fieldMap := models.GetUserSettingFieldMap()
 	values := make(map[string]interface{})
-	buildDeviceWhereClause(query, or, and, in, span, values)
+	buildUserSettingWhereClause(query, or, and, in, span, values)
 	if column != "" {
 		if f, ok := fieldMap[column]; ok {
 			if order == "" {
@@ -181,7 +181,7 @@ func FindDevice(or []string, and []string, in string, span []string, limit strin
 		q = db.Rebind(q)
 		logger.Debug(q)
 		logger.Debugf("Values: %#v", a)
-		m := []models.Device{}
+		m := []models.UserSetting{}
 		if err := db.Select(&m, q, a...); err != nil {
 			logger.Error(err)
 			return m, errors.New(errors.DB_ERROR, err.Error())
@@ -190,10 +190,10 @@ func FindDevice(or []string, and []string, in string, span []string, limit strin
 	}
 }
 
-func UpdateDeviceWhere(or []string, and []string, in string, span []string, data []byte) *errors.SensError {
-	fieldMap := models.GetDeviceFieldMap()
+func UpdateUserSettingWhere(or []string, and []string, in string, span []string, data []byte) *errors.SensError {
+	fieldMap := models.GetUserSettingFieldMap()
 	values := make(map[string]interface{})
-	update := bytes.NewBufferString("UPDATE devices SET ")
+	update := bytes.NewBufferString("UPDATE user_settings SET ")
 
 	//SET FIELD VALUES
 	var j map[string]interface{}
@@ -201,7 +201,7 @@ func UpdateDeviceWhere(or []string, and []string, in string, span []string, data
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
 	}
-	var m models.Device
+	var m models.UserSetting
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return errors.FromError(errors.GO_ERROR, err)
@@ -218,7 +218,7 @@ func UpdateDeviceWhere(or []string, and []string, in string, span []string, data
 	//SET ENDS
 
 	fmt.Fprint(update, " WHERE ")
-	buildDeviceWhereClause(update, or, and, in, span, values)
+	buildUserSettingWhereClause(update, or, and, in, span, values)
 
 	logger.Debug(update.String())
 	logger.Debugf("Values: %#v", values)

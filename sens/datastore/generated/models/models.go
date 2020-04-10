@@ -76,6 +76,60 @@ func GetUserTypeMap() map[string]string {
 	return map[string]string{"AccessGroup": "*string", "Age": "*int64", "AuthId": "*string", "CreatedAt": "*int64", "OrgId": "*string", "Status": "*string", "UpdatedAt": "*int64", "UserId": "*string"}
 }
 
+type SurveyQuestion struct {
+	SurveyQuestionId *string `db:"survey_question_id" json:",omitempty"`
+	Question         *string `db:"question" json:",omitempty"`
+}
+
+func GetSurveyQuestionFieldMap() map[string]string {
+	return map[string]string{"Question": "question", "SurveyQuestionId": "survey_question_id"}
+}
+func GetSurveyQuestionTypeMap() map[string]string {
+	return map[string]string{"Question": "*string", "SurveyQuestionId": "*string"}
+}
+
+type SurveyAnswer struct {
+	SurveyAnswerId   *string `db:"survey_answer_id" json:",omitempty"`
+	SurveyQuestionId *string `db:"survey_question_id" json:",omitempty"`
+	Answer           *string `db:"answer" json:",omitempty"`
+}
+
+func GetSurveyAnswerFieldMap() map[string]string {
+	return map[string]string{"Answer": "answer", "SurveyAnswerId": "survey_answer_id", "SurveyQuestionId": "survey_question_id"}
+}
+func GetSurveyAnswerTypeMap() map[string]string {
+	return map[string]string{"Answer": "*string", "SurveyAnswerId": "*string", "SurveyQuestionId": "*string"}
+}
+
+type UserSetting struct {
+	Id        *string `db:"id" json:",omitempty"`
+	UserId    *string `db:"user_id" json:",omitempty"`
+	CreatedAt *int64  `db:"created_at" json:",omitempty"`
+	Key       *string `db:"key" json:",omitempty"`
+	Value     *string `db:"value" json:",omitempty"`
+}
+
+func GetUserSettingFieldMap() map[string]string {
+	return map[string]string{"CreatedAt": "created_at", "Id": "id", "Key": "key", "UserId": "user_id", "Value": "value"}
+}
+func GetUserSettingTypeMap() map[string]string {
+	return map[string]string{"CreatedAt": "*int64", "Id": "*string", "Key": "*string", "UserId": "*string", "Value": "*string"}
+}
+
+type UserPropertie struct {
+	Id     *string `db:"id" json:",omitempty"`
+	UserId *string `db:"user_id" json:",omitempty"`
+	Key    *string `db:"key" json:",omitempty"`
+	Value  *string `db:"value" json:",omitempty"`
+}
+
+func GetUserPropertieFieldMap() map[string]string {
+	return map[string]string{"Id": "id", "Key": "key", "UserId": "user_id", "Value": "value"}
+}
+func GetUserPropertieTypeMap() map[string]string {
+	return map[string]string{"Id": "*string", "Key": "*string", "UserId": "*string", "Value": "*string"}
+}
+
 type ApiKey struct {
 	ApiKeyId    *string `db:"api_key_id" json:",omitempty"`
 	OrgId       *string `db:"org_id" json:",omitempty"`
@@ -206,33 +260,32 @@ func GetUserEndpointTypeMap() map[string]string {
 }
 
 type Device struct {
-	RowId      *string `db:"row_id" json:",omitempty"`
 	DeviceId   *string `db:"device_id" json:",omitempty"`
+	CreatedAt  *int64  `db:"created_at" json:",omitempty"`
 	DeviceName *string `db:"device_name" json:",omitempty"`
 	OrgId      *string `db:"org_id" json:",omitempty"`
 	UserId     *string `db:"user_id" json:",omitempty"`
-	CreatedAt  *int64  `db:"created_at" json:",omitempty"`
 	Status     *string `db:"status" json:",omitempty"`
 }
 
 func GetDeviceFieldMap() map[string]string {
-	return map[string]string{"CreatedAt": "created_at", "DeviceId": "device_id", "DeviceName": "device_name", "OrgId": "org_id", "RowId": "row_id", "Status": "status", "UserId": "user_id"}
+	return map[string]string{"CreatedAt": "created_at", "DeviceId": "device_id", "DeviceName": "device_name", "OrgId": "org_id", "Status": "status", "UserId": "user_id"}
 }
 func GetDeviceTypeMap() map[string]string {
-	return map[string]string{"CreatedAt": "*int64", "DeviceId": "*string", "DeviceName": "*string", "OrgId": "*string", "RowId": "*string", "Status": "*string", "UserId": "*string"}
+	return map[string]string{"CreatedAt": "*int64", "DeviceId": "*string", "DeviceName": "*string", "OrgId": "*string", "Status": "*string", "UserId": "*string"}
 }
 
 type DeviceActivitie struct {
-	DeviceId *string `db:"device_id" json:",omitempty"`
-	ActiveAt *int64  `db:"active_at" json:",omitempty"`
-	Type     *string `db:"type" json:",omitempty"`
+	DeviceId     *string `db:"device_id" json:",omitempty"`
+	ActivityType *string `db:"activity_type" json:",omitempty"`
+	ActiveAt     *int64  `db:"active_at" json:",omitempty"`
 }
 
 func GetDeviceActivitieFieldMap() map[string]string {
-	return map[string]string{"ActiveAt": "active_at", "DeviceId": "device_id", "Type": "type"}
+	return map[string]string{"ActiveAt": "active_at", "ActivityType": "activity_type", "DeviceId": "device_id"}
 }
 func GetDeviceActivitieTypeMap() map[string]string {
-	return map[string]string{"ActiveAt": "*int64", "DeviceId": "*string", "Type": "*string"}
+	return map[string]string{"ActiveAt": "*int64", "ActivityType": "*string", "DeviceId": "*string"}
 }
 
 type Alert struct {
@@ -255,16 +308,48 @@ type Session struct {
 	SessionId   *string `db:"session_id" json:",omitempty"`
 	UserId      *string `db:"user_id" json:",omitempty"`
 	SessionName *string `db:"session_name" json:",omitempty"`
-	Type        *string `db:"type" json:",omitempty"`
+	SessionType *string `db:"session_type" json:",omitempty"`
 	StartedAt   *int64  `db:"started_at" json:",omitempty"`
 	EndedAt     *int64  `db:"ended_at" json:",omitempty"`
 }
 
 func GetSessionFieldMap() map[string]string {
-	return map[string]string{"EndedAt": "ended_at", "SessionId": "session_id", "SessionName": "session_name", "StartedAt": "started_at", "Type": "type", "UserId": "user_id"}
+	return map[string]string{"EndedAt": "ended_at", "SessionId": "session_id", "SessionName": "session_name", "SessionType": "session_type", "StartedAt": "started_at", "UserId": "user_id"}
 }
 func GetSessionTypeMap() map[string]string {
-	return map[string]string{"EndedAt": "*int64", "SessionId": "*string", "SessionName": "*string", "StartedAt": "*int64", "Type": "*string", "UserId": "*string"}
+	return map[string]string{"EndedAt": "*int64", "SessionId": "*string", "SessionName": "*string", "SessionType": "*string", "StartedAt": "*int64", "UserId": "*string"}
+}
+
+type SessionSetting struct {
+	SessionSettingId *string `db:"session_setting_id" json:",omitempty"`
+	UserId           *string `db:"user_id" json:",omitempty"`
+	Key              *string `db:"key" json:",omitempty"`
+	CreatedAt        *int64  `db:"created_at" json:",omitempty"`
+	SessionType      *string `db:"session_type" json:",omitempty"`
+	Value            *string `db:"value" json:",omitempty"`
+}
+
+func GetSessionSettingFieldMap() map[string]string {
+	return map[string]string{"CreatedAt": "created_at", "Key": "key", "SessionSettingId": "session_setting_id", "SessionType": "session_type", "UserId": "user_id", "Value": "value"}
+}
+func GetSessionSettingTypeMap() map[string]string {
+	return map[string]string{"CreatedAt": "*int64", "Key": "*string", "SessionSettingId": "*string", "SessionType": "*string", "UserId": "*string", "Value": "*string"}
+}
+
+type VitalBaseline struct {
+	VitalBaselineId *string `db:"vital_baseline_id" json:",omitempty"`
+	UserId          *string `db:"user_id" json:",omitempty"`
+	Key             *string `db:"key" json:",omitempty"`
+	CreatedAt       *int64  `db:"created_at" json:",omitempty"`
+	LowerLimit      *int64  `db:"lower_limit" json:",omitempty"`
+	UpperLimit      *int64  `db:"upper_limit" json:",omitempty"`
+}
+
+func GetVitalBaselineFieldMap() map[string]string {
+	return map[string]string{"CreatedAt": "created_at", "Key": "key", "LowerLimit": "lower_limit", "UpperLimit": "upper_limit", "UserId": "user_id", "VitalBaselineId": "vital_baseline_id"}
+}
+func GetVitalBaselineTypeMap() map[string]string {
+	return map[string]string{"CreatedAt": "*int64", "Key": "*string", "LowerLimit": "*int64", "UpperLimit": "*int64", "UserId": "*string", "VitalBaselineId": "*string"}
 }
 
 type SessionEvent struct {
@@ -432,32 +517,32 @@ type SleepView struct {
 	SessionId   *string `db:"session_id" json:",omitempty"`
 	UserId      *string `db:"user_id" json:",omitempty"`
 	SessionName *string `db:"session_name" json:",omitempty"`
-	Type        *string `db:"type" json:",omitempty"`
+	SessionType *string `db:"session_type" json:",omitempty"`
 	StartedAt   *int64  `db:"started_at" json:",omitempty"`
 	EndedAt     *int64  `db:"ended_at" json:",omitempty"`
 }
 
 func GetSleepViewFieldMap() map[string]string {
-	return map[string]string{"EndedAt": "ended_at", "SessionId": "session_id", "SessionName": "session_name", "StartedAt": "started_at", "Type": "type", "UserId": "user_id"}
+	return map[string]string{"EndedAt": "ended_at", "SessionId": "session_id", "SessionName": "session_name", "SessionType": "session_type", "StartedAt": "started_at", "UserId": "user_id"}
 }
 func GetSleepViewTypeMap() map[string]string {
-	return map[string]string{"EndedAt": "*int64", "SessionId": "*string", "SessionName": "*string", "StartedAt": "*int64", "Type": "*string", "UserId": "*string"}
+	return map[string]string{"EndedAt": "*int64", "SessionId": "*string", "SessionName": "*string", "SessionType": "*string", "StartedAt": "*int64", "UserId": "*string"}
 }
 
 type MeditationView struct {
 	SessionId   *string `db:"session_id" json:",omitempty"`
 	UserId      *string `db:"user_id" json:",omitempty"`
 	SessionName *string `db:"session_name" json:",omitempty"`
-	Type        *string `db:"type" json:",omitempty"`
+	SessionType *string `db:"session_type" json:",omitempty"`
 	StartedAt   *int64  `db:"started_at" json:",omitempty"`
 	EndedAt     *int64  `db:"ended_at" json:",omitempty"`
 }
 
 func GetMeditationViewFieldMap() map[string]string {
-	return map[string]string{"EndedAt": "ended_at", "SessionId": "session_id", "SessionName": "session_name", "StartedAt": "started_at", "Type": "type", "UserId": "user_id"}
+	return map[string]string{"EndedAt": "ended_at", "SessionId": "session_id", "SessionName": "session_name", "SessionType": "session_type", "StartedAt": "started_at", "UserId": "user_id"}
 }
 func GetMeditationViewTypeMap() map[string]string {
-	return map[string]string{"EndedAt": "*int64", "SessionId": "*string", "SessionName": "*string", "StartedAt": "*int64", "Type": "*string", "UserId": "*string"}
+	return map[string]string{"EndedAt": "*int64", "SessionId": "*string", "SessionName": "*string", "SessionType": "*string", "StartedAt": "*int64", "UserId": "*string"}
 }
 
 type SleepSummarie struct {

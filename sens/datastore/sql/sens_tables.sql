@@ -38,6 +38,34 @@ CREATE TABLE "users" (
   "status" text
 );
 
+CREATE TABLE "survey_questions" (
+  "survey_question_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
+  "question" text
+);
+
+CREATE TABLE "survey_answers" (
+  "survey_answer_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
+  "survey_question_id" uuid,
+  "answer" text
+);
+
+CREATE TABLE "user_settings" (
+  "id" uuid,
+  "user_id" uuid,
+  "created_at" int,
+  "key" text,
+  "value" text,
+  PRIMARY KEY ("id", "user_id")
+);
+
+CREATE TABLE "user_properties" (
+  "id" uuid,
+  "user_id" uuid,
+  "key" text,
+  "value" text,
+  PRIMARY KEY ("id", "user_id")
+);
+
 CREATE TABLE "api_keys" (
   "api_key_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "org_id" uuid,
@@ -106,20 +134,20 @@ CREATE TABLE "user_endpoints" (
 );
 
 CREATE TABLE "devices" (
-  "row_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "device_id" uuid,
+  "created_at" int DEFAULT (now()::int),
   "device_name" text,
   "org_id" uuid,
   "user_id" uuid,
-  "created_at" int DEFAULT (now()::int),
-  "status" text
+  "status" text,
+  PRIMARY KEY ("device_id", "created_at")
 );
 
 CREATE TABLE "device_activities" (
   "device_id" uuid,
-  "active_at" int,
-  "type" text,
-  PRIMARY KEY ("device_id", "active_at")
+  "activity_type" text,
+  "active_at" int DEFAULT (now()::int),
+  PRIMARY KEY ("device_id", "activity_type")
 );
 
 CREATE TABLE "alerts" (
@@ -135,9 +163,27 @@ CREATE TABLE "sessions" (
   "session_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "user_id" uuid,
   "session_name" text,
-  "type" text,
+  "session_type" text,
   "started_at" int,
   "ended_at" int
+);
+
+CREATE TABLE "session_settings" (
+  "session_setting_id" uuid PRIMARY KEY,
+  "user_id" uuid,
+  "key" text,
+  "created_at" int,
+  "session_type" text,
+  "value" text
+);
+
+CREATE TABLE "vital_baselines" (
+  "vital_baseline_id" uuid PRIMARY KEY,
+  "user_id" uuid,
+  "key" text,
+  "created_at" int,
+  "lower_limit" int,
+  "upper_limit" int
 );
 
 CREATE TABLE "session_events" (
@@ -175,6 +221,12 @@ ALTER TABLE "users" ADD FOREIGN KEY ("auth_id") REFERENCES "auths" ("auth_id");
 
 ALTER TABLE "users" ADD FOREIGN KEY ("org_id") REFERENCES "orgs" ("org_id");
 
+ALTER TABLE "survey_answers" ADD FOREIGN KEY ("survey_question_id") REFERENCES "survey_questions" ("survey_question_id");
+
+ALTER TABLE "user_settings" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
+
+ALTER TABLE "user_properties" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
+
 ALTER TABLE "api_keys" ADD FOREIGN KEY ("org_id") REFERENCES "orgs" ("org_id");
 
 ALTER TABLE "op_user_access_groups" ADD FOREIGN KEY ("op_id") REFERENCES "ops" ("op_id");
@@ -209,13 +261,15 @@ ALTER TABLE "alerts" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
 
 ALTER TABLE "sessions" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
 
+ALTER TABLE "session_settings" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
+
+ALTER TABLE "vital_baselines" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
+
 ALTER TABLE "session_events" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
 
 ALTER TABLE "session_records" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
 
 ALTER TABLE "session_properties" ADD FOREIGN KEY ("session_id") REFERENCES "sessions" ("session_id");
-
-CREATE INDEX ON "devices" ("device_id");
 
 CREATE INDEX ON "sessions" ("ended_at");
 
