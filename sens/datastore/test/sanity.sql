@@ -63,113 +63,113 @@ VALUES('dce42705-73cf-4c28-8940-f7228ec506eb', 'ddf0529e-d0f1-416b-9e96-6522813f
 -- create 8 devices
 
 INSERT INTO public.devices
-(row_id, device_id, device_name, org_id, user_id, created_at, "status")
-VALUES('15a91bcb-c52f-4daa-b268-33853e8b8dae', 'dc641f85-529d-4cf5-8f0e-b80dc43309ed', 'Device1', '83632c67-5208-4949-9216-0b809a4ed1cb', '208cf5c8-0fa9-47d6-9ed8-ef5cdd2cb5d6', 1586341177, 'PAIRED');
+(device_id, device_name, org_id, user_id, created_at, "status")
+VALUES('dc641f85-529d-4cf5-8f0e-b80dc43309ed', 'Device1', '83632c67-5208-4949-9216-0b809a4ed1cb', '208cf5c8-0fa9-47d6-9ed8-ef5cdd2cb5d6', 1586341177, 'PAIRED');
 INSERT INTO public.devices
-(row_id, device_id, device_name, org_id, user_id, created_at, "status")
-VALUES('29e65170-0d74-4746-adcb-eca2762f3941', '8aefe53f-bec8-411d-9495-b1277bbff0e2', 'Device2', '83632c67-5208-4949-9216-0b809a4ed1cb', 'd99e07c1-bcb7-4e6e-819d-f66b22bb0282', 1586341220, 'PAIRED');
+(device_id, device_name, org_id, user_id, created_at, "status")
+VALUES('8aefe53f-bec8-411d-9495-b1277bbff0e2', 'Device2', '83632c67-5208-4949-9216-0b809a4ed1cb', 'd99e07c1-bcb7-4e6e-819d-f66b22bb0282', 1586341220, 'PAIRED');
 INSERT INTO public.devices
-(row_id, device_id, device_name, org_id, user_id, created_at, "status")
-VALUES('2a611f3c-2c7b-402b-9e22-1a24a1eeff58', 'caec6326-13e0-44e5-be16-679de2f719c7', 'Device3', '83632c67-5208-4949-9216-0b809a4ed1cb', '92575c99-a421-44f2-b1c5-89e2b4ea3e44', 1586341177, 'PAIRED');
+(device_id, device_name, org_id, user_id, created_at, "status")
+VALUES('caec6326-13e0-44e5-be16-679de2f719c7', 'Device3', '83632c67-5208-4949-9216-0b809a4ed1cb', '92575c99-a421-44f2-b1c5-89e2b4ea3e44', 1586341177, 'PAIRED');
 INSERT INTO public.devices
-(row_id, device_id, device_name, org_id, user_id, created_at, "status")
-VALUES('31123680-e2c1-47b4-9092-b22e56bc0fbd', '711c0ca3-1a25-415c-bb4e-39d52e7ad8a9', 'Device4', '83632c67-5208-4949-9216-0b809a4ed1cb', '98a798a0-4e38-46ef-9b12-95c01c8e96ed', 1586341220, 'PAIRED');
+(device_id, device_name, org_id, user_id, created_at, "status")
+VALUES('711c0ca3-1a25-415c-bb4e-39d52e7ad8a9', 'Device4', '83632c67-5208-4949-9216-0b809a4ed1cb', '98a798a0-4e38-46ef-9b12-95c01c8e96ed', 1586341220, 'PAIRED');
 INSERT INTO public.devices
-(row_id, device_id, device_name, org_id, user_id, created_at, "status")
-VALUES('321e55a8-4b03-4167-82d3-9f4fe0310c13', 'c3f4c2f7-c5cd-48aa-b4c5-a92b520a66ee', 'Device5', '83632c67-5208-4949-9216-0b809a4ed1cb', 'dce42705-73cf-4c28-8940-f7228ec506eb', 1586341220, 'PAIRED');
+(device_id, device_name, org_id, user_id, created_at, "status")
+VALUES('c3f4c2f7-c5cd-48aa-b4c5-a92b520a66ee', 'Device5', '83632c67-5208-4949-9216-0b809a4ed1cb', 'dce42705-73cf-4c28-8940-f7228ec506eb', 1586341220, 'PAIRED');
 INSERT INTO public.devices
-(row_id, device_id, device_name, org_id, user_id, created_at, "status")
-VALUES('48fc2850-e3a8-4918-bcc3-8d1ccced985a', 'ad7f7218-5d34-4510-8382-46ec8237be54', 'Device6', '83632c67-5208-4949-9216-0b809a4ed1cb', NULL, 1586341220, 'REGISTERED');
+(device_id, device_name, org_id, user_id, created_at, "status")
+VALUES('ad7f7218-5d34-4510-8382-46ec8237be54', 'Device6', '83632c67-5208-4949-9216-0b809a4ed1cb', NULL, 1586341220, 'REGISTERED');
 INSERT INTO public.devices
-(row_id, device_id, device_name, org_id, user_id, created_at, "status")
-VALUES('c8ed8c76-ed68-472c-ba16-491c3a794b3a', 'e0fb8e1d-7cf7-495f-ae68-31b0ea1af920', 'Device7', '83632c67-5208-4949-9216-0b809a4ed1cb', NULL, 1586341220, 'REGISTERED');
+(device_id, device_name, org_id, user_id, created_at, "status")
+VALUES('e0fb8e1d-7cf7-495f-ae68-31b0ea1af920', 'Device7', '83632c67-5208-4949-9216-0b809a4ed1cb', NULL, 1586341220, 'REGISTERED');
 INSERT INTO public.devices
-(row_id, device_id, device_name, org_id, user_id, created_at, "status")
-VALUES('0e81dfa8-9617-4c5d-8555-e56ccc6cb315', '0b2746b7-44ff-43a8-8676-9173fd3acfaf', 'Device8', '83632c67-5208-4949-9216-0b809a4ed1cb', NULL, 1586341220, 'REGISTERED');
+(device_id, device_name, org_id, user_id, created_at, "status")
+VALUES('0b2746b7-44ff-43a8-8676-9173fd3acfaf', 'Device8', '83632c67-5208-4949-9216-0b809a4ed1cb', NULL, 1586341220, 'REGISTERED');
 
 
 
 -- for each user create 2 sleeps and 2 meditations
 
 INSERT INTO public."sessions"
-(session_id, user_id, session_name, "type", started_at, ended_at)
+(session_id, user_id, session_name, session_type, started_at, ended_at)
 VALUES('001c0042-f0f3-4e69-98f7-109d7265822f', '208cf5c8-0fa9-47d6-9ed8-ef5cdd2cb5d6', 'SN', 'Sleep', '1586072569', '1586292569');
 
 INSERT INTO public."sessions"
-(session_id, user_id, session_name, "type", started_at, ended_at)
+(session_id, user_id, session_name, session_type, started_at, ended_at)
 VALUES('02744d0f-c257-4c16-9db9-750917493918', '92575c99-a421-44f2-b1c5-89e2b4ea3e44', 'SN', 'Sleep', '1586076569', '1586292569');
 
 INSERT INTO public."sessions"
-(session_id, user_id, session_name, "type", started_at, ended_at)
+(session_id, user_id, session_name, session_type, started_at, ended_at)
 VALUES('57ccb971-22f6-4b02-8fb4-cac4563602f8', '98a798a0-4e38-46ef-9b12-95c01c8e96ed', 'SN', 'Sleep', '1586078569', '1586292569');
 
 INSERT INTO public."sessions"
-(session_id, user_id, session_name, "type", started_at, ended_at)
+(session_id, user_id, session_name, session_type, started_at, ended_at)
 VALUES('72894b1b-f5f5-46e6-a7c7-886aa6a0d5ff', 'd99e07c1-bcb7-4e6e-819d-f66b22bb0282', 'SN', 'Sleep', '1586075569', '1586292569');
 
 INSERT INTO public."sessions"
-(session_id, user_id, session_name, "type", started_at, ended_at)
+(session_id, user_id, session_name, session_type, started_at, ended_at)
 VALUES('77312aee-192a-4a10-927a-c529c941ccff', 'dce42705-73cf-4c28-8940-f7228ec506eb', 'SN', 'Sleep', '1586074569', '1586292569');
 
 INSERT INTO public."sessions"
-(session_id, user_id, session_name, "type", started_at, ended_at)
+(session_id, user_id, session_name, session_type, started_at, ended_at)
 VALUES('8043ba29-7624-4640-a829-47fcb1d0eda7', '208cf5c8-0fa9-47d6-9ed8-ef5cdd2cb5d6', 'SN', 'Sleep', '1586206169', '1586225969');
 
 INSERT INTO public."sessions"
-(session_id, user_id, session_name, "type", started_at, ended_at)
+(session_id, user_id, session_name, session_type, started_at, ended_at)
 VALUES('851b992f-1364-49ae-8953-31b80a256667', '92575c99-a421-44f2-b1c5-89e2b4ea3e44', 'SN', 'Sleep', '1586202169', '1586223969');
 
 INSERT INTO public."sessions"
-(session_id, user_id, session_name, "type", started_at, ended_at)
+(session_id, user_id, session_name, session_type, started_at, ended_at)
 VALUES('ce58342e-4973-4c3c-960a-fcabbcc16e11', '98a798a0-4e38-46ef-9b12-95c01c8e96ed', 'SN', 'Sleep', '1586208169', '1586225369');
 
 INSERT INTO public."sessions"
-(session_id, user_id, session_name, "type", started_at, ended_at)
+(session_id, user_id, session_name, session_type, started_at, ended_at)
 VALUES('ddbca8b9-6ed4-4c71-81b1-ced144b7548c', 'd99e07c1-bcb7-4e6e-819d-f66b22bb0282', 'SN', 'Sleep', '1586206169', '1586221969');
 
 INSERT INTO public."sessions"
-(session_id, user_id, session_name, "type", started_at, ended_at)
+(session_id, user_id, session_name, session_type, started_at, ended_at)
 VALUES('ef4d7791-2aea-4819-a1c9-75ac05f1b5e2', 'dce42705-73cf-4c28-8940-f7228ec506eb', 'SN', 'Sleep', '1586206169', '1586228969');
 
 -- Meditations
 INSERT INTO public."sessions"
-(session_id, user_id, session_name, "type", started_at, ended_at)
+(session_id, user_id, session_name, session_type, started_at, ended_at)
 VALUES('0a4a1e5a-a7c1-4cc3-b1e4-e67945368967', '208cf5c8-0fa9-47d6-9ed8-ef5cdd2cb5d6', 'SN', 'Meditation', '1586115769', '1586114769');
 
 INSERT INTO public."sessions"
-(session_id, user_id, session_name, "type", started_at, ended_at)
+(session_id, user_id, session_name, session_type, started_at, ended_at)
 VALUES('3964667b-06db-46bd-9cf4-3e6767415a5a', '92575c99-a421-44f2-b1c5-89e2b4ea3e44', 'SN', 'Meditation', '1586115769', '1586114069');
 
 INSERT INTO public."sessions"
-(session_id, user_id, session_name, "type", started_at, ended_at)
+(session_id, user_id, session_name, session_type, started_at, ended_at)
 VALUES('3a6e43f1-cf2c-4abc-998e-3388ea9df2d4', '98a798a0-4e38-46ef-9b12-95c01c8e96ed', 'SN', 'Meditation', '1586115769', '1586113769');
 
 INSERT INTO public."sessions"
-(session_id, user_id, session_name, "type", started_at, ended_at)
+(session_id, user_id, session_name, session_type, started_at, ended_at)
 VALUES('3bb4a251-7e18-4733-a20a-7f769756a5b1', 'd99e07c1-bcb7-4e6e-819d-f66b22bb0282', 'SN', 'Meditation', '1586115769', '1586114369');
 
 INSERT INTO public."sessions"
-(session_id, user_id, session_name, "type", started_at, ended_at)
+(session_id, user_id, session_name, session_type, started_at, ended_at)
 VALUES('45134944-211c-4e9b-8886-677f2b6faaf2', 'dce42705-73cf-4c28-8940-f7228ec506eb', 'SN', 'Meditation', '1586115769', '1586114769');
 
 INSERT INTO public."sessions"
-(session_id, user_id, session_name, "type", started_at, ended_at)
+(session_id, user_id, session_name, session_type, started_at, ended_at)
 VALUES('48e01b74-6f88-4f01-a3f3-420310b50be6', '208cf5c8-0fa9-47d6-9ed8-ef5cdd2cb5d6', 'SN', 'Meditation', '1586115769', '1586113769');
 
 INSERT INTO public."sessions"
-(session_id, user_id, session_name, "type", started_at, ended_at)
+(session_id, user_id, session_name, session_type, started_at, ended_at)
 VALUES('51a49fa4-b4e2-4510-8b2a-a8fdc7be839f', '92575c99-a421-44f2-b1c5-89e2b4ea3e44', 'SN', 'Meditation', '1586115769', '1586112700');
 
 INSERT INTO public."sessions"
-(session_id, user_id, session_name, "type", started_at, ended_at)
+(session_id, user_id, session_name, session_type, started_at, ended_at)
 VALUES('a2da13e1-2dd1-4c6a-8494-4b4d0f01ff75', '98a798a0-4e38-46ef-9b12-95c01c8e96ed', 'SN', 'Meditation', '1586115769', '1586114769');
 
 INSERT INTO public."sessions"
-(session_id, user_id, session_name, "type", started_at, ended_at)
+(session_id, user_id, session_name, session_type, started_at, ended_at)
 VALUES('aa060b70-25aa-4c0d-9985-91540dfec35e', 'd99e07c1-bcb7-4e6e-819d-f66b22bb0282', 'SN', 'Meditation', '1586115769', '1586113769');
 
 INSERT INTO public."sessions"
-(session_id, user_id, session_name, "type", started_at, ended_at)
+(session_id, user_id, session_name, session_type, started_at, ended_at)
 VALUES('aeb82f5c-6f63-46e8-a4d9-4c97e1d6ecee', 'dce42705-73cf-4c28-8940-f7228ec506eb', 'SN', 'Meditation', '1586115769', '1586114769');
 
 -- add properties for each

@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/senslabs/alpha/sens/datastore"
@@ -25,15 +27,19 @@ type Activity struct {
 
 func GetOrgActivites(w http.ResponseWriter, r *http.Request) {
 	in := r.URL.Query().Get("in")
+	days := r.URL.Query().Get("days")
 	userIds := strings.Split(in, "^")
 	if len(userIds) < 2 {
 		logger.Error("Too less number of arguments")
 		httpclient.WriteError(w, http.StatusInternalServerError, errors.New("Too less number of arguments"))
+	} else if duration, err := strconv.Atoi(days); err != nil {
+		logger.Error("Too less number of arguments")
+		httpclient.WriteError(w, http.StatusInternalServerError, errors.New("Too less number of arguments"))
 	} else {
-		days := r.URL.Query().Get("days")
+		when := time.Now().Add(-time.Duration(duration*24) * time.Hour).Unix()
 		values := map[string]interface{}{
 			"user_ids": userIds[1:],
-			"when":     days,
+			"when":     when,
 		}
 		if query, args, err := sqlx.Named(ACTIVITY_DASHBOARD_QUERY, values); err != nil {
 			logger.Error(err)

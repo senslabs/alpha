@@ -163,7 +163,7 @@ WHERE
   sp.key IN (
     'HeartRate',
     'BreathRate',
-    'Lastsyncedat',
+    'LastSyncedAt',
     'Stress',
     'Score'
   );
@@ -180,7 +180,7 @@ WHERE
   sp.key IN (
     'HeartRate',
     'BreathRate',
-    'Lastsyncedat',
+    'LastSyncedAt',
     'Stress',
     'Score'
   );
@@ -206,7 +206,7 @@ WHERE
   sp.key IN (
     'HeartRate',
     'BreathRate',
-    'Lastsyncedat',
+    'LastSyncedAt',
     'Stress',
     'Score'
   );
@@ -224,7 +224,7 @@ WHERE
   sp.key IN (
     'HeartRate',
     'BreathRate',
-    'Lastsyncedat',
+    'LastSyncedAt',
     'Stress',
     'Score'
   );
