@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/senslabs/alpha/sens/datastore"
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
@@ -154,6 +155,27 @@ func getMeditationViewFieldValue(c string, v interface{}) interface{} {
 	return v
 }
 
+func findMeditationViewIn(query string, values map[string]interface{}) ([]models.MeditationView, *errors.SensError) {
+	if q, a, err := sqlx.Named(query, values); err != nil {
+		logger.Error(err.Error())
+		return nil, errors.New(errors.DB_ERROR, err.Error())
+	} else if q, a, err := sqlx.In(q, a...); err != nil {
+		logger.Error(err.Error())
+		return nil, errors.New(errors.DB_ERROR, err.Error())
+	} else {
+		db := datastore.GetConnection()
+		q = db.Rebind(q)
+		logger.Debug(q)
+		logger.Debugf("Values: %s", a)
+		m := []models.MeditationView{}
+		if err := db.Select(&m, q, a...); err != nil {
+			logger.Error(err)
+			return m, errors.New(errors.DB_ERROR, err.Error())
+		}
+		return m, nil
+	}
+}
+
 func FindMeditationView(or []string, and []string, in string, span []string, limit string, column string, order string) ([]models.MeditationView, *errors.SensError) {
 	query := bytes.NewBufferString("SELECT * FROM meditation_views WHERE ")
 	fieldMap := models.GetMeditationViewFieldMap()
@@ -169,24 +191,27 @@ func FindMeditationView(or []string, and []string, in string, span []string, lim
 	}
 	fmt.Fprint(query, " LIMIT ", limit)
 
-	logger.Debug(query.String())
-	if q, a, err := sqlx.Named(query.String(), values); err != nil {
-		logger.Error(err.Error())
-		return nil, errors.New(errors.DB_ERROR, err.Error())
-	} else if q, a, err := sqlx.In(q, a...); err != nil {
-		logger.Error(err.Error())
-		return nil, errors.New(errors.DB_ERROR, err.Error())
-	} else {
+	q := query.String()
+	logger.Debug(q)
+	if strings.TrimSpace(in) == "" {
+		logger.Debug("No in clause present. Using prepared and not sqlIn")
 		db := datastore.GetConnection()
-		q = db.Rebind(q)
-		logger.Debug(q)
-		logger.Debugf("Values: %#v", a)
-		m := []models.MeditationView{}
-		if err := db.Select(&m, q, a...); err != nil {
-			logger.Error(err)
-			return m, errors.New(errors.DB_ERROR, err.Error())
+		stmt, err := db.PrepareNamed(q)
+		if err != nil {
+			logger.Error(err.Error())
+			return nil, errors.New(errors.DB_ERROR, err.Error())
 		}
-		return m, nil
+
+		var m []models.MeditationView
+		if err := stmt.Select(&m, values); err != nil {
+			logger.Error(err)
+			return nil, errors.New(errors.DB_ERROR, err.Error())
+		} else {
+			return m, nil
+		}
+	} else {
+		logger.Debug("Before find In")
+		return findMeditationViewIn(q, values)
 	}
 }
 

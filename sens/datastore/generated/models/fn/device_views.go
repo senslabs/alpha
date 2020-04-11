@@ -40,7 +40,7 @@ func InsertDeviceView(data []byte) (string, error) {
 	}
 	fmt.Fprint(insert, ") ")
 	fmt.Fprint(insert, values, ")")
-
+	
 	db := datastore.GetConnection()
 
 	logger.Debug(insert.String())
@@ -51,14 +51,14 @@ func InsertDeviceView(data []byte) (string, error) {
 		logger.Error(err)
 		return "", errors.FromError(errors.DB_ERROR, err)
 	}
-
+	
 	if _, err := stmt.Exec(m); err != nil {
 		logger.Errorf("Received error %s while inserting values\n\t %#v", err, values)
 		return "", errors.FromError(errors.DB_ERROR, err)
 	} else {
 		return "", nil
 	}
-
+	
 }
 
 func BatchInsertDeviceView(data []byte) ([]string, error) {
@@ -100,6 +100,8 @@ func BatchInsertDeviceView(data []byte) ([]string, error) {
 	}
 	return nil, nil
 }
+
+
 
 func buildDeviceViewWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values map[string]interface{}) {
 	ors := datastore.ParseOrParams(or)
@@ -208,8 +210,8 @@ func FindDeviceView(or []string, and []string, in string, span []string, limit s
 			return m, nil
 		}
 	} else {
-		logger.Debug("Before findDeviceViewIn")
-		return findDeviceViewIn(query.String(), values)
+		logger.Debug("Before find In")
+		return findDeviceViewIn(q, values)
 	}
 }
 
