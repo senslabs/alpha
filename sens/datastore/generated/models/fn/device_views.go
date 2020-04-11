@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/senslabs/alpha/sens/datastore"
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
@@ -39,7 +40,7 @@ func InsertDeviceView(data []byte) (string, error) {
 	}
 	fmt.Fprint(insert, ") ")
 	fmt.Fprint(insert, values, ")")
-	
+
 	db := datastore.GetConnection()
 
 	logger.Debug(insert.String())
@@ -50,14 +51,14 @@ func InsertDeviceView(data []byte) (string, error) {
 		logger.Error(err)
 		return "", errors.FromError(errors.DB_ERROR, err)
 	}
-	
+
 	if _, err := stmt.Exec(m); err != nil {
 		logger.Errorf("Received error %s while inserting values\n\t %#v", err, values)
 		return "", errors.FromError(errors.DB_ERROR, err)
 	} else {
 		return "", nil
 	}
-	
+
 }
 
 func BatchInsertDeviceView(data []byte) ([]string, error) {
@@ -99,8 +100,6 @@ func BatchInsertDeviceView(data []byte) ([]string, error) {
 	}
 	return nil, nil
 }
-
-
 
 func buildDeviceViewWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values map[string]interface{}) {
 	ors := datastore.ParseOrParams(or)
@@ -154,6 +153,27 @@ func getDeviceViewFieldValue(c string, v interface{}) interface{} {
 	return v
 }
 
+func findDeviceViewIn(query string, values map[string]interface{}) ([]models.DeviceView, *errors.SensError) {
+	if q, a, err := sqlx.Named(query, values); err != nil {
+		logger.Error(err.Error())
+		return nil, errors.New(errors.DB_ERROR, err.Error())
+	} else if q, a, err := sqlx.In(q, a...); err != nil {
+		logger.Error(err.Error())
+		return nil, errors.New(errors.DB_ERROR, err.Error())
+	} else {
+		db := datastore.GetConnection()
+		q = db.Rebind(q)
+		logger.Debug(q)
+		logger.Debugf("Values: %s", a)
+		m := []models.DeviceView{}
+		if err := db.Select(&m, q, a...); err != nil {
+			logger.Error(err)
+			return m, errors.New(errors.DB_ERROR, err.Error())
+		}
+		return m, nil
+	}
+}
+
 func FindDeviceView(or []string, and []string, in string, span []string, limit string, column string, order string) ([]models.DeviceView, *errors.SensError) {
 	query := bytes.NewBufferString("SELECT * FROM device_views WHERE ")
 	fieldMap := models.GetDeviceViewFieldMap()
@@ -169,24 +189,27 @@ func FindDeviceView(or []string, and []string, in string, span []string, limit s
 	}
 	fmt.Fprint(query, " LIMIT ", limit)
 
-	logger.Debug(query.String())
-	if q, a, err := sqlx.Named(query.String(), values); err != nil {
-		logger.Error(err.Error())
-		return nil, errors.New(errors.DB_ERROR, err.Error())
-	} else if q, a, err := sqlx.In(q, a...); err != nil {
-		logger.Error(err.Error())
-		return nil, errors.New(errors.DB_ERROR, err.Error())
-	} else {
+	q := query.String()
+	logger.Debug(q)
+	if strings.TrimSpace(in) == "" {
+		logger.Debug("No in clause present. Using prepared and not sqlIn")
 		db := datastore.GetConnection()
-		q = db.Rebind(q)
-		logger.Debug(q)
-		logger.Debugf("Values: %#v", a)
-		m := []models.DeviceView{}
-		if err := db.Select(&m, q, a...); err != nil {
-			logger.Error(err)
-			return m, errors.New(errors.DB_ERROR, err.Error())
+		stmt, err := db.PrepareNamed(q)
+		if err != nil {
+			logger.Error(err.Error())
+			return nil, errors.New(errors.DB_ERROR, err.Error())
 		}
-		return m, nil
+
+		var m []models.DeviceView
+		if err := stmt.Select(&m, values); err != nil {
+			logger.Error(err)
+			return nil, errors.New(errors.DB_ERROR, err.Error())
+		} else {
+			return m, nil
+		}
+	} else {
+		logger.Debug("Before findDeviceViewIn")
+		return findDeviceViewIn(query.String(), values)
 	}
 }
 
