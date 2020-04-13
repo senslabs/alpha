@@ -67,7 +67,7 @@ func BatchInsertUserSessionView(data []byte) ([]string, error) {
 		logger.Error(err)
 		return nil, errors.FromError(errors.GO_ERROR, err)
 	}
-	var m []*models.SessionRecord
+	var m []*models.UserSessionView
 	if err := json.Unmarshal(data, &m); err != nil {
 		logger.Error(err)
 		return nil, errors.FromError(errors.GO_ERROR, err)
