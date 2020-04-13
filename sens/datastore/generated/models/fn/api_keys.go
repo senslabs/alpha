@@ -235,6 +235,7 @@ func findApiKeyIn(query string, values map[string]interface{}) ([]models.ApiKey,
 
 func FindApiKey(or []string, and []string, in string, span []string, limit string, column string, order string) ([]models.ApiKey, *errors.SensError) {
 	from := time.Now().Unix()
+	seq := from % 10000
 	query := bytes.NewBufferString("SELECT * FROM api_keys WHERE ")
 	fieldMap := models.GetApiKeyFieldMap()
 	values := make(map[string]interface{})
@@ -266,15 +267,15 @@ func FindApiKey(or []string, and []string, in string, span []string, limit strin
 			return nil, errors.New(errors.DB_ERROR, err.Error())
 		} else {
 			to := time.Now().Unix()
-			logger.Debugf("Returning FIND after %d seconds: RESULT => %#v", (to - from), m)
+			logger.Debugf("%d: Returning FIND after %d seconds: RESULT => %#v", seq, (to - from), m)
 			return m, nil
 		}
 	} else {
-		logger.Debug("Before find In")
+		logger.Debug(seq, ": Before find In")
 		m, err := findApiKeyIn(q, values)
-		logger.Debug("After find In")
+		logger.Debug(seq, " :After find In")
 		to := time.Now().Unix()
-		logger.Debugf("Returning IN after %d seconds: RESULT => %#v", (to - from), m)
+		logger.Debugf("%d: Returning IN after %d seconds: RESULT => %#v", seq, (to - from), m)
 		return m, err
 	}
 }

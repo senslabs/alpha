@@ -235,6 +235,7 @@ func findEndpointIn(query string, values map[string]interface{}) ([]models.Endpo
 
 func FindEndpoint(or []string, and []string, in string, span []string, limit string, column string, order string) ([]models.Endpoint, *errors.SensError) {
 	from := time.Now().Unix()
+	seq := from % 10000
 	query := bytes.NewBufferString("SELECT * FROM endpoints WHERE ")
 	fieldMap := models.GetEndpointFieldMap()
 	values := make(map[string]interface{})
@@ -266,15 +267,15 @@ func FindEndpoint(or []string, and []string, in string, span []string, limit str
 			return nil, errors.New(errors.DB_ERROR, err.Error())
 		} else {
 			to := time.Now().Unix()
-			logger.Debugf("Returning FIND after %d seconds: RESULT => %#v", (to - from), m)
+			logger.Debugf("%d: Returning FIND after %d seconds: RESULT => %#v", seq, (to - from), m)
 			return m, nil
 		}
 	} else {
-		logger.Debug("Before find In")
+		logger.Debug(seq, ": Before find In")
 		m, err := findEndpointIn(q, values)
-		logger.Debug("After find In")
+		logger.Debug(seq, " :After find In")
 		to := time.Now().Unix()
-		logger.Debugf("Returning IN after %d seconds: RESULT => %#v", (to - from), m)
+		logger.Debugf("%d: Returning IN after %d seconds: RESULT => %#v", seq, (to - from), m)
 		return m, err
 	}
 }

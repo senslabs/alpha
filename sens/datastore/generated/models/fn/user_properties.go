@@ -179,6 +179,7 @@ func findUserPropertieIn(query string, values map[string]interface{}) ([]models.
 
 func FindUserPropertie(or []string, and []string, in string, span []string, limit string, column string, order string) ([]models.UserPropertie, *errors.SensError) {
 	from := time.Now().Unix()
+	seq := from % 10000
 	query := bytes.NewBufferString("SELECT * FROM user_properties WHERE ")
 	fieldMap := models.GetUserPropertieFieldMap()
 	values := make(map[string]interface{})
@@ -210,15 +211,15 @@ func FindUserPropertie(or []string, and []string, in string, span []string, limi
 			return nil, errors.New(errors.DB_ERROR, err.Error())
 		} else {
 			to := time.Now().Unix()
-			logger.Debugf("Returning FIND after %d seconds: RESULT => %#v", (to - from), m)
+			logger.Debugf("%d: Returning FIND after %d seconds: RESULT => %#v", seq, (to - from), m)
 			return m, nil
 		}
 	} else {
-		logger.Debug("Before find In")
+		logger.Debug(seq, ": Before find In")
 		m, err := findUserPropertieIn(q, values)
-		logger.Debug("After find In")
+		logger.Debug(seq, " :After find In")
 		to := time.Now().Unix()
-		logger.Debugf("Returning IN after %d seconds: RESULT => %#v", (to - from), m)
+		logger.Debugf("%d: Returning IN after %d seconds: RESULT => %#v", seq, (to - from), m)
 		return m, err
 	}
 }
