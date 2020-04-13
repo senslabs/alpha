@@ -11,7 +11,7 @@ require (
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/lib/pq v1.3.0
 	github.com/nats-io/nats-server/v2 v2.1.6 // indirect
-	github.com/nats-io/nats-streaming-server v0.17.0 // indirect
+	github.com/nats-io/nats-streaming-server v0.17.0
 	github.com/nats-io/nats.go v1.9.2
 	github.com/nats-io/stan.go v0.6.0
 	github.com/philhofer/fwd v1.0.0 // indirect
