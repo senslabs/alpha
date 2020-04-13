@@ -212,7 +212,7 @@ func getSurveyAnswerFieldValue(c string, v interface{}) interface{} {
 	return v
 }
 
-func findSurveyAnswerIn(query string, values map[string]interface{}) ([]models.SurveyAnswer, *errors.SensError) {
+func findSurveyAnswerIn(seq int64, query string, values map[string]interface{}) ([]models.SurveyAnswer, *errors.SensError) {
 	if q, a, err := sqlx.Named(query, values); err != nil {
 		logger.Error(err.Error())
 		return nil, errors.New(errors.DB_ERROR, err.Error())
@@ -222,8 +222,8 @@ func findSurveyAnswerIn(query string, values map[string]interface{}) ([]models.S
 	} else {
 		db := datastore.GetConnection()
 		q = db.Rebind(q)
-		logger.Debug(q)
-		logger.Debugf("Values: %s", a)
+		logger.Debug(seq, ": ", q)
+		logger.Debugf("%d: Values: %s", seq, a)
 		m := []models.SurveyAnswer{}
 		if err := db.Select(&m, q, a...); err != nil {
 			logger.Error(err)
@@ -253,7 +253,7 @@ func FindSurveyAnswer(or []string, and []string, in string, span []string, limit
 	q := query.String()
 	logger.Debug(q)
 	if strings.TrimSpace(in) == "" {
-		logger.Debug("No in clause present. Using prepared and not sqlIn")
+		logger.Debug(seq, ": No in clause present. Using prepared and not sqlIn")
 		db := datastore.GetConnection()
 		stmt, err := db.PrepareNamed(q)
 		if err != nil {
@@ -272,7 +272,7 @@ func FindSurveyAnswer(or []string, and []string, in string, span []string, limit
 		}
 	} else {
 		logger.Debug(seq, ": Before find In")
-		m, err := findSurveyAnswerIn(q, values)
+		m, err := findSurveyAnswerIn(seq, q, values)
 		logger.Debug(seq, " :After find In")
 		to := time.Now().Unix()
 		logger.Debugf("%d: Returning IN after %d seconds: RESULT => %#v", seq, (to - from), m)

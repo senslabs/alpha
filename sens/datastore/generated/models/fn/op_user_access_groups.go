@@ -156,7 +156,7 @@ func getOpUserAccessGroupFieldValue(c string, v interface{}) interface{} {
 	return v
 }
 
-func findOpUserAccessGroupIn(query string, values map[string]interface{}) ([]models.OpUserAccessGroup, *errors.SensError) {
+func findOpUserAccessGroupIn(seq int64, query string, values map[string]interface{}) ([]models.OpUserAccessGroup, *errors.SensError) {
 	if q, a, err := sqlx.Named(query, values); err != nil {
 		logger.Error(err.Error())
 		return nil, errors.New(errors.DB_ERROR, err.Error())
@@ -166,8 +166,8 @@ func findOpUserAccessGroupIn(query string, values map[string]interface{}) ([]mod
 	} else {
 		db := datastore.GetConnection()
 		q = db.Rebind(q)
-		logger.Debug(q)
-		logger.Debugf("Values: %s", a)
+		logger.Debug(seq, ": ", q)
+		logger.Debugf("%d: Values: %s", seq, a)
 		m := []models.OpUserAccessGroup{}
 		if err := db.Select(&m, q, a...); err != nil {
 			logger.Error(err)
@@ -197,7 +197,7 @@ func FindOpUserAccessGroup(or []string, and []string, in string, span []string, 
 	q := query.String()
 	logger.Debug(q)
 	if strings.TrimSpace(in) == "" {
-		logger.Debug("No in clause present. Using prepared and not sqlIn")
+		logger.Debug(seq, ": No in clause present. Using prepared and not sqlIn")
 		db := datastore.GetConnection()
 		stmt, err := db.PrepareNamed(q)
 		if err != nil {
@@ -216,7 +216,7 @@ func FindOpUserAccessGroup(or []string, and []string, in string, span []string, 
 		}
 	} else {
 		logger.Debug(seq, ": Before find In")
-		m, err := findOpUserAccessGroupIn(q, values)
+		m, err := findOpUserAccessGroupIn(seq, q, values)
 		logger.Debug(seq, " :After find In")
 		to := time.Now().Unix()
 		logger.Debugf("%d: Returning IN after %d seconds: RESULT => %#v", seq, (to - from), m)

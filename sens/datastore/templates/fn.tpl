@@ -219,7 +219,7 @@ func get{{.Model}}FieldValue(c string, v interface{}) interface{} {
 	return v
 }
 
-func find{{.Model}}In(query string, values map[string]interface{}) ([]models.{{.Model}}, *errors.SensError) {
+func find{{.Model}}In(seq int64, query string, values map[string]interface{}) ([]models.{{.Model}}, *errors.SensError) {
 	if q, a, err := sqlx.Named(query, values); err != nil {
 		logger.Error(err.Error())
 		return nil, errors.New(errors.DB_ERROR, err.Error())
@@ -229,8 +229,8 @@ func find{{.Model}}In(query string, values map[string]interface{}) ([]models.{{.
 	} else {
 		db := datastore.GetConnection()
 		q = db.Rebind(q)
-		logger.Debug(q)
-		logger.Debugf("Values: %s", a)
+		logger.Debug(seq, ": ", q)
+		logger.Debugf("%d: Values: %s", seq, a)
 		m := []models.{{.Model}}{}
 		if err := db.Select(&m, q, a...); err != nil {
 			logger.Error(err)
@@ -260,7 +260,7 @@ func Find{{.Model}}(or []string, and []string, in string, span []string, limit s
 	q := query.String()
 	logger.Debug(q)
 	if strings.TrimSpace(in) == "" {
-		logger.Debug("No in clause present. Using prepared and not sqlIn")
+		logger.Debug(seq, ": No in clause present. Using prepared and not sqlIn")
 		db := datastore.GetConnection()
 		stmt, err := db.PrepareNamed(q)
 		if err != nil {
@@ -279,7 +279,7 @@ func Find{{.Model}}(or []string, and []string, in string, span []string, limit s
 		}
 	} else {
 		logger.Debug(seq, ": Before find In")
-		m, err := find{{.Model}}In(q, values)
+		m, err := find{{.Model}}In(seq, q, values)
 		logger.Debug(seq, " :After find In")
 		to := time.Now().Unix()
 		logger.Debugf("%d: Returning IN after %d seconds: RESULT => %#v", seq, (to - from), m)

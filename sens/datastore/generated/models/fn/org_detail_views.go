@@ -156,7 +156,7 @@ func getOrgDetailViewFieldValue(c string, v interface{}) interface{} {
 	return v
 }
 
-func findOrgDetailViewIn(query string, values map[string]interface{}) ([]models.OrgDetailView, *errors.SensError) {
+func findOrgDetailViewIn(seq int64, query string, values map[string]interface{}) ([]models.OrgDetailView, *errors.SensError) {
 	if q, a, err := sqlx.Named(query, values); err != nil {
 		logger.Error(err.Error())
 		return nil, errors.New(errors.DB_ERROR, err.Error())
@@ -166,8 +166,8 @@ func findOrgDetailViewIn(query string, values map[string]interface{}) ([]models.
 	} else {
 		db := datastore.GetConnection()
 		q = db.Rebind(q)
-		logger.Debug(q)
-		logger.Debugf("Values: %s", a)
+		logger.Debug(seq, ": ", q)
+		logger.Debugf("%d: Values: %s", seq, a)
 		m := []models.OrgDetailView{}
 		if err := db.Select(&m, q, a...); err != nil {
 			logger.Error(err)
@@ -197,7 +197,7 @@ func FindOrgDetailView(or []string, and []string, in string, span []string, limi
 	q := query.String()
 	logger.Debug(q)
 	if strings.TrimSpace(in) == "" {
-		logger.Debug("No in clause present. Using prepared and not sqlIn")
+		logger.Debug(seq, ": No in clause present. Using prepared and not sqlIn")
 		db := datastore.GetConnection()
 		stmt, err := db.PrepareNamed(q)
 		if err != nil {
@@ -216,7 +216,7 @@ func FindOrgDetailView(or []string, and []string, in string, span []string, limi
 		}
 	} else {
 		logger.Debug(seq, ": Before find In")
-		m, err := findOrgDetailViewIn(q, values)
+		m, err := findOrgDetailViewIn(seq, q, values)
 		logger.Debug(seq, " :After find In")
 		to := time.Now().Unix()
 		logger.Debugf("%d: Returning IN after %d seconds: RESULT => %#v", seq, (to - from), m)

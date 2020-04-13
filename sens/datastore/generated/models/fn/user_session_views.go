@@ -156,7 +156,7 @@ func getUserSessionViewFieldValue(c string, v interface{}) interface{} {
 	return v
 }
 
-func findUserSessionViewIn(query string, values map[string]interface{}) ([]models.UserSessionView, *errors.SensError) {
+func findUserSessionViewIn(seq int64, query string, values map[string]interface{}) ([]models.UserSessionView, *errors.SensError) {
 	if q, a, err := sqlx.Named(query, values); err != nil {
 		logger.Error(err.Error())
 		return nil, errors.New(errors.DB_ERROR, err.Error())
@@ -166,8 +166,8 @@ func findUserSessionViewIn(query string, values map[string]interface{}) ([]model
 	} else {
 		db := datastore.GetConnection()
 		q = db.Rebind(q)
-		logger.Debug(q)
-		logger.Debugf("Values: %s", a)
+		logger.Debug(seq, ": ", q)
+		logger.Debugf("%d: Values: %s", seq, a)
 		m := []models.UserSessionView{}
 		if err := db.Select(&m, q, a...); err != nil {
 			logger.Error(err)
@@ -197,7 +197,7 @@ func FindUserSessionView(or []string, and []string, in string, span []string, li
 	q := query.String()
 	logger.Debug(q)
 	if strings.TrimSpace(in) == "" {
-		logger.Debug("No in clause present. Using prepared and not sqlIn")
+		logger.Debug(seq, ": No in clause present. Using prepared and not sqlIn")
 		db := datastore.GetConnection()
 		stmt, err := db.PrepareNamed(q)
 		if err != nil {
@@ -216,7 +216,7 @@ func FindUserSessionView(or []string, and []string, in string, span []string, li
 		}
 	} else {
 		logger.Debug(seq, ": Before find In")
-		m, err := findUserSessionViewIn(q, values)
+		m, err := findUserSessionViewIn(seq, q, values)
 		logger.Debug(seq, " :After find In")
 		to := time.Now().Unix()
 		logger.Debugf("%d: Returning IN after %d seconds: RESULT => %#v", seq, (to - from), m)
