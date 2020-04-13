@@ -1,6 +1,10 @@
 package errors
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/senslabs/alpha/sens/logger"
+)
 
 const (
 	DB_ERROR   = 600
@@ -27,4 +31,18 @@ func FromError(code int, err error) *SensError {
 
 func GetErrorCode(err *SensError) int {
 	return err.code
+}
+
+func Mpie(err error, msg string) {
+	if err != nil {
+		logger.Error(msg, "ERROR: ", err)
+		panic(err)
+	}
+}
+
+func Pie(err error) {
+	if err != nil {
+		logger.Error("ERROR: ", err)
+		panic(err)
+	}
 }

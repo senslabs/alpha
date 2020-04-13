@@ -50,3 +50,32 @@ func ConvertStruct(input interface{}, output interface{}) error {
 		return nil
 	}
 }
+
+//This is also json but new. The upper ones will be deprecated
+func Marshal(v interface{}) []byte {
+	b, err := json.Marshal(v)
+	errors.Pie(err)
+	return b
+}
+
+func MarshalInto(v interface{}, w io.Writer) {
+	err := json.NewEncoder(w).Encode(v)
+	errors.Pie(err)
+}
+
+func Unmarshal(data []byte, v interface{}) {
+	err := json.Unmarshal(data, v)
+	errors.Pie(err)
+}
+
+func UnmarshalFrom(r io.Reader, v interface{}) {
+	err := json.NewDecoder(r).Decode(v)
+	errors.Pie(err)
+}
+
+func UnmarshalMap(data []byte) map[string]interface{} {
+	var m map[string]interface{}
+	err := json.Unmarshal(data, &m)
+	errors.Pie(err)
+	return m
+}
