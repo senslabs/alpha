@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/senslabs/alpha/sens/datastore"
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
@@ -177,6 +178,7 @@ func findAuthDetailViewIn(query string, values map[string]interface{}) ([]models
 }
 
 func FindAuthDetailView(or []string, and []string, in string, span []string, limit string, column string, order string) ([]models.AuthDetailView, *errors.SensError) {
+	from := time.Now().Unix()
 	query := bytes.NewBufferString("SELECT * FROM auth_detail_views WHERE ")
 	fieldMap := models.GetAuthDetailViewFieldMap()
 	values := make(map[string]interface{})
@@ -207,11 +209,17 @@ func FindAuthDetailView(or []string, and []string, in string, span []string, lim
 			logger.Error(err)
 			return nil, errors.New(errors.DB_ERROR, err.Error())
 		} else {
+			to := time.Now().Unix()
+			logger.Debugf("Returning FIND after %d seconds: RESULT => %#v", (to - from), m)
 			return m, nil
 		}
 	} else {
 		logger.Debug("Before find In")
-		return findAuthDetailViewIn(q, values)
+		m, err := findAuthDetailViewIn(q, values)
+		logger.Debug("After find In")
+		to := time.Now().Unix()
+		logger.Debugf("Returning IN after %d seconds: RESULT => %#v", (to - from), m)
+		return m, err
 	}
 }
 

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/senslabs/alpha/sens/datastore"
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
@@ -177,6 +178,7 @@ func findUserAlertViewIn(query string, values map[string]interface{}) ([]models.
 }
 
 func FindUserAlertView(or []string, and []string, in string, span []string, limit string, column string, order string) ([]models.UserAlertView, *errors.SensError) {
+	from := time.Now().Unix()
 	query := bytes.NewBufferString("SELECT * FROM user_alert_views WHERE ")
 	fieldMap := models.GetUserAlertViewFieldMap()
 	values := make(map[string]interface{})
@@ -207,11 +209,17 @@ func FindUserAlertView(or []string, and []string, in string, span []string, limi
 			logger.Error(err)
 			return nil, errors.New(errors.DB_ERROR, err.Error())
 		} else {
+			to := time.Now().Unix()
+			logger.Debugf("Returning FIND after %d seconds: RESULT => %#v", (to - from), m)
 			return m, nil
 		}
 	} else {
 		logger.Debug("Before find In")
-		return findUserAlertViewIn(q, values)
+		m, err := findUserAlertViewIn(q, values)
+		logger.Debug("After find In")
+		to := time.Now().Unix()
+		logger.Debugf("Returning IN after %d seconds: RESULT => %#v", (to - from), m)
+		return m, err
 	}
 }
 

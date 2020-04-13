@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/senslabs/alpha/sens/datastore"
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
@@ -233,6 +234,7 @@ func findOrgIn(query string, values map[string]interface{}) ([]models.Org, *erro
 }
 
 func FindOrg(or []string, and []string, in string, span []string, limit string, column string, order string) ([]models.Org, *errors.SensError) {
+	from := time.Now().Unix()
 	query := bytes.NewBufferString("SELECT * FROM orgs WHERE ")
 	fieldMap := models.GetOrgFieldMap()
 	values := make(map[string]interface{})
@@ -263,11 +265,17 @@ func FindOrg(or []string, and []string, in string, span []string, limit string, 
 			logger.Error(err)
 			return nil, errors.New(errors.DB_ERROR, err.Error())
 		} else {
+			to := time.Now().Unix()
+			logger.Debugf("Returning FIND after %d seconds: RESULT => %#v", (to - from), m)
 			return m, nil
 		}
 	} else {
 		logger.Debug("Before find In")
-		return findOrgIn(q, values)
+		m, err := findOrgIn(q, values)
+		logger.Debug("After find In")
+		to := time.Now().Unix()
+		logger.Debugf("Returning IN after %d seconds: RESULT => %#v", (to - from), m)
+		return m, err
 	}
 }
 

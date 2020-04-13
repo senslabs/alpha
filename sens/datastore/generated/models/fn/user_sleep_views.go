@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/senslabs/alpha/sens/datastore"
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
@@ -177,6 +178,7 @@ func findUserSleepViewIn(query string, values map[string]interface{}) ([]models.
 }
 
 func FindUserSleepView(or []string, and []string, in string, span []string, limit string, column string, order string) ([]models.UserSleepView, *errors.SensError) {
+	from := time.Now().Unix()
 	query := bytes.NewBufferString("SELECT * FROM user_sleep_views WHERE ")
 	fieldMap := models.GetUserSleepViewFieldMap()
 	values := make(map[string]interface{})
@@ -207,11 +209,17 @@ func FindUserSleepView(or []string, and []string, in string, span []string, limi
 			logger.Error(err)
 			return nil, errors.New(errors.DB_ERROR, err.Error())
 		} else {
+			to := time.Now().Unix()
+			logger.Debugf("Returning FIND after %d seconds: RESULT => %#v", (to - from), m)
 			return m, nil
 		}
 	} else {
 		logger.Debug("Before find In")
-		return findUserSleepViewIn(q, values)
+		m, err := findUserSleepViewIn(q, values)
+		logger.Debug("After find In")
+		to := time.Now().Unix()
+		logger.Debugf("Returning IN after %d seconds: RESULT => %#v", (to - from), m)
+		return m, err
 	}
 }
 

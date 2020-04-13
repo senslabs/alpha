@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/senslabs/alpha/sens/datastore"
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
@@ -233,6 +234,7 @@ func findUserIn(query string, values map[string]interface{}) ([]models.User, *er
 }
 
 func FindUser(or []string, and []string, in string, span []string, limit string, column string, order string) ([]models.User, *errors.SensError) {
+	from := time.Now().Unix()
 	query := bytes.NewBufferString("SELECT * FROM users WHERE ")
 	fieldMap := models.GetUserFieldMap()
 	values := make(map[string]interface{})
@@ -263,11 +265,17 @@ func FindUser(or []string, and []string, in string, span []string, limit string,
 			logger.Error(err)
 			return nil, errors.New(errors.DB_ERROR, err.Error())
 		} else {
+			to := time.Now().Unix()
+			logger.Debugf("Returning FIND after %d seconds: RESULT => %#v", (to - from), m)
 			return m, nil
 		}
 	} else {
 		logger.Debug("Before find In")
-		return findUserIn(q, values)
+		m, err := findUserIn(q, values)
+		logger.Debug("After find In")
+		to := time.Now().Unix()
+		logger.Debugf("Returning IN after %d seconds: RESULT => %#v", (to - from), m)
+		return m, err
 	}
 }
 

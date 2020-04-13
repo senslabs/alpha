@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/senslabs/alpha/sens/datastore"
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
@@ -177,6 +178,7 @@ func findMeditationSummarieIn(query string, values map[string]interface{}) ([]mo
 }
 
 func FindMeditationSummarie(or []string, and []string, in string, span []string, limit string, column string, order string) ([]models.MeditationSummarie, *errors.SensError) {
+	from := time.Now().Unix()
 	query := bytes.NewBufferString("SELECT * FROM meditation_summaries WHERE ")
 	fieldMap := models.GetMeditationSummarieFieldMap()
 	values := make(map[string]interface{})
@@ -207,11 +209,17 @@ func FindMeditationSummarie(or []string, and []string, in string, span []string,
 			logger.Error(err)
 			return nil, errors.New(errors.DB_ERROR, err.Error())
 		} else {
+			to := time.Now().Unix()
+			logger.Debugf("Returning FIND after %d seconds: RESULT => %#v", (to - from), m)
 			return m, nil
 		}
 	} else {
 		logger.Debug("Before find In")
-		return findMeditationSummarieIn(q, values)
+		m, err := findMeditationSummarieIn(q, values)
+		logger.Debug("After find In")
+		to := time.Now().Unix()
+		logger.Debugf("Returning IN after %d seconds: RESULT => %#v", (to - from), m)
+		return m, err
 	}
 }
 
