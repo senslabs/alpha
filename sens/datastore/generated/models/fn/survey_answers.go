@@ -220,9 +220,11 @@ func findSurveyAnswerIn(seq int64, query string, values map[string]interface{}) 
 		logger.Error(err.Error())
 		return nil, errors.New(errors.DB_ERROR, err.Error())
 	} else {
+		logger.Debug(seq, ": Before GetConnection, time => ", time.Now().Unix())
 		db := datastore.GetConnection()
+		logger.Debug(seq, ": After GetConnection, time => ", time.Now().Unix())
 		q = db.Rebind(q)
-		logger.Debug(seq, ": ", q)
+		logger.Debug(seq, ": ", q, ", time => ", time.Now().Unix())
 		logger.Debugf("%d: Values: %s", seq, a)
 		m := []models.SurveyAnswer{}
 		if err := db.Select(&m, q, a...); err != nil {
