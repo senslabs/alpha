@@ -70,3 +70,10 @@ func TestUpdate(t *testing.T) {
 	// }
 	fn.UpdateSessionRecordWhere(nil, []string{"Name^Points", "Timestamp^1528236411"}, "", nil, []byte(b))
 }
+
+func TestUpdateSession(t *testing.T) {
+	logger.InitConsoleLogger()
+	os.Setenv("LOG_LEVEL", "DEBUG")
+	b := []byte(`{"EndedAt": 1586780694}`)
+	fn.UpdateSession("c598fc84-0e36-4399-93f7-594ca0359281", b)
+}

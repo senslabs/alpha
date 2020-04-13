@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/senslabs/alpha/sens/logger"
 	"github.com/senslabs/sqlx"
@@ -57,7 +58,7 @@ func GetCockroachPort() string {
 	return port
 }
 
-func GetConnection() *sqlx.DB {
+func GetConnectionObsolete() *sqlx.DB {
 	once.Do(func() {
 		r = ring.New(10)
 		n := r.Len()
@@ -73,12 +74,31 @@ func GetConnection() *sqlx.DB {
 	return getNextConnection()
 }
 
-// func GetConnection() *sqlx.DB {
-// 	defer func() {
-// 		if r := recover(); r != nil {
-// 			logger.Error(err)
-// 		}
-// 	}()
-// 	pgurl := fmt.Sprintf("postgresql://root@%s:%s/postgres?ssl=false&sslmode=disable", GetCockroachHost(), GetCockroachPort())
-// 	db := sqlx.MustConnect("postgres", pgurl)
-// }
+var db *sqlx.DB = nil
+
+func init() {
+	initdb()
+}
+
+func initdb() {
+	defer func() {
+		if r := recover(); r != nil {
+			logger.Error(err)
+		}
+	}()
+	pgurl := fmt.Sprintf("postgresql://root@%s:%s/postgres?ssl=false&sslmode=disable", GetCockroachHost(), GetCockroachPort())
+	db = sqlx.MustConnect("postgres", pgurl)
+}
+
+func GetConnection() *sqlx.DB {
+	for {
+		if err := db.Ping(); err != nil {
+			logger.Error("DB connection failure... Waiting for sometime before retrying")
+			time.Sleep(5 * time.Second)
+			initdb()
+		} else {
+			break
+		}
+	}
+	return db
+}
