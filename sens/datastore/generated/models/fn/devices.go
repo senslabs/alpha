@@ -199,9 +199,11 @@ func FindDevice(or []string, and []string, in string, span []string, limit strin
 	q := query.String()
 	logger.Debug(q)
 	if strings.TrimSpace(in) == "" {
-		logger.Debug(seq, ": No in clause present. Using prepared and not sqlIn")
+		logger.Debug(seq, ": No in clause present. Using prepared and not sqlIn, time => ", time.Now().Unix())
 		db := datastore.GetConnection()
+		logger.Debug(seq, ": GET CONNECTION, time => ", time.Now().Unix())
 		stmt, err := db.PrepareNamed(q)
+		logger.Debug(seq, ": AFTER PREPARED, time => ", time.Now().Unix())
 		if err != nil {
 			logger.Error(err.Error())
 			return nil, errors.New(errors.DB_ERROR, err.Error())
