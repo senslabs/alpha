@@ -37,6 +37,7 @@ func getNextConnection() *sqlx.DB {
 			return conn.db
 		}
 	}
+	logger.Error("No db connections available")
 	return nil
 }
 
