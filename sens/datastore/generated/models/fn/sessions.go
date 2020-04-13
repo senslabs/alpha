@@ -10,7 +10,7 @@ import (
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
 	"github.com/senslabs/alpha/sens/errors"
 	"github.com/senslabs/alpha/sens/logger"
-	"github.com/senslabs/sqlx"
+	"github.com/jmoiron/sqlx"
 )
 
 func InsertSession(data []byte) (string, error) {
@@ -292,7 +292,7 @@ func UpdateSessionWhere(or []string, and []string, in string, span []string, dat
 	for k, _ := range j {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(update, comma, f, " = :set_", f)
-			values["set_"+f] = j[k]
+			values["set_"+f] = getSessionFieldValue(k, j[k])
 			comma = ", "
 		}
 	}

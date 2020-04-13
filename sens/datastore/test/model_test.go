@@ -14,7 +14,7 @@ func TestInsert(t *testing.T) {
 	os.Setenv("LOG_LEVEL", "DEBUG")
 	body := `{
 			"Name": "Points",
-			"UserId": "eb226cda-3d90-4cad-b325-2125d371783d",
+			"UserId": "208cf5c8-0fa9-47d6-9ed8-ef5cdd2cb5d6",
 			"Timestamp": 1528236415,
 			"Properties": {
 				"heart": 10
@@ -30,7 +30,7 @@ func TestBatchInsert(t *testing.T) {
 	body := `[
 		{
 			"Key": "Points",
-			"UserId": "30783287-6cc8-4cc6-acca-47fb372d6908",
+			"UserId": "208cf5c8-0fa9-47d6-9ed8-ef5cdd2cb5d6",
 			"Timestamp": 1528236411,
 			"Properties": {
 				"heart": 110
@@ -38,7 +38,7 @@ func TestBatchInsert(t *testing.T) {
 		},
 		{
 			"Key": "Points",
-			"UserId": "30783287-6cc8-4cc6-acca-47fb372d6908",
+			"UserId": "208cf5c8-0fa9-47d6-9ed8-ef5cdd2cb5d6",
 			"Timestamp": 1528236412,
 			"Properties": {
 				"heart": 22
@@ -46,7 +46,7 @@ func TestBatchInsert(t *testing.T) {
 		},
 		{
 			"Key": "Points",
-			"UserId": "30783287-6cc8-4cc6-acca-47fb372d6908",
+			"UserId": "208cf5c8-0fa9-47d6-9ed8-ef5cdd2cb5d6",
 			"Timestamp": 1528236413,
 			"Properties": {
 				"heart": 25

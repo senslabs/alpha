@@ -8,10 +8,11 @@ require (
 	github.com/fluent/fluent-logger-golang v1.5.0
 	github.com/gorilla/mux v1.7.4
 	github.com/hashicorp/go-retryablehttp v0.6.5
+	github.com/jmoiron/sqlx v1.2.0
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/lib/pq v1.3.0
 	github.com/nats-io/nats-server/v2 v2.1.6 // indirect
-	github.com/nats-io/nats-streaming-server v0.17.0
+	github.com/nats-io/nats-streaming-server v0.17.0 // indirect
 	github.com/nats-io/nats.go v1.9.2
 	github.com/nats-io/stan.go v0.6.0
 	github.com/philhofer/fwd v1.0.0 // indirect
