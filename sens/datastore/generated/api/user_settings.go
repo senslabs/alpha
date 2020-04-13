@@ -15,6 +15,9 @@ func UserSettingMain(r *mux.Router) {
 	r.HandleFunc("/api/user-settings/create", CreateUserSetting)
 	r.HandleFunc("/api/user-settings/batch/create", BatchCreateUserSetting)
 	
+	r.HandleFunc("/api/user-settings/{id}/update", UpdateUserSetting)
+	r.HandleFunc("/api/user-settings/{id}/get", GetUserSetting)
+	
 	r.HandleFunc("/api/user-settings/update", UpdateUserSettingWhere)
 	r.HandleFunc("/api/user-settings/find", FindUserSetting)
 }
@@ -43,6 +46,32 @@ func BatchCreateUserSetting(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
+func UpdateUserSetting(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	if data, err := ioutil.ReadAll(r.Body); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if err := fn.UpdateUserSetting(id, data); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func GetUserSetting(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	if m, err := fn.SelectUserSetting(id); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
 
 
 func UpdateUserSettingWhere(w http.ResponseWriter, r *http.Request) {

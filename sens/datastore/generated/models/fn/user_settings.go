@@ -41,6 +41,8 @@ func InsertUserSetting(data []byte) (string, error) {
 	fmt.Fprint(insert, ") ")
 	fmt.Fprint(insert, values, ")")
 	
+	fmt.Fprint(insert, " returning user_setting_id")
+	
 	db := datastore.GetConnection()
 
 	logger.Debug(insert.String())
@@ -52,11 +54,12 @@ func InsertUserSetting(data []byte) (string, error) {
 		return "", errors.FromError(errors.DB_ERROR, err)
 	}
 	
-	if _, err := stmt.Exec(m); err != nil {
+	var id string
+	if err := stmt.Get(&id, m); err != nil {
 		logger.Errorf("Received error %s while inserting values\n\t %#v", err, values)
 		return "", errors.FromError(errors.DB_ERROR, err)
 	} else {
-		return "", nil
+		return id, nil
 	}
 	
 }
@@ -101,6 +104,59 @@ func BatchInsertUserSetting(data []byte) ([]string, error) {
 	return nil, nil
 }
 
+
+func UpdateUserSetting(id string, data []byte) error {
+	var j map[string]interface{}
+	if err := json.Unmarshal(data, &j); err != nil {
+		logger.Error(err)
+		return errors.FromError(errors.GO_ERROR, err)
+	}
+	var m models.UserSetting
+	if err := json.Unmarshal(data, &m); err != nil {
+		logger.Error(err)
+		return errors.FromError(errors.GO_ERROR, err)
+	}
+
+	logger.Debug(m)
+
+	comma := ""
+	fieldMap := models.GetUserSettingFieldMap()
+	update := bytes.NewBufferString("UPDATE user_settings SET ")
+	for k, _ := range j {
+		if f, ok := fieldMap[k]; ok {
+			fmt.Fprint(update, comma, f, " = :", f)
+			comma = ", "
+		}
+	}
+	fmt.Fprint(update, " WHERE user_setting_id = :user_setting_id")
+
+	logger.Debug(update.String())
+
+	db := datastore.GetConnection()
+	stmt, err := db.PrepareNamed(update.String())
+	if err != nil {
+		logger.Error(err)
+		return errors.FromError(errors.GO_ERROR, err)
+	}
+	//<no value>
+	m.UserSettingId = &id
+	_, err = stmt.Exec(m)
+	if err != nil {
+		logger.Error(err)
+		return errors.FromError(errors.GO_ERROR, err)
+	}
+	return nil
+}
+
+func SelectUserSetting(id string) (models.UserSetting, *errors.SensError) {
+	db := datastore.GetConnection()
+	m := models.UserSetting{}
+	if err := db.Get(&m, "SELECT * FROM user_settings WHERE user_setting_id = $1", id); err != nil {
+		logger.Error(err)
+		return m, errors.FromError(errors.DB_ERROR, err)
+	}
+	return m, nil
+}
 
 
 func buildUserSettingWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values map[string]interface{}) {

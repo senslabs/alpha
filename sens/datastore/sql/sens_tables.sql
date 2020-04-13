@@ -50,20 +50,18 @@ CREATE TABLE "survey_answers" (
 );
 
 CREATE TABLE "user_settings" (
-  "id" uuid,
+  "user_setting_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "user_id" uuid,
-  "created_at" int,
-  "key" text,
-  "value" text,
-  PRIMARY KEY ("id", "user_id")
+  "created_at" int DEFAULT (now()::int),
+  "key" text NOT NULL,
+  "value" text NOT NULL
 );
 
 CREATE TABLE "user_properties" (
-  "id" uuid,
   "user_id" uuid,
-  "key" text,
-  "value" text,
-  PRIMARY KEY ("id", "user_id")
+  "key" text NOT NULL,
+  "value" text NOT NULL,
+  PRIMARY KEY ("user_id", "key")
 );
 
 CREATE TABLE "api_keys" (
@@ -151,7 +149,7 @@ CREATE TABLE "device_activities" (
 );
 
 CREATE TABLE "alerts" (
-  "alert_id" uuid PRIMARY KEY,
+  "alert_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "user_id" uuid,
   "created_at" int,
   "alert_name" text,
@@ -169,7 +167,7 @@ CREATE TABLE "sessions" (
 );
 
 CREATE TABLE "session_settings" (
-  "session_setting_id" uuid PRIMARY KEY,
+  "session_setting_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "user_id" uuid,
   "key" text,
   "created_at" int,
@@ -178,7 +176,7 @@ CREATE TABLE "session_settings" (
 );
 
 CREATE TABLE "vital_baselines" (
-  "vital_baseline_id" uuid PRIMARY KEY,
+  "vital_baseline_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "user_id" uuid,
   "key" text,
   "created_at" int,

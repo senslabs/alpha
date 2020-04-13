@@ -102,32 +102,31 @@ func GetSurveyAnswerTypeMap() map[string]string {
 }
 
 type UserSetting struct {
-	Id        *string `db:"id" json:",omitempty"`
-	UserId    *string `db:"user_id" json:",omitempty"`
-	CreatedAt *int64  `db:"created_at" json:",omitempty"`
-	Key       *string `db:"key" json:",omitempty"`
-	Value     *string `db:"value" json:",omitempty"`
+	UserSettingId *string `db:"user_setting_id" json:",omitempty"`
+	UserId        *string `db:"user_id" json:",omitempty"`
+	CreatedAt     *int64  `db:"created_at" json:",omitempty"`
+	Key           *string `db:"key" json:",omitempty"`
+	Value         *string `db:"value" json:",omitempty"`
 }
 
 func GetUserSettingFieldMap() map[string]string {
-	return map[string]string{"CreatedAt": "created_at", "Id": "id", "Key": "key", "UserId": "user_id", "Value": "value"}
+	return map[string]string{"CreatedAt": "created_at", "Key": "key", "UserId": "user_id", "UserSettingId": "user_setting_id", "Value": "value"}
 }
 func GetUserSettingTypeMap() map[string]string {
-	return map[string]string{"CreatedAt": "*int64", "Id": "*string", "Key": "*string", "UserId": "*string", "Value": "*string"}
+	return map[string]string{"CreatedAt": "*int64", "Key": "*string", "UserId": "*string", "UserSettingId": "*string", "Value": "*string"}
 }
 
 type UserPropertie struct {
-	Id     *string `db:"id" json:",omitempty"`
 	UserId *string `db:"user_id" json:",omitempty"`
 	Key    *string `db:"key" json:",omitempty"`
 	Value  *string `db:"value" json:",omitempty"`
 }
 
 func GetUserPropertieFieldMap() map[string]string {
-	return map[string]string{"Id": "id", "Key": "key", "UserId": "user_id", "Value": "value"}
+	return map[string]string{"Key": "key", "UserId": "user_id", "Value": "value"}
 }
 func GetUserPropertieTypeMap() map[string]string {
-	return map[string]string{"Id": "*string", "Key": "*string", "UserId": "*string", "Value": "*string"}
+	return map[string]string{"Key": "*string", "UserId": "*string", "Value": "*string"}
 }
 
 type ApiKey struct {
