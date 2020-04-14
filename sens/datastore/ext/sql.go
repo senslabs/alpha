@@ -1,10 +1,5 @@
 package ext
 
-import (
-	"github.com/senslabs/alpha/sens/datastore"
-	"github.com/senslabs/sqlx"
-)
-
 const (
 	ACTIVITY_DASHBOARD_QUERY_ = `SELECT count(type), type FROM (
 		SELECT type, ended_at as timestamp FROM sessions WHERE type = 'Sleep' and user_id IN (:user_ids)
@@ -22,7 +17,7 @@ const (
 		WHERE timestamp > :when and user_id in(:user_ids) GROUP BY (activity_type)`
 )
 
-func GetPrepared(name string) (*sqlx.NamedStmt, error) {
-	db := datastore.GetConnection()
-	return db.PrepareNamed(name)
-}
+// func GetPrepared(name string) (*sqlx.NamedStmt, error) {
+// db := datastore.GetConnection()
+// return db.PrepareNamed(name)
+// }

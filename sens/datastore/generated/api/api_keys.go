@@ -7,6 +7,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/senslabs/alpha/sens/datastore/generated/models/fn"
+	"github.com/senslabs/alpha/sens/errors"
+	"github.com/senslabs/alpha/sens/httpclient"
 	"github.com/senslabs/alpha/sens/logger"
 	"github.com/senslabs/alpha/sens/types"
 )
@@ -17,82 +19,72 @@ func ApiKeyMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/api-keys/{id}/update", UpdateApiKey)
 	r.HandleFunc("/api/api-keys/{id}/get", GetApiKey)
-	
+    
 	r.HandleFunc("/api/api-keys/update", UpdateApiKeyWhere)
-	r.HandleFunc("/api/api-keys/find", FindApiKey)
+	r.HandleFunc("/api/api-keys/find", FindApiKey).Queries("limit", "{limit}")
+}
+
+func ApiKeyRecovery(w http.ResponseWriter) {
+	if r := recover(); r != nil {
+		err := r.(error)
+		logger.Error(err)
+		httpclient.WriteInternalServerError(w, err)
+	}
 }
 
 func CreateApiKey(w http.ResponseWriter, r *http.Request) {
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.InsertApiKey(data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		fmt.Fprint(w, id)
-	}
+	defer ApiKeyRecovery(w)
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	id := fn.InsertApiKey(data)
+	errors.Pie(err)
+	fmt.Fprint(w, id)
 }
 
 func BatchCreateApiKey(w http.ResponseWriter, r *http.Request) {
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.BatchInsertApiKey(data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		fmt.Fprint(w, id)
-	}
+	defer ApiKeyRecovery(w)
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	fn.BatchInsertApiKey(data)
+	w.WriteHeader(http.StatusOK)
 }
 
 
 func UpdateApiKey(w http.ResponseWriter, r *http.Request) {
+	defer ApiKeyRecovery(w)
 	vars := mux.Vars(r)
 	id := vars["id"]
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateApiKey(id, data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	fn.UpdateApiKey(id, data)
+	w.WriteHeader(http.StatusOK)
 }
 
 func GetApiKey(w http.ResponseWriter, r *http.Request) {
+	defer ApiKeyRecovery(w)
 	vars := mux.Vars(r)
 	id := vars["id"]
-	if m, err := fn.SelectApiKey(id); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	m := fn.SelectApiKey(id)
+	types.MarshalInto(m, w)
 }
 
 
 func UpdateApiKeyWhere(w http.ResponseWriter, r *http.Request) {
+	defer ApiKeyRecovery(w)
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
 	and := values["and"]
 	in := values.Get("in")
 
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateApiKeyWhere(or, and, in, span, data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	fn.UpdateApiKeyWhere(or, and, in, span, data)
+	w.WriteHeader(http.StatusOK)
 }
 
 func FindApiKey(w http.ResponseWriter, r *http.Request) {
+	defer ApiKeyRecovery(w)
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -102,13 +94,6 @@ func FindApiKey(w http.ResponseWriter, r *http.Request) {
 	column := values.Get("column")
 	order := values.Get("order")
 
-	if limit == "" {
-		http.Error(w, "Query param limit is mandatory", http.StatusBadRequest)
-	} else if ms, err := fn.FindApiKey(or, and, in, span, limit, column, order); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	m := fn.FindApiKey(or, and, in, span, limit, column, order)
+	types.MarshalInto(m, w)
 }

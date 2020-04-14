@@ -2,331 +2,261 @@ package fn
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
-	"strings"
-	"time"
 
+	"github.com/lib/pq"
 	"github.com/senslabs/alpha/sens/datastore"
 	"github.com/senslabs/alpha/sens/datastore/generated/models"
 	"github.com/senslabs/alpha/sens/errors"
 	"github.com/senslabs/alpha/sens/logger"
-	"github.com/jmoiron/sqlx"
+	"github.com/senslabs/alpha/sens/types"
 )
 
-func InsertSurveyQuestion(data []byte) (string, error) {
-	var j map[string]interface{}
-	if err := json.Unmarshal(data, &j); err != nil {
-		logger.Error(err)
-		return "", errors.FromError(errors.GO_ERROR, err)
-	}
-	var m models.SurveyQuestion
-	if err := json.Unmarshal(data, &m); err != nil {
-		logger.Error(err)
-		return "", errors.FromError(errors.GO_ERROR, err)
-	}
+func InsertSurveyQuestion(data []byte) string {
+	j := types.UnmarshalMap(data)
 
-	logger.Debug(m)
-
+	phi := 1
 	comma := ""
+	var values []interface{}
 	fieldMap := models.GetSurveyQuestionFieldMap()
+	typeMap := models.GetSurveyQuestionTypeMap()
 	insert := bytes.NewBufferString("INSERT INTO survey_questions(")
-	values := bytes.NewBufferString("VALUES(")
-	for k, _ := range j {
+	ph := bytes.NewBufferString("VALUES(")
+	for k, v := range j {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
-			fmt.Fprint(values, comma, ":", f)
+			fmt.Fprint(ph, comma, "$", phi)
+			values = append(values, datastore.ConvertFieldValue(k, v, typeMap))
 			comma = ", "
+			phi++
 		}
 	}
 	fmt.Fprint(insert, ") ")
-	fmt.Fprint(insert, values, ")")
+	fmt.Fprint(insert, ph, ")")
+
 	
 	fmt.Fprint(insert, " returning survey_question_id")
 	
+
 	db := datastore.GetConnection()
 
 	logger.Debug(insert.String())
-	logger.Debugf("%#v", m)
 
-	stmt, err := db.PrepareNamed(insert.String())
-	if err != nil {
-		logger.Error(err)
-		return "", errors.FromError(errors.DB_ERROR, err)
-	}
+	stmt, err := db.Prepare(insert.String())
+	errors.Pie(err)
+
 	
 	var id string
-	if err := stmt.Get(&id, m); err != nil {
-		logger.Errorf("Received error %s while inserting values\n\t %#v", err, values)
-		return "", errors.FromError(errors.DB_ERROR, err)
-	} else {
-		return id, nil
-	}
+	r := stmt.QueryRow(values...)
+	errors.Pie(r.Scan(&id))
+	return id
 	
 }
 
-func BatchInsertSurveyQuestion(data []byte) ([]string, error) {
+func BatchInsertSurveyQuestion(data []byte) {
 	var j []map[string]interface{}
-	if err := json.Unmarshal(data, &j); err != nil {
-		logger.Error(err)
-		return nil, errors.FromError(errors.GO_ERROR, err)
-	}
-	var m []*models.SurveyQuestion
-	if err := json.Unmarshal(data, &m); err != nil {
-		logger.Error(err)
-		return nil, errors.FromError(errors.GO_ERROR, err)
-	}
+	types.Unmarshal(data, &j)
 
 	comma := ""
 	var keys []string
 	fieldMap := models.GetSurveyQuestionFieldMap()
+	typeMap := models.GetSurveyQuestionTypeMap()
 	insert := bytes.NewBufferString("UPSERT INTO survey_questions(")
-	ph := bytes.NewBufferString("(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
-			fmt.Fprint(ph, comma, ":", f)
 			keys = append(keys, k)
 			comma = ", "
 		}
 	}
-	fmt.Fprint(ph, ")")
-	fmt.Fprint(insert, ") VALUES ")
 
-	fmt.Fprint(insert, ph.String())
+	phi := 1
+	comma = ""
+	var values []interface{}
+	fmt.Fprint(insert, ") VALUES ")
+	for _, kv := range j {
+		fmt.Fprint(insert, comma, "(")
+		comma = ""
+		for _, k := range keys {
+			values = append(values, datastore.ConvertFieldValue(k, kv[k], typeMap))
+			fmt.Fprint(insert, comma, "$", phi)
+			comma = ", "
+			phi++
+		}
+		fmt.Fprint(insert, ")")
+	}
 
 	logger.Debug(insert.String())
 
 	db := datastore.GetConnection()
-	if _, err := db.NamedExec(insert.String(), m); err != nil {
-		logger.Errorf("Received error %s while inserting values\n\t %#v", err, m)
-		return nil, errors.FromError(errors.DB_ERROR, err)
-	}
-	return nil, nil
+	stmt, err := db.Prepare(insert.String())
+	errors.Pie(err)
+
+	_, err = stmt.Exec(values...)
+	errors.Pie(err)
 }
 
 
-func UpdateSurveyQuestion(id string, data []byte) error {
+
+func UpdateSurveyQuestion(id string, data []byte) {
 	var j map[string]interface{}
-	if err := json.Unmarshal(data, &j); err != nil {
-		logger.Error(err)
-		return errors.FromError(errors.GO_ERROR, err)
-	}
-	var m models.SurveyQuestion
-	if err := json.Unmarshal(data, &m); err != nil {
-		logger.Error(err)
-		return errors.FromError(errors.GO_ERROR, err)
-	}
+	types.Unmarshal(data, &j)
 
-	logger.Debug(m)
-
+	phi := 1
 	comma := ""
+	var values []interface{}
 	fieldMap := models.GetSurveyQuestionFieldMap()
 	update := bytes.NewBufferString("UPDATE survey_questions SET ")
-	for k, _ := range j {
+	for k, v := range j {
 		if f, ok := fieldMap[k]; ok {
-			fmt.Fprint(update, comma, f, " = :", f)
+			fmt.Fprint(update, comma, f, " = $", phi)
+			values = append(values, v)
 			comma = ", "
+			phi++
 		}
 	}
-	fmt.Fprint(update, " WHERE survey_question_id = :survey_question_id")
+	values = append(values, id)
+	fmt.Fprint(update, " WHERE alert_id = $", phi)
 
 	logger.Debug(update.String())
 
 	db := datastore.GetConnection()
-	stmt, err := db.PrepareNamed(update.String())
-	if err != nil {
-		logger.Error(err)
-		return errors.FromError(errors.GO_ERROR, err)
-	}
-	//<no value>
-	m.SurveyQuestionId = &id
-	_, err = stmt.Exec(m)
-	if err != nil {
-		logger.Error(err)
-		return errors.FromError(errors.GO_ERROR, err)
-	}
-	return nil
+	stmt, err := db.Prepare(update.String())
+	errors.Pie(err)
+	_, err = stmt.Exec(values...)
+	errors.Pie(err)
 }
 
-func SelectSurveyQuestion(id string) (models.SurveyQuestion, *errors.SensError) {
+func SelectSurveyQuestion(id string) map[string]interface{} {
 	db := datastore.GetConnection()
-	m := models.SurveyQuestion{}
-	if err := db.Get(&m, "SELECT * FROM survey_questions WHERE survey_question_id = $1", id); err != nil {
-		logger.Error(err)
-		return m, errors.FromError(errors.DB_ERROR, err)
+
+	stmt, err := db.Prepare("SELECT * FROM survey_questions WHERE alert_id = $1")
+	errors.Pie(err)
+
+	r, err := stmt.Query(id)
+	errors.Pie(err)
+
+	result := datastore.RowsToMap(r, models.GetSurveyQuestionReverseFieldMap(), models.GetSurveyQuestionTypeMap())
+	if len(result) == 0 {
+		return map[string]interface{}{}
 	}
-	return m, nil
+	return result[0]
 }
 
 
-func buildSurveyQuestionWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values map[string]interface{}) {
+func buildSurveyQuestionWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
 	ins := datastore.ParseInParams(in)
 	fieldMap := models.GetSurveyQuestionFieldMap()
 
+	phi := len(*values) + 1
 	cond := ""
+	fmt.Fprint(query, "(")
 	for _, o := range ors {
 		if f, ok := fieldMap[o.Column]; ok {
-			fmt.Fprint(query, cond, fmt.Sprintf("%s = :%s ", f, f))
-			values[f] = getSurveyQuestionFieldValue(o.Column, o.Value)
+			fmt.Fprint(query, cond, f, " = $", phi)
+			*values = append(*values, o.Value)
 			cond = "OR "
+			phi++
 		}
 	}
 
 	if cond == "OR " {
-		fmt.Fprint(query, "AND ")
+		fmt.Fprint(query, ") AND (")
 	}
-	fmt.Fprint(query, "(")
 	for _, a := range ands {
 		if f, ok := fieldMap[a.Column]; ok {
-			fmt.Fprint(query, fmt.Sprintf("%s = :%s AND ", f, f))
-			values[f] = getSurveyQuestionFieldValue(a.Column, a.Value)
+			fmt.Fprint(query, f, " = $", phi, " AND ")
+			*values = append(*values, a.Value)
+			phi++
 		}
 	}
 
 	if len(ins.Value) > 0 {
 		if f, ok := fieldMap[ins.Column]; ok {
-			fmt.Fprint(query, f, " in (:", f, ") AND ")
-			values[f] = ins.Value
+			fmt.Fprint(query, f, " = ANY($", phi, ") AND ")
+			*values = append(*values, pq.Array(ins.Value))
+			phi++
 		}
 	}
 
 	for _, s := range spans {
 		if f, ok := fieldMap[s.Column]; ok {
-			fmt.Fprint(query, fmt.Sprintf("%s >= :from_%s AND %s <= :to_%s AND ", f, f, f, f))
-			values["from_"+f] = getSurveyQuestionFieldValue(s.Column, s.From)
-			values["to_"+f] = getSurveyQuestionFieldValue(s.Column, s.To)
+			if s.From != "" {
+				fmt.Fprint(query, f, " >= $", phi, " AND ")
+				*values = append(*values, s.From)
+				phi++
+			}
+			if s.To != "" {
+				fmt.Fprint(query, f, " <= $", phi, " AND ")
+				*values = append(*values, s.To)
+				phi++
+			}
 		}
 	}
 	fmt.Fprint(query, "1 = 1)")
 }
 
-func getSurveyQuestionFieldValue(c string, v interface{}) interface{} {
-	typeMap := models.GetSurveyQuestionTypeMap()
-	if typeMap[c] == "*datastore.RawMessage" {
-		v, _ = json.Marshal(v)
-	}
-	return v
-}
-
-func findSurveyQuestionIn(seq int64, query string, values map[string]interface{}) ([]models.SurveyQuestion, *errors.SensError) {
-	if q, a, err := sqlx.Named(query, values); err != nil {
-		logger.Error(err.Error())
-		return nil, errors.New(errors.DB_ERROR, err.Error())
-	} else if q, a, err := sqlx.In(q, a...); err != nil {
-		logger.Error(err.Error())
-		return nil, errors.New(errors.DB_ERROR, err.Error())
-	} else {
-		logger.Debug(seq, ": Before GetConnection, time => ", time.Now().Unix())
-		db := datastore.GetConnection()
-		logger.Debug(seq, ": After GetConnection, time => ", time.Now().Unix())
-		q = db.Rebind(q)
-		logger.Debug(seq, ": ", q, ", time => ", time.Now().Unix())
-		logger.Debugf("%d: Values: %s", seq, a)
-		m := []models.SurveyQuestion{}
-		if err := db.Select(&m, q, a...); err != nil {
-			logger.Error(err)
-			return m, errors.New(errors.DB_ERROR, err.Error())
-		}
-		return m, nil
-	}
-}
-
-func FindSurveyQuestion(or []string, and []string, in string, span []string, limit string, column string, order string) ([]models.SurveyQuestion, *errors.SensError) {
-	from := time.Now().Unix()
-	seq := from % 10000
+func FindSurveyQuestion(or []string, and []string, in string, span []string, limit string, column string, order string) []map[string]interface{} {
 	query := bytes.NewBufferString("SELECT * FROM survey_questions WHERE ")
 	fieldMap := models.GetSurveyQuestionFieldMap()
-	values := make(map[string]interface{})
-	buildSurveyQuestionWhereClause(query, or, and, in, span, values)
-	if column != "" {
-		if f, ok := fieldMap[column]; ok {
-			if order == "" {
-				order = "DESC"
-			}
-			fmt.Fprint(query, " ORDER BY ", f, " ", order)
+	var values []interface{}
+	buildSurveyQuestionWhereClause(query, or, and, in, span, &values)
+	if column == "" {
+		column = "created_at"
+	}
+	if f, ok := fieldMap[column]; ok {
+		if order == "" {
+			order = "DESC"
 		}
+		fmt.Fprint(query, " ORDER BY ", f, " ", order)
 	}
 	fmt.Fprint(query, " LIMIT ", limit)
 
 	q := query.String()
 	logger.Debug(q)
-	if strings.TrimSpace(in) == "" {
-		logger.Debug(seq, ": No in clause present. Using prepared and not sqlIn, time => ", time.Now().Unix())
-		db := datastore.GetConnection()
-		logger.Debug(seq, ": GET CONNECTION, time => ", time.Now().Unix())
-		stmt, err := db.PrepareNamed(q)
-		logger.Debug(seq, ": AFTER PREPARED, time => ", time.Now().Unix())
-		if err != nil {
-			logger.Error(err.Error())
-			return nil, errors.New(errors.DB_ERROR, err.Error())
-		}
 
-		var m []models.SurveyQuestion
-		if err := stmt.Select(&m, values); err != nil {
-			logger.Error(err)
-			return nil, errors.New(errors.DB_ERROR, err.Error())
-		} else {
-			to := time.Now().Unix()
-			logger.Debugf("%d: Returning FIND after %d seconds: RESULT => %#v", seq, (to - from), m)
-			return m, nil
-		}
-	} else {
-		logger.Debug(seq, ": Before find In")
-		m, err := findSurveyQuestionIn(seq, q, values)
-		logger.Debug(seq, " :After find In")
-		to := time.Now().Unix()
-		logger.Debugf("%d: Returning IN after %d seconds: RESULT => %#v", seq, (to - from), m)
-		return m, err
-	}
+	db := datastore.GetConnection()
+	stmt, err := db.Prepare(q)
+	errors.Pie(err)
+
+	r, err := stmt.Query(values...)
+	errors.Pie(err)
+
+	return datastore.RowsToMap(r, models.GetSurveyQuestionReverseFieldMap(), models.GetSurveyQuestionTypeMap())
 }
 
-func UpdateSurveyQuestionWhere(or []string, and []string, in string, span []string, data []byte) *errors.SensError {
+func UpdateSurveyQuestionWhere(or []string, and []string, in string, span []string, data []byte) {
+	var values []interface{}
+	j := types.UnmarshalMap(data)
 	fieldMap := models.GetSurveyQuestionFieldMap()
-	values := make(map[string]interface{})
+	typeMap := models.GetSurveyQuestionTypeMap()
 	update := bytes.NewBufferString("UPDATE survey_questions SET ")
 
-	//SET FIELD VALUES
-	var j map[string]interface{}
-	if err := json.Unmarshal(data, &j); err != nil {
-		logger.Error(err)
-		return errors.FromError(errors.GO_ERROR, err)
-	}
-	var m models.SurveyQuestion
-	if err := json.Unmarshal(data, &m); err != nil {
-		logger.Error(err)
-		return errors.FromError(errors.GO_ERROR, err)
-	}
-
+	phi := 1
 	comma := ""
-	for k, _ := range j {
+	for k, v := range j {
 		if f, ok := fieldMap[k]; ok {
-			fmt.Fprint(update, comma, f, " = :set_", f)
-			values["set_"+f] = getSurveyQuestionFieldValue(k, j[k])
+			fmt.Fprint(update, comma, f, " = $", phi)
+			values = append(values, datastore.ConvertFieldValue(k, v, typeMap))
 			comma = ", "
+			phi++
 		}
 	}
-	//SET ENDS
 
 	fmt.Fprint(update, " WHERE ")
-	buildSurveyQuestionWhereClause(update, or, and, in, span, values)
+	buildSurveyQuestionWhereClause(update, or, and, in, span, &values)
 
 	logger.Debug(update.String())
 	logger.Debugf("Values: %#v", values)
 
 	db := datastore.GetConnection()
-	stmt, err := db.PrepareNamed(update.String())
-	if err != nil {
-		logger.Error(err.Error())
-		return errors.New(errors.DB_ERROR, err.Error())
-	}
 
-	if _, err := stmt.Exec(values); err != nil {
-		logger.Error(err)
-		return errors.New(errors.DB_ERROR, err.Error())
-	}
-	return nil
+	stmt, err := db.Prepare(update.String())
+	errors.Pie(err)
+
+	_, err = stmt.Query(values...)
+	errors.Pie(err)
 }

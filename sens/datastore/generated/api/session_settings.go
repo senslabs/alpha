@@ -7,6 +7,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/senslabs/alpha/sens/datastore/generated/models/fn"
+	"github.com/senslabs/alpha/sens/errors"
+	"github.com/senslabs/alpha/sens/httpclient"
 	"github.com/senslabs/alpha/sens/logger"
 	"github.com/senslabs/alpha/sens/types"
 )
@@ -17,82 +19,72 @@ func SessionSettingMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/session-settings/{id}/update", UpdateSessionSetting)
 	r.HandleFunc("/api/session-settings/{id}/get", GetSessionSetting)
-	
+    
 	r.HandleFunc("/api/session-settings/update", UpdateSessionSettingWhere)
-	r.HandleFunc("/api/session-settings/find", FindSessionSetting)
+	r.HandleFunc("/api/session-settings/find", FindSessionSetting).Queries("limit", "{limit}")
+}
+
+func SessionSettingRecovery(w http.ResponseWriter) {
+	if r := recover(); r != nil {
+		err := r.(error)
+		logger.Error(err)
+		httpclient.WriteInternalServerError(w, err)
+	}
 }
 
 func CreateSessionSetting(w http.ResponseWriter, r *http.Request) {
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.InsertSessionSetting(data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		fmt.Fprint(w, id)
-	}
+	defer SessionSettingRecovery(w)
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	id := fn.InsertSessionSetting(data)
+	errors.Pie(err)
+	fmt.Fprint(w, id)
 }
 
 func BatchCreateSessionSetting(w http.ResponseWriter, r *http.Request) {
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.BatchInsertSessionSetting(data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		fmt.Fprint(w, id)
-	}
+	defer SessionSettingRecovery(w)
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	fn.BatchInsertSessionSetting(data)
+	w.WriteHeader(http.StatusOK)
 }
 
 
 func UpdateSessionSetting(w http.ResponseWriter, r *http.Request) {
+	defer SessionSettingRecovery(w)
 	vars := mux.Vars(r)
 	id := vars["id"]
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateSessionSetting(id, data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	fn.UpdateSessionSetting(id, data)
+	w.WriteHeader(http.StatusOK)
 }
 
 func GetSessionSetting(w http.ResponseWriter, r *http.Request) {
+	defer SessionSettingRecovery(w)
 	vars := mux.Vars(r)
 	id := vars["id"]
-	if m, err := fn.SelectSessionSetting(id); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	m := fn.SelectSessionSetting(id)
+	types.MarshalInto(m, w)
 }
 
 
 func UpdateSessionSettingWhere(w http.ResponseWriter, r *http.Request) {
+	defer SessionSettingRecovery(w)
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
 	and := values["and"]
 	in := values.Get("in")
 
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateSessionSettingWhere(or, and, in, span, data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	fn.UpdateSessionSettingWhere(or, and, in, span, data)
+	w.WriteHeader(http.StatusOK)
 }
 
 func FindSessionSetting(w http.ResponseWriter, r *http.Request) {
+	defer SessionSettingRecovery(w)
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -102,13 +94,6 @@ func FindSessionSetting(w http.ResponseWriter, r *http.Request) {
 	column := values.Get("column")
 	order := values.Get("order")
 
-	if limit == "" {
-		http.Error(w, "Query param limit is mandatory", http.StatusBadRequest)
-	} else if ms, err := fn.FindSessionSetting(or, and, in, span, limit, column, order); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	m := fn.FindSessionSetting(or, and, in, span, limit, column, order)
+	types.MarshalInto(m, w)
 }

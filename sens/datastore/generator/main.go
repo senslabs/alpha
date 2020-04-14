@@ -52,27 +52,22 @@ type FieldInfo struct {
 
 func GetFieldType(field FieldInfo) string {
 	switch field.Type {
-	case "UUID", "STRING":
-		// if field.IsNullable == "YES" {
-		// 	return "datastore.NullString"
-		// }
+	case "STRING":
 		return "*string"
+	case "UUID":
+		return "*uuid.UUID"
 	case "TIMESTAMP":
-		// if field.IsNullable == "YES" {
-		// 	return "datastore.NullTime"
-		// }
 		return "*time.Time"
 	case "INT8":
-		// if field.IsNullable == "YES" {
-		// 	return "datastore.NullInt64"
-		// }
 		return "*int64"
 	case "BOOL":
 		return "*bool"
 	case "FLOAT8":
 		return "*float64"
-	default:
+	case "JSONB":
 		return "*datastore.RawMessage"
+	default:
+		return "[]byte"
 	}
 }
 
@@ -115,12 +110,14 @@ func GenerateModel(db *sqlx.DB, schema string, mi *ModelInfo) string {
 	fields := GetTableFields(db, schema, *mi)
 	members := []string{}
 	fieldMap := map[string]string{}
+	reverseFieldMap := map[string]string{}
 	typeMap := map[string]string{}
 	for _, f := range fields {
 		// mi.HasId = mi.HasId || f.TableField == "id"
 		member := fmt.Sprintf("%s %s `db:\"%s\" json:\",omitempty\"`", f.ModelField, f.Type, f.TableField)
 		members = append(members, member)
 		fieldMap[f.ModelField] = f.TableField
+		reverseFieldMap[f.TableField] = f.ModelField
 		typeMap[f.ModelField] = f.Type
 	}
 	st := fmt.Sprintf(`type %s struct {
@@ -132,6 +129,10 @@ func GenerateModel(db *sqlx.DB, schema string, mi *ModelInfo) string {
 	if err != nil {
 		log.Fatal(err)
 	}
+	rfm, err := json.Marshal(reverseFieldMap)
+	if err != nil {
+		log.Fatal(err)
+	}
 	tm, err := json.Marshal(typeMap)
 	if err != nil {
 		log.Fatal(err)
@@ -139,11 +140,19 @@ func GenerateModel(db *sqlx.DB, schema string, mi *ModelInfo) string {
 	st = st + fmt.Sprintf(`func Get%sFieldMap() map[string]string {
 		return map[string]string%s
 		}
+
 		`, mi.Model, fm)
-	return st + fmt.Sprintf(`func Get%sTypeMap() map[string]string {
+	st = st + fmt.Sprintf(`func Get%sReverseFieldMap() map[string]string {
 		return map[string]string%s
 		}
+
+		`, mi.Model, rfm)
+	st = st + fmt.Sprintf(`func Get%sTypeMap() map[string]string {
+		return map[string]string%s
+		}
+
 		`, mi.Model, tm)
+	return st
 }
 
 func UpdateIdInfo(db *sqlx.DB, constraintsMap map[string][]string, mi *ModelInfo) {
@@ -164,6 +173,7 @@ func GenerateModels(db *sqlx.DB, schema string, mis []*ModelInfo) {
 	import (
 		"time"
 
+		"github.com/google/uuid"
 		"github.com/senslabs/alpha/sens/datastore"
 	)
 

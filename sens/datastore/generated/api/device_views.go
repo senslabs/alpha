@@ -7,6 +7,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/senslabs/alpha/sens/datastore/generated/models/fn"
+	"github.com/senslabs/alpha/sens/errors"
+	"github.com/senslabs/alpha/sens/httpclient"
 	"github.com/senslabs/alpha/sens/logger"
 	"github.com/senslabs/alpha/sens/types"
 )
@@ -16,54 +18,52 @@ func DeviceViewMain(r *mux.Router) {
 	r.HandleFunc("/api/device-views/batch/create", BatchCreateDeviceView)
 	
 	r.HandleFunc("/api/device-views/update", UpdateDeviceViewWhere)
-	r.HandleFunc("/api/device-views/find", FindDeviceView)
+	r.HandleFunc("/api/device-views/find", FindDeviceView).Queries("limit", "{limit}")
+}
+
+func DeviceViewRecovery(w http.ResponseWriter) {
+	if r := recover(); r != nil {
+		err := r.(error)
+		logger.Error(err)
+		httpclient.WriteInternalServerError(w, err)
+	}
 }
 
 func CreateDeviceView(w http.ResponseWriter, r *http.Request) {
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.InsertDeviceView(data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		fmt.Fprint(w, id)
-	}
+	defer DeviceViewRecovery(w)
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	id := fn.InsertDeviceView(data)
+	errors.Pie(err)
+	fmt.Fprint(w, id)
 }
 
 func BatchCreateDeviceView(w http.ResponseWriter, r *http.Request) {
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.BatchInsertDeviceView(data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		fmt.Fprint(w, id)
-	}
+	defer DeviceViewRecovery(w)
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	fn.BatchInsertDeviceView(data)
+	w.WriteHeader(http.StatusOK)
 }
 
 
 
 func UpdateDeviceViewWhere(w http.ResponseWriter, r *http.Request) {
+	defer DeviceViewRecovery(w)
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
 	and := values["and"]
 	in := values.Get("in")
 
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateDeviceViewWhere(or, and, in, span, data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	fn.UpdateDeviceViewWhere(or, and, in, span, data)
+	w.WriteHeader(http.StatusOK)
 }
 
 func FindDeviceView(w http.ResponseWriter, r *http.Request) {
+	defer DeviceViewRecovery(w)
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -73,13 +73,6 @@ func FindDeviceView(w http.ResponseWriter, r *http.Request) {
 	column := values.Get("column")
 	order := values.Get("order")
 
-	if limit == "" {
-		http.Error(w, "Query param limit is mandatory", http.StatusBadRequest)
-	} else if ms, err := fn.FindDeviceView(or, and, in, span, limit, column, order); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	m := fn.FindDeviceView(or, and, in, span, limit, column, order)
+	types.MarshalInto(m, w)
 }

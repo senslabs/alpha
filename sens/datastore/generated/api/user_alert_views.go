@@ -7,6 +7,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/senslabs/alpha/sens/datastore/generated/models/fn"
+	"github.com/senslabs/alpha/sens/errors"
+	"github.com/senslabs/alpha/sens/httpclient"
 	"github.com/senslabs/alpha/sens/logger"
 	"github.com/senslabs/alpha/sens/types"
 )
@@ -16,54 +18,52 @@ func UserAlertViewMain(r *mux.Router) {
 	r.HandleFunc("/api/user-alert-views/batch/create", BatchCreateUserAlertView)
 	
 	r.HandleFunc("/api/user-alert-views/update", UpdateUserAlertViewWhere)
-	r.HandleFunc("/api/user-alert-views/find", FindUserAlertView)
+	r.HandleFunc("/api/user-alert-views/find", FindUserAlertView).Queries("limit", "{limit}")
+}
+
+func UserAlertViewRecovery(w http.ResponseWriter) {
+	if r := recover(); r != nil {
+		err := r.(error)
+		logger.Error(err)
+		httpclient.WriteInternalServerError(w, err)
+	}
 }
 
 func CreateUserAlertView(w http.ResponseWriter, r *http.Request) {
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.InsertUserAlertView(data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		fmt.Fprint(w, id)
-	}
+	defer UserAlertViewRecovery(w)
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	id := fn.InsertUserAlertView(data)
+	errors.Pie(err)
+	fmt.Fprint(w, id)
 }
 
 func BatchCreateUserAlertView(w http.ResponseWriter, r *http.Request) {
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.BatchInsertUserAlertView(data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		fmt.Fprint(w, id)
-	}
+	defer UserAlertViewRecovery(w)
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	fn.BatchInsertUserAlertView(data)
+	w.WriteHeader(http.StatusOK)
 }
 
 
 
 func UpdateUserAlertViewWhere(w http.ResponseWriter, r *http.Request) {
+	defer UserAlertViewRecovery(w)
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
 	and := values["and"]
 	in := values.Get("in")
 
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateUserAlertViewWhere(or, and, in, span, data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	fn.UpdateUserAlertViewWhere(or, and, in, span, data)
+	w.WriteHeader(http.StatusOK)
 }
 
 func FindUserAlertView(w http.ResponseWriter, r *http.Request) {
+	defer UserAlertViewRecovery(w)
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -73,13 +73,6 @@ func FindUserAlertView(w http.ResponseWriter, r *http.Request) {
 	column := values.Get("column")
 	order := values.Get("order")
 
-	if limit == "" {
-		http.Error(w, "Query param limit is mandatory", http.StatusBadRequest)
-	} else if ms, err := fn.FindUserAlertView(or, and, in, span, limit, column, order); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	m := fn.FindUserAlertView(or, and, in, span, limit, column, order)
+	types.MarshalInto(m, w)
 }

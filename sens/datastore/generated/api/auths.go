@@ -7,6 +7,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/senslabs/alpha/sens/datastore/generated/models/fn"
+	"github.com/senslabs/alpha/sens/errors"
+	"github.com/senslabs/alpha/sens/httpclient"
 	"github.com/senslabs/alpha/sens/logger"
 	"github.com/senslabs/alpha/sens/types"
 )
@@ -17,82 +19,72 @@ func AuthMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/auths/{id}/update", UpdateAuth)
 	r.HandleFunc("/api/auths/{id}/get", GetAuth)
-	
+    
 	r.HandleFunc("/api/auths/update", UpdateAuthWhere)
-	r.HandleFunc("/api/auths/find", FindAuth)
+	r.HandleFunc("/api/auths/find", FindAuth).Queries("limit", "{limit}")
+}
+
+func AuthRecovery(w http.ResponseWriter) {
+	if r := recover(); r != nil {
+		err := r.(error)
+		logger.Error(err)
+		httpclient.WriteInternalServerError(w, err)
+	}
 }
 
 func CreateAuth(w http.ResponseWriter, r *http.Request) {
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.InsertAuth(data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		fmt.Fprint(w, id)
-	}
+	defer AuthRecovery(w)
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	id := fn.InsertAuth(data)
+	errors.Pie(err)
+	fmt.Fprint(w, id)
 }
 
 func BatchCreateAuth(w http.ResponseWriter, r *http.Request) {
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if id, err := fn.BatchInsertAuth(data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		fmt.Fprint(w, id)
-	}
+	defer AuthRecovery(w)
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	fn.BatchInsertAuth(data)
+	w.WriteHeader(http.StatusOK)
 }
 
 
 func UpdateAuth(w http.ResponseWriter, r *http.Request) {
+	defer AuthRecovery(w)
 	vars := mux.Vars(r)
 	id := vars["id"]
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateAuth(id, data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	fn.UpdateAuth(id, data)
+	w.WriteHeader(http.StatusOK)
 }
 
 func GetAuth(w http.ResponseWriter, r *http.Request) {
+	defer AuthRecovery(w)
 	vars := mux.Vars(r)
 	id := vars["id"]
-	if m, err := fn.SelectAuth(id); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWriter(w, m); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	m := fn.SelectAuth(id)
+	types.MarshalInto(m, w)
 }
 
 
 func UpdateAuthWhere(w http.ResponseWriter, r *http.Request) {
+	defer AuthRecovery(w)
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
 	and := values["and"]
 	in := values.Get("in")
 
-	if data, err := ioutil.ReadAll(r.Body); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := fn.UpdateAuthWhere(or, and, in, span, data); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	fn.UpdateAuthWhere(or, and, in, span, data)
+	w.WriteHeader(http.StatusOK)
 }
 
 func FindAuth(w http.ResponseWriter, r *http.Request) {
+	defer AuthRecovery(w)
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -102,13 +94,6 @@ func FindAuth(w http.ResponseWriter, r *http.Request) {
 	column := values.Get("column")
 	order := values.Get("order")
 
-	if limit == "" {
-		http.Error(w, "Query param limit is mandatory", http.StatusBadRequest)
-	} else if ms, err := fn.FindAuth(or, and, in, span, limit, column, order); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else if err := types.JsonMarshalToWriter(w, ms); err != nil {
-		logger.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	m := fn.FindAuth(or, and, in, span, limit, column, order)
+	types.MarshalInto(m, w)
 }

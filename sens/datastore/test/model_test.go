@@ -13,7 +13,7 @@ func TestInsert(t *testing.T) {
 	os.Setenv("COCKROACH_PORT", "26256")
 	os.Setenv("LOG_LEVEL", "DEBUG")
 	body := `{
-			"Name": "Points",
+			"Key": "Points",
 			"UserId": "208cf5c8-0fa9-47d6-9ed8-ef5cdd2cb5d6",
 			"Timestamp": 1528236415,
 			"Properties": {
@@ -61,14 +61,9 @@ func TestUpdate(t *testing.T) {
 	os.Setenv("COCKROACH_PORT", "26256")
 	os.Setenv("LOG_LEVEL", "DEBUG")
 
-	b := `{"Name":"Breath", "Properties": {"a":100, "b":200}}`
+	b := `{"Key":"Breath", "Properties": {"a":100, "b":200}}`
 
-	// p := json.M
-	// b := map[string]interface{}{
-	// 	"Name":"Breath",
-	// 	"Properties":
-	// }
-	fn.UpdateSessionRecordWhere(nil, []string{"Name^Points", "Timestamp^1528236411"}, "", nil, []byte(b))
+	fn.UpdateSessionRecordWhere(nil, []string{"Key^Points", "Timestamp^1528236411"}, "", nil, []byte(b))
 }
 
 func TestUpdateSession(t *testing.T) {

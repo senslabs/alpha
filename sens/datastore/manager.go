@@ -2,12 +2,15 @@ package datastore
 
 import (
 	"container/ring"
+	"database/sql"
 	"fmt"
 	"os"
 	"sync"
 	"time"
 
+	"github.com/senslabs/alpha/sens/errors"
 	"github.com/senslabs/alpha/sens/logger"
+	"github.com/senslabs/alpha/sens/types"
 	"github.com/senslabs/sqlx"
 
 	_ "github.com/lib/pq"
@@ -74,7 +77,7 @@ func GetConnectionObsolete() *sqlx.DB {
 	return getNextConnection()
 }
 
-var db *sqlx.DB = nil
+var db *sql.DB = nil
 
 func init() {
 	initdb()
@@ -87,10 +90,11 @@ func initdb() {
 		}
 	}()
 	pgurl := fmt.Sprintf("postgresql://root@%s:%s/postgres?ssl=false&sslmode=disable", GetCockroachHost(), GetCockroachPort())
-	db = sqlx.MustConnect("postgres", pgurl)
+	db, err = sql.Open("postgres", pgurl)
+	errors.Pie(err)
 }
 
-func GetConnection() *sqlx.DB {
+func GetConnection() *sql.DB {
 	for {
 		if err := db.Ping(); err != nil {
 			logger.Error("DB connection failure... Waiting for sometime before retrying")
@@ -101,4 +105,59 @@ func GetConnection() *sqlx.DB {
 		}
 	}
 	return db
+}
+
+//This is used while writing into DB
+func ConvertFieldValue(column string, v interface{}, typeMap map[string]string) interface{} {
+	t := typeMap[column]
+	switch t {
+	case "*datastore.RawMessage":
+		return types.Marshal(v)
+	}
+	return v
+}
+
+func getValue(column string, v interface{}, typeMap map[string]string) interface{} {
+	v = *(v.(*interface{}))
+	t := typeMap[column]
+
+	switch t {
+	case "*string":
+	case "*int64":
+	case "*bool":
+		return v
+	case "*uuid.UUID":
+		return fmt.Sprintf("%s", v)
+	case "*datastore.RawMessage":
+		if v != nil {
+			return types.UnmarshalMap(v.([]byte))
+		}
+	}
+	return v
+}
+
+func RowsToMap(r *sql.Rows, reverseFieldMap map[string]string, typeMap map[string]string) []map[string]interface{} {
+	columns, err := r.Columns()
+	errors.Pie(err)
+
+	var result []map[string]interface{}
+	for r.Next() {
+		temp := make([]interface{}, len(columns))
+		values := make([]interface{}, len(columns))
+		for i := range temp {
+			values[i] = &temp[i]
+		}
+
+		err = r.Scan(values...)
+		errors.Pie(err)
+
+		m := make(map[string]interface{})
+		for i, c := range columns {
+			if field, ok := reverseFieldMap[c]; ok {
+				m[field] = getValue(field, values[i], typeMap)
+			}
+		}
+		result = append(result, m)
+	}
+	return result
 }
