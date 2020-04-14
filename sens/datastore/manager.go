@@ -96,7 +96,7 @@ func initdb() {
 	errors.Pie(err)
 }
 
-func GetConnectionPostgres() *sql.DB {
+func GetConnection() *sql.DB {
 	for {
 		if err := db.Ping(); err != nil {
 			logger.Error(err)
