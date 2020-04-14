@@ -2,8 +2,16 @@ package ext
 
 import (
 	"net/http"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/lib/pq"
+	"github.com/senslabs/alpha/sens/datastore"
+	"github.com/senslabs/alpha/sens/errors"
+	"github.com/senslabs/alpha/sens/httpclient"
+	"github.com/senslabs/alpha/sens/logger"
 )
 
 func ExtMain(r *mux.Router) {
@@ -17,39 +25,20 @@ type Activity struct {
 }
 
 func GetOrgActivites(w http.ResponseWriter, r *http.Request) {
-	// in := r.URL.Query().Get("in")
-	// days := r.URL.Query().Get("days")
-	// userIds := strings.Split(in, "^")
-	// if len(userIds) < 2 {
-	// 	logger.Error("Too less number of arguments")
-	// 	httpclient.WriteError(w, http.StatusInternalServerError, errors.New("Too less number of arguments"))
-	// } else if duration, err := strconv.Atoi(days); err != nil {
-	// 	logger.Error("Too less number of arguments")
-	// 	httpclient.WriteError(w, http.StatusInternalServerError, errors.New("Too less number of arguments"))
-	// } else {
-	// 	when := time.Now().Add(-time.Duration(duration*24) * time.Hour).Unix()
-	// 	values := map[string]interface{}{
-	// 		"user_ids": userIds[1:],
-	// 		"when":     when,
-	// 	}
-	// 	if query, args, err := sqlx.Named(ACTIVITY_DASHBOARD_QUERY, values); err != nil {
-	// 		logger.Error(err)
-	// 		httpclient.WriteError(w, http.StatusInternalServerError, err)
-	// 	} else if query, args, err := sqlx.In(query, args...); err != nil {
-	// 		logger.Error(err)
-	// 		httpclient.WriteError(w, http.StatusInternalServerError, err)
-	// 	} else {
-	// 		db := datastore.GetConnection()
-	// 		query = db.Rebind(query)
-	// 		logger.Debug(query, args)
-	// 		var dest []Activity
-	// 		if err := db.Select(&dest, query, args...); err != nil {
-	// 			logger.Error(err)
-	// 			httpclient.WriteError(w, http.StatusInternalServerError, err)
-	// 		} else if err := json.NewEncoder(w).Encode(dest); err != nil {
-	// 			logger.Error(err)
-	// 			httpclient.WriteError(w, http.StatusInternalServerError, err)
-	// 		}
-	// 	}
-	// }
+	in := r.URL.Query().Get("in")
+	days := r.URL.Query().Get("days")
+	userIds := strings.Split(in, "^")
+	if len(userIds) < 2 {
+		logger.Error("Too less number of arguments")
+		httpclient.WriteError(w, http.StatusInternalServerError, errors.New(errors.GO_ERROR, "Too less number of arguments"))
+	} else if duration, err := strconv.Atoi(days); err != nil {
+		logger.Error("Too less number of arguments")
+		httpclient.WriteError(w, http.StatusInternalServerError, errors.New(errors.GO_ERROR, "Too less number of arguments"))
+	} else {
+		when := time.Now().Add(-time.Duration(duration*24) * time.Hour).Unix()
+		db := datastore.GetConnection()
+		stmt, err := db.Prepare(ACTIVITY_DASHBOARD_QUERY)
+		errors.Pie(err)
+		stmt.Query(when, pq.Array(userIds[1:]))
+	}
 }
