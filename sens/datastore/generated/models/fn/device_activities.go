@@ -3,8 +3,7 @@ package fn
 import (
 	"bytes"
 	"fmt"
-	"runtime"
-	"time"
+	"math/rand"
 
 	"github.com/lib/pq"
 	"github.com/senslabs/alpha/sens/datastore"
@@ -174,21 +173,21 @@ func FindDeviceActivitie(or []string, and []string, in string, span []string, li
 	q := query.String()
 	logger.Debug(q)
 
-	pc, file, line, ok := runtime.Caller(0)
-	logger.Debug(time.Now().Unix(), "<BEFORE DB CONNECTION>", pc, file, line, ok)
+	seq := rand.Intn(99999)
+	datastore.TRACE(seq, "1: <BEFORE DB CONNECTION>")
 	db := datastore.GetConnection()
 	defer db.Close()
-	logger.Debug(time.Now().Unix(), "<AFTER DB CONNECTION>", pc, file, line, ok)
+	datastore.TRACE(seq, "2: <AFTER DB CONNECTION>")
 	stmt, err := db.Prepare(q)
-	logger.Debug(time.Now().Unix(), "<AFTER PREPARE>", pc, file, line, ok)
+	datastore.TRACE(seq, "3: <AFTER PREPARED>")
 	errors.Pie(err)
 
 	r, err := stmt.Query(values...)
-	logger.Debug(time.Now().Unix(), "<AFTER QUERY>", pc, file, line, ok)
+	datastore.TRACE(seq, "4: <AFTER QUERY>")
 	errors.Pie(err)
 
 	result := datastore.RowsToMap(r, models.GetDeviceActivitieReverseFieldMap(), models.GetDeviceActivitieTypeMap())
-	logger.Debug(time.Now().Unix(), "<RETURNING>", pc, file, line, ok)
+	datastore.TRACE(seq, "5: <RETURNING>")
 	return result
 }
 

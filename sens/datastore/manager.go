@@ -5,7 +5,10 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"path/filepath"
+	"runtime"
 	"sync"
+	"time"
 
 	"github.com/senslabs/alpha/sens/errors"
 	"github.com/senslabs/alpha/sens/logger"
@@ -174,4 +177,9 @@ func RowsToMap(r *sql.Rows, reverseFieldMap map[string]string, typeMap map[strin
 		result = append(result, m)
 	}
 	return result
+}
+
+func TRACE(seq int, msg string) {
+	_, f, _, _ := runtime.Caller(1)
+	logger.Debugf("%d: [%s] :: %s in (%s)", seq, time.Now(), msg, filepath.Base(f))
 }
