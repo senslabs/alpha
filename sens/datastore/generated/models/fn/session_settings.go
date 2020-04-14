@@ -39,6 +39,7 @@ func InsertSessionSetting(data []byte) string {
 	
 
 	db := datastore.GetConnection()
+	defer db.Close()
 
 	logger.Debug(insert.String())
 
@@ -88,6 +89,7 @@ func BatchInsertSessionSetting(data []byte) {
 	logger.Debug(insert.String())
 
 	db := datastore.GetConnection()
+	defer db.Close()
 	stmt, err := db.Prepare(insert.String())
 	errors.Pie(err)
 
@@ -175,6 +177,7 @@ func FindSessionSetting(or []string, and []string, in string, span []string, lim
 	pc, file, line, ok := runtime.Caller(0)
 	logger.Debug(time.Now().Unix(), "<BEFORE DB CONNECTION>", pc, file, line, ok)
 	db := datastore.GetConnection()
+	defer db.Close()
 	logger.Debug(time.Now().Unix(), "<AFTER DB CONNECTION>", pc, file, line, ok)
 	stmt, err := db.Prepare(q)
 	logger.Debug(time.Now().Unix(), "<AFTER PREPARE>", pc, file, line, ok)
@@ -214,6 +217,7 @@ func UpdateSessionSettingWhere(or []string, and []string, in string, span []stri
 	logger.Debugf("Values: %#v", values)
 
 	db := datastore.GetConnection()
+	defer db.Close()
 
 	stmt, err := db.Prepare(update.String())
 	errors.Pie(err)

@@ -41,6 +41,7 @@ func Insert{{.Model}}(data []byte) string {
 	{{end}}
 
 	db := datastore.GetConnection()
+	defer db.Close()
 
 	logger.Debug(insert.String())
 
@@ -95,6 +96,7 @@ func BatchInsert{{.Model}}(data []byte) {
 	logger.Debug(insert.String())
 
 	db := datastore.GetConnection()
+	defer db.Close()
 	stmt, err := db.Prepare(insert.String())
 	errors.Pie(err)
 
@@ -127,6 +129,7 @@ func Update{{.Model}}(id string, data []byte) {
 	logger.Debug(update.String())
 
 	db := datastore.GetConnection()
+	defer db.Close()
 	stmt, err := db.Prepare(update.String())
 	errors.Pie(err)
 	_, err = stmt.Exec(values...)
@@ -135,6 +138,7 @@ func Update{{.Model}}(id string, data []byte) {
 
 func Select{{.Model}}(id string) map[string]interface{} {
 	db := datastore.GetConnection()
+	defer db.Close()
 
 	stmt, err := db.Prepare("SELECT * FROM {{.Table}} WHERE alert_id = $1")
 	errors.Pie(err)
@@ -227,6 +231,7 @@ func Find{{.Model}}(or []string, and []string, in string, span []string, limit s
 	pc, file, line, ok := runtime.Caller(0)
 	logger.Debug(time.Now().Unix(), "<BEFORE DB CONNECTION>", pc, file, line, ok)
 	db := datastore.GetConnection()
+	defer db.Close()
 	logger.Debug(time.Now().Unix(), "<AFTER DB CONNECTION>", pc, file, line, ok)
 	stmt, err := db.Prepare(q)
 	logger.Debug(time.Now().Unix(), "<AFTER PREPARE>", pc, file, line, ok)
@@ -266,6 +271,7 @@ func Update{{.Model}}Where(or []string, and []string, in string, span []string, 
 	logger.Debugf("Values: %#v", values)
 
 	db := datastore.GetConnection()
+	defer db.Close()
 
 	stmt, err := db.Prepare(update.String())
 	errors.Pie(err)
