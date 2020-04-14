@@ -17,9 +17,6 @@ func SessionMain(r *mux.Router) {
 	r.HandleFunc("/api/sessions/create", CreateSession)
 	r.HandleFunc("/api/sessions/batch/create", BatchCreateSession)
 	
-	r.HandleFunc("/api/sessions/{id}/update", UpdateSession)
-	r.HandleFunc("/api/sessions/{id}/get", GetSession)
-    
 	r.HandleFunc("/api/sessions/update", UpdateSessionWhere)
 	r.HandleFunc("/api/sessions/find", FindSession).Queries("limit", "{limit}")
 }
@@ -49,24 +46,6 @@ func BatchCreateSession(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-
-func UpdateSession(w http.ResponseWriter, r *http.Request) {
-	defer SessionRecovery(w)
-	vars := mux.Vars(r)
-	id := vars["id"]
-	data, err := ioutil.ReadAll(r.Body)
-	errors.Pie(err)
-	fn.UpdateSession(id, data)
-	w.WriteHeader(http.StatusOK)
-}
-
-func GetSession(w http.ResponseWriter, r *http.Request) {
-	defer SessionRecovery(w)
-	vars := mux.Vars(r)
-	id := vars["id"]
-	m := fn.SelectSession(id)
-	types.MarshalInto(m, w)
-}
 
 
 func UpdateSessionWhere(w http.ResponseWriter, r *http.Request) {

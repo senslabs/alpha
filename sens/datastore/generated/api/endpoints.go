@@ -17,9 +17,6 @@ func EndpointMain(r *mux.Router) {
 	r.HandleFunc("/api/endpoints/create", CreateEndpoint)
 	r.HandleFunc("/api/endpoints/batch/create", BatchCreateEndpoint)
 	
-	r.HandleFunc("/api/endpoints/{id}/update", UpdateEndpoint)
-	r.HandleFunc("/api/endpoints/{id}/get", GetEndpoint)
-    
 	r.HandleFunc("/api/endpoints/update", UpdateEndpointWhere)
 	r.HandleFunc("/api/endpoints/find", FindEndpoint).Queries("limit", "{limit}")
 }
@@ -49,24 +46,6 @@ func BatchCreateEndpoint(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-
-func UpdateEndpoint(w http.ResponseWriter, r *http.Request) {
-	defer EndpointRecovery(w)
-	vars := mux.Vars(r)
-	id := vars["id"]
-	data, err := ioutil.ReadAll(r.Body)
-	errors.Pie(err)
-	fn.UpdateEndpoint(id, data)
-	w.WriteHeader(http.StatusOK)
-}
-
-func GetEndpoint(w http.ResponseWriter, r *http.Request) {
-	defer EndpointRecovery(w)
-	vars := mux.Vars(r)
-	id := vars["id"]
-	m := fn.SelectEndpoint(id)
-	types.MarshalInto(m, w)
-}
 
 
 func UpdateEndpointWhere(w http.ResponseWriter, r *http.Request) {

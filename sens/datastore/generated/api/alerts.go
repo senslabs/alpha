@@ -17,9 +17,6 @@ func AlertMain(r *mux.Router) {
 	r.HandleFunc("/api/alerts/create", CreateAlert)
 	r.HandleFunc("/api/alerts/batch/create", BatchCreateAlert)
 	
-	r.HandleFunc("/api/alerts/{id}/update", UpdateAlert)
-	r.HandleFunc("/api/alerts/{id}/get", GetAlert)
-    
 	r.HandleFunc("/api/alerts/update", UpdateAlertWhere)
 	r.HandleFunc("/api/alerts/find", FindAlert).Queries("limit", "{limit}")
 }
@@ -49,24 +46,6 @@ func BatchCreateAlert(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-
-func UpdateAlert(w http.ResponseWriter, r *http.Request) {
-	defer AlertRecovery(w)
-	vars := mux.Vars(r)
-	id := vars["id"]
-	data, err := ioutil.ReadAll(r.Body)
-	errors.Pie(err)
-	fn.UpdateAlert(id, data)
-	w.WriteHeader(http.StatusOK)
-}
-
-func GetAlert(w http.ResponseWriter, r *http.Request) {
-	defer AlertRecovery(w)
-	vars := mux.Vars(r)
-	id := vars["id"]
-	m := fn.SelectAlert(id)
-	types.MarshalInto(m, w)
-}
 
 
 func UpdateAlertWhere(w http.ResponseWriter, r *http.Request) {

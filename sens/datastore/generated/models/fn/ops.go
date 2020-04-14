@@ -37,8 +37,6 @@ func InsertOp(data []byte) string {
 	fmt.Fprint(insert, ph, ")")
 
 	
-	fmt.Fprint(insert, " returning op_id")
-	
 
 	db := datastore.GetConnection()
 
@@ -48,10 +46,9 @@ func InsertOp(data []byte) string {
 	errors.Pie(err)
 
 	
-	var id string
-	r := stmt.QueryRow(values...)
-	errors.Pie(r.Scan(&id))
-	return id
+	_, err = stmt.Exec(values...)
+	errors.Pie(err)
+	return ""
 	
 }
 
@@ -99,51 +96,6 @@ func BatchInsertOp(data []byte) {
 }
 
 
-
-func UpdateOp(id string, data []byte) {
-	var j map[string]interface{}
-	types.Unmarshal(data, &j)
-
-	phi := 1
-	comma := ""
-	var values []interface{}
-	fieldMap := models.GetOpFieldMap()
-	update := bytes.NewBufferString("UPDATE ops SET ")
-	for k, v := range j {
-		if f, ok := fieldMap[k]; ok {
-			fmt.Fprint(update, comma, f, " = $", phi)
-			values = append(values, v)
-			comma = ", "
-			phi++
-		}
-	}
-	values = append(values, id)
-	fmt.Fprint(update, " WHERE alert_id = $", phi)
-
-	logger.Debug(update.String())
-
-	db := datastore.GetConnection()
-	stmt, err := db.Prepare(update.String())
-	errors.Pie(err)
-	_, err = stmt.Exec(values...)
-	errors.Pie(err)
-}
-
-func SelectOp(id string) map[string]interface{} {
-	db := datastore.GetConnection()
-
-	stmt, err := db.Prepare("SELECT * FROM ops WHERE alert_id = $1")
-	errors.Pie(err)
-
-	r, err := stmt.Query(id)
-	errors.Pie(err)
-
-	result := datastore.RowsToMap(r, models.GetOpReverseFieldMap(), models.GetOpTypeMap())
-	if len(result) == 0 {
-		return map[string]interface{}{}
-	}
-	return result[0]
-}
 
 
 func buildOpWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {

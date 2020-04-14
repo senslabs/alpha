@@ -18,9 +18,9 @@ import (
 
 const (
 	host     = "localhost"
-	port     = 26256
-	user     = "root"
-	password = "nahinhai"
+	port     = 5432
+	user     = "postgres"
+	password = "Sens1234"
 	dbname   = "postgres"
 )
 
@@ -51,20 +51,20 @@ type FieldInfo struct {
 }
 
 func GetFieldType(field FieldInfo) string {
-	switch field.Type {
-	case "STRING":
+	switch strings.ToLower(field.Type) {
+	case "string", "text":
 		return "*string"
-	case "UUID":
+	case "uuid":
 		return "*uuid.UUID"
-	case "TIMESTAMP":
+	case "timestamp":
 		return "*time.Time"
-	case "INT8":
+	case "int8", "integer", "bigint":
 		return "*int64"
-	case "BOOL":
+	case "bool", "boolean":
 		return "*bool"
-	case "FLOAT8":
+	case "float8", "float", "double precision":
 		return "*float64"
-	case "JSONB":
+	case "json", "jsonb":
 		return "*datastore.RawMessage"
 	default:
 		return "[]byte"
@@ -73,7 +73,7 @@ func GetFieldType(field FieldInfo) string {
 
 func GetTableFields(db *sqlx.DB, schema string, mi ModelInfo) []FieldInfo {
 	fields := []FieldInfo{}
-	query := fmt.Sprintf(`SELECT column_name AS table_field, replace(initcap(replace(column_name, '_', ' ')), ' ', '') AS model_field, crdb_sql_type AS type, is_nullable FROM information_schema.columns WHERE table_schema='%s' AND table_name = '%s'`, schema, mi.Table)
+	query := fmt.Sprintf(`SELECT column_name AS table_field, replace(initcap(replace(column_name, '_', ' ')), ' ', '') AS model_field, data_type AS type, is_nullable FROM information_schema.columns WHERE table_schema='%s' AND table_name = '%s'`, schema, mi.Table)
 	err := db.Select(&fields, query)
 	if err != nil {
 		log.Fatal(err)

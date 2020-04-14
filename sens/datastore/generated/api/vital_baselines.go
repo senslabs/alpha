@@ -17,9 +17,6 @@ func VitalBaselineMain(r *mux.Router) {
 	r.HandleFunc("/api/vital-baselines/create", CreateVitalBaseline)
 	r.HandleFunc("/api/vital-baselines/batch/create", BatchCreateVitalBaseline)
 	
-	r.HandleFunc("/api/vital-baselines/{id}/update", UpdateVitalBaseline)
-	r.HandleFunc("/api/vital-baselines/{id}/get", GetVitalBaseline)
-    
 	r.HandleFunc("/api/vital-baselines/update", UpdateVitalBaselineWhere)
 	r.HandleFunc("/api/vital-baselines/find", FindVitalBaseline).Queries("limit", "{limit}")
 }
@@ -49,24 +46,6 @@ func BatchCreateVitalBaseline(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-
-func UpdateVitalBaseline(w http.ResponseWriter, r *http.Request) {
-	defer VitalBaselineRecovery(w)
-	vars := mux.Vars(r)
-	id := vars["id"]
-	data, err := ioutil.ReadAll(r.Body)
-	errors.Pie(err)
-	fn.UpdateVitalBaseline(id, data)
-	w.WriteHeader(http.StatusOK)
-}
-
-func GetVitalBaseline(w http.ResponseWriter, r *http.Request) {
-	defer VitalBaselineRecovery(w)
-	vars := mux.Vars(r)
-	id := vars["id"]
-	m := fn.SelectVitalBaseline(id)
-	types.MarshalInto(m, w)
-}
 
 
 func UpdateVitalBaselineWhere(w http.ResponseWriter, r *http.Request) {

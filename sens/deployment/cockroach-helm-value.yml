@@ -196,11 +196,11 @@ statefulset:
   # by Pods of this StatefulSet.
   resources:
     limits:
-      cpu: 2500m
-      memory: 8Gi
+      #cpu: 2500m
+      memory: 2Gi
     requests:
-      cpu: 2500m
-      memory: 8Gi
+      #cpu: 2500m
+      memory: 2Gi
 
 service:
   ports:

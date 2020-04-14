@@ -9,6 +9,24 @@ import (
 
 var t time.Time
 
+type DeviceActivitie struct {
+	DeviceId     *uuid.UUID `db:"device_id" json:",omitempty"`
+	ActivityType *string    `db:"activity_type" json:",omitempty"`
+	ActiveAt     *int64     `db:"active_at" json:",omitempty"`
+}
+
+func GetDeviceActivitieFieldMap() map[string]string {
+	return map[string]string{"ActiveAt": "active_at", "ActivityType": "activity_type", "DeviceId": "device_id"}
+}
+
+func GetDeviceActivitieReverseFieldMap() map[string]string {
+	return map[string]string{"active_at": "ActiveAt", "activity_type": "ActivityType", "device_id": "DeviceId"}
+}
+
+func GetDeviceActivitieTypeMap() map[string]string {
+	return map[string]string{"ActiveAt": "*int64", "ActivityType": "*string", "DeviceId": "*uuid.UUID"}
+}
+
 type Auth struct {
 	AuthId    *uuid.UUID `db:"auth_id" json:",omitempty"`
 	Email     *string    `db:"email" json:",omitempty"`
@@ -225,25 +243,6 @@ func GetOpUserTypeMap() map[string]string {
 	return map[string]string{"Access": "*bool", "OpId": "*uuid.UUID", "UserId": "*uuid.UUID"}
 }
 
-type Endpoint struct {
-	EndpointId  *uuid.UUID `db:"endpoint_id" json:",omitempty"`
-	AccessGroup *string    `db:"access_group" json:",omitempty"`
-	Path        *string    `db:"path" json:",omitempty"`
-	Secure      *bool      `db:"secure" json:",omitempty"`
-}
-
-func GetEndpointFieldMap() map[string]string {
-	return map[string]string{"AccessGroup": "access_group", "EndpointId": "endpoint_id", "Path": "path", "Secure": "secure"}
-}
-
-func GetEndpointReverseFieldMap() map[string]string {
-	return map[string]string{"access_group": "AccessGroup", "endpoint_id": "EndpointId", "path": "Path", "secure": "Secure"}
-}
-
-func GetEndpointTypeMap() map[string]string {
-	return map[string]string{"AccessGroup": "*string", "EndpointId": "*uuid.UUID", "Path": "*string", "Secure": "*bool"}
-}
-
 type OrgEndpointAccessGroup struct {
 	OrgId       *uuid.UUID `db:"org_id" json:",omitempty"`
 	AccessGroup *string    `db:"access_group" json:",omitempty"`
@@ -277,6 +276,25 @@ func GetOrgEndpointReverseFieldMap() map[string]string {
 
 func GetOrgEndpointTypeMap() map[string]string {
 	return map[string]string{"Access": "*bool", "EndpointId": "*uuid.UUID", "OrgId": "*uuid.UUID"}
+}
+
+type Endpoint struct {
+	EndpointId  *uuid.UUID `db:"endpoint_id" json:",omitempty"`
+	AccessGroup *string    `db:"access_group" json:",omitempty"`
+	Path        *string    `db:"path" json:",omitempty"`
+	Secure      *bool      `db:"secure" json:",omitempty"`
+}
+
+func GetEndpointFieldMap() map[string]string {
+	return map[string]string{"AccessGroup": "access_group", "EndpointId": "endpoint_id", "Path": "path", "Secure": "secure"}
+}
+
+func GetEndpointReverseFieldMap() map[string]string {
+	return map[string]string{"access_group": "AccessGroup", "endpoint_id": "EndpointId", "path": "Path", "secure": "Secure"}
+}
+
+func GetEndpointTypeMap() map[string]string {
+	return map[string]string{"AccessGroup": "*string", "EndpointId": "*uuid.UUID", "Path": "*string", "Secure": "*bool"}
 }
 
 type OpEndpointAccessGroup struct {
@@ -368,24 +386,6 @@ func GetDeviceReverseFieldMap() map[string]string {
 
 func GetDeviceTypeMap() map[string]string {
 	return map[string]string{"CreatedAt": "*int64", "DeviceId": "*uuid.UUID", "DeviceName": "*string", "OrgId": "*uuid.UUID", "Status": "*string", "UserId": "*uuid.UUID"}
-}
-
-type DeviceActivitie struct {
-	DeviceId     *uuid.UUID `db:"device_id" json:",omitempty"`
-	ActivityType *string    `db:"activity_type" json:",omitempty"`
-	ActiveAt     *int64     `db:"active_at" json:",omitempty"`
-}
-
-func GetDeviceActivitieFieldMap() map[string]string {
-	return map[string]string{"ActiveAt": "active_at", "ActivityType": "activity_type", "DeviceId": "device_id"}
-}
-
-func GetDeviceActivitieReverseFieldMap() map[string]string {
-	return map[string]string{"active_at": "ActiveAt", "activity_type": "ActivityType", "device_id": "DeviceId"}
-}
-
-func GetDeviceActivitieTypeMap() map[string]string {
-	return map[string]string{"ActiveAt": "*int64", "ActivityType": "*string", "DeviceId": "*uuid.UUID"}
 }
 
 type Alert struct {

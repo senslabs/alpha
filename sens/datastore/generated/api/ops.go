@@ -17,9 +17,6 @@ func OpMain(r *mux.Router) {
 	r.HandleFunc("/api/ops/create", CreateOp)
 	r.HandleFunc("/api/ops/batch/create", BatchCreateOp)
 	
-	r.HandleFunc("/api/ops/{id}/update", UpdateOp)
-	r.HandleFunc("/api/ops/{id}/get", GetOp)
-    
 	r.HandleFunc("/api/ops/update", UpdateOpWhere)
 	r.HandleFunc("/api/ops/find", FindOp).Queries("limit", "{limit}")
 }
@@ -49,24 +46,6 @@ func BatchCreateOp(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-
-func UpdateOp(w http.ResponseWriter, r *http.Request) {
-	defer OpRecovery(w)
-	vars := mux.Vars(r)
-	id := vars["id"]
-	data, err := ioutil.ReadAll(r.Body)
-	errors.Pie(err)
-	fn.UpdateOp(id, data)
-	w.WriteHeader(http.StatusOK)
-}
-
-func GetOp(w http.ResponseWriter, r *http.Request) {
-	defer OpRecovery(w)
-	vars := mux.Vars(r)
-	id := vars["id"]
-	m := fn.SelectOp(id)
-	types.MarshalInto(m, w)
-}
 
 
 func UpdateOpWhere(w http.ResponseWriter, r *http.Request) {
