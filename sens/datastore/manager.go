@@ -79,49 +79,35 @@ func GetConnectionObsolete() *sqlx.DB {
 	return getNextConnection()
 }
 
-// var db *sql.DB = nil
+var db *sql.DB = nil
 
-// func init() {
-// 	initdb()
-// }
+func init() {
+	initdb()
+}
 
-// func initdb() {
-// 	defer func() {
-// 		if r := recover(); r != nil {
-// 			logger.Error(err)
-// 		}
-// 	}()
-// 	pgurl := fmt.Sprintf("postgresql://postgres:Sens1234@%s:%s/postgres?sslmode=disable", GetCockroachHost(), GetCockroachPort())
-// 	db, err = sql.Open("postgres", pgurl)
-// 	errors.Pie(err)
-// }
-
-// func GetConnectionPostgres() *sql.DB {
-// 	for {
-// 		if err := db.Ping(); err != nil {
-// 			logger.Error(err)
-// 			logger.Error("DB connection failure... Waiting for sometime before retrying")
-// 			time.Sleep(5 * time.Second)
-// 			initdb()
-// 		} else {
-// 			break
-// 		}
-// 	}
-// 	return db
-// }
-
-func GetConnection() *sql.DB {
+func initdb() {
 	defer func() {
 		if r := recover(); r != nil {
 			logger.Error(err)
 		}
 	}()
+	pgurl := fmt.Sprintf("postgresql://postgres:Sens1234@%s:%s/postgres?sslmode=disable", GetCockroachHost(), GetCockroachPort())
+	db, err = sql.Open("postgres", pgurl)
+	errors.Pie(err)
+}
+
+func GetConnectionPostgres() *sql.DB {
 	for {
-		pgurl := fmt.Sprintf("postgresql://postgres:Sens1234@%s:%s/postgres?sslmode=disable", GetCockroachHost(), GetCockroachPort())
-		db, err := sql.Open("postgres", pgurl)
-		errors.Pie(err)
-		return db
+		if err := db.Ping(); err != nil {
+			logger.Error(err)
+			logger.Error("DB connection failure... Waiting for sometime before retrying")
+			time.Sleep(5 * time.Second)
+			initdb()
+		} else {
+			break
+		}
 	}
+	return db
 }
 
 //This is used while writing into DB
