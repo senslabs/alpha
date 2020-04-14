@@ -38,11 +38,11 @@ func InsertUserSummaryView(data []byte) string {
 	
 
 	db := datastore.GetConnection()
-	defer db.Close()
 
 	logger.Debug(insert.String())
 
 	stmt, err := db.Prepare(insert.String())
+	defer stmt.Close()
 	errors.Pie(err)
 
 	
@@ -88,8 +88,8 @@ func BatchInsertUserSummaryView(data []byte) {
 	logger.Debug(insert.String())
 
 	db := datastore.GetConnection()
-	defer db.Close()
 	stmt, err := db.Prepare(insert.String())
+	defer stmt.Close()
 	errors.Pie(err)
 
 	_, err = stmt.Exec(values...)
@@ -176,9 +176,9 @@ func FindUserSummaryView(or []string, and []string, in string, span []string, li
 	seq := rand.Intn(99999)
 	datastore.TRACE(seq, "1: <BEFORE DB CONNECTION>")
 	db := datastore.GetConnection()
-	defer db.Close()
 	datastore.TRACE(seq, "2: <AFTER DB CONNECTION>")
 	stmt, err := db.Prepare(q)
+	defer stmt.Close()
 	datastore.TRACE(seq, "3: <AFTER PREPARED>")
 	errors.Pie(err)
 
@@ -216,9 +216,9 @@ func UpdateUserSummaryViewWhere(or []string, and []string, in string, span []str
 	logger.Debugf("Values: %#v", values)
 
 	db := datastore.GetConnection()
-	defer db.Close()
 
 	stmt, err := db.Prepare(update.String())
+	defer stmt.Close()
 	errors.Pie(err)
 
 	_, err = stmt.Query(values...)

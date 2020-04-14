@@ -40,11 +40,11 @@ func Insert{{.Model}}(data []byte) string {
 	{{end}}
 
 	db := datastore.GetConnection()
-	defer db.Close()
 
 	logger.Debug(insert.String())
 
 	stmt, err := db.Prepare(insert.String())
+	defer stmt.Close()
 	errors.Pie(err)
 
 	{{if .HasId}}
@@ -95,8 +95,8 @@ func BatchInsert{{.Model}}(data []byte) {
 	logger.Debug(insert.String())
 
 	db := datastore.GetConnection()
-	defer db.Close()
 	stmt, err := db.Prepare(insert.String())
+	defer stmt.Close()
 	errors.Pie(err)
 
 	_, err = stmt.Exec(values...)
@@ -128,8 +128,8 @@ func Update{{.Model}}(id string, data []byte) {
 	logger.Debug(update.String())
 
 	db := datastore.GetConnection()
-	defer db.Close()
 	stmt, err := db.Prepare(update.String())
+	defer stmt.Close()
 	errors.Pie(err)
 	_, err = stmt.Exec(values...)
 	errors.Pie(err)
@@ -137,9 +137,9 @@ func Update{{.Model}}(id string, data []byte) {
 
 func Select{{.Model}}(id string) map[string]interface{} {
 	db := datastore.GetConnection()
-	defer db.Close()
 
 	stmt, err := db.Prepare("SELECT * FROM {{.Table}} WHERE alert_id = $1")
+	defer stmt.Close()
 	errors.Pie(err)
 
 	r, err := stmt.Query(id)
@@ -230,9 +230,9 @@ func Find{{.Model}}(or []string, and []string, in string, span []string, limit s
 	seq := rand.Intn(99999)
 	datastore.TRACE(seq, "1: <BEFORE DB CONNECTION>")
 	db := datastore.GetConnection()
-	defer db.Close()
 	datastore.TRACE(seq, "2: <AFTER DB CONNECTION>")
 	stmt, err := db.Prepare(q)
+	defer stmt.Close()
 	datastore.TRACE(seq, "3: <AFTER PREPARED>")
 	errors.Pie(err)
 
@@ -270,9 +270,9 @@ func Update{{.Model}}Where(or []string, and []string, in string, span []string, 
 	logger.Debugf("Values: %#v", values)
 
 	db := datastore.GetConnection()
-	defer db.Close()
 
 	stmt, err := db.Prepare(update.String())
+	defer stmt.Close()
 	errors.Pie(err)
 
 	_, err = stmt.Query(values...)
