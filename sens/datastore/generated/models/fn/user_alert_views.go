@@ -3,6 +3,8 @@ package fn
 import (
 	"bytes"
 	"fmt"
+	"runtime"
+	"time"
 
 	"github.com/lib/pq"
 	"github.com/senslabs/alpha/sens/datastore"
@@ -170,14 +172,21 @@ func FindUserAlertView(or []string, and []string, in string, span []string, limi
 	q := query.String()
 	logger.Debug(q)
 
+	pc, file, line, ok := runtime.Caller(0)
+	logger.Debug(time.Now().Unix(), "<BEFORE DB CONNECTION>", pc, file, line, ok)
 	db := datastore.GetConnection()
+	logger.Debug(time.Now().Unix(), "<AFTER DB CONNECTION>", pc, file, line, ok)
 	stmt, err := db.Prepare(q)
+	logger.Debug(time.Now().Unix(), "<AFTER PREPARE>", pc, file, line, ok)
 	errors.Pie(err)
 
 	r, err := stmt.Query(values...)
+	logger.Debug(time.Now().Unix(), "<AFTER QUERY>", pc, file, line, ok)
 	errors.Pie(err)
 
-	return datastore.RowsToMap(r, models.GetUserAlertViewReverseFieldMap(), models.GetUserAlertViewTypeMap())
+	result := datastore.RowsToMap(r, models.GetUserAlertViewReverseFieldMap(), models.GetUserAlertViewTypeMap())
+	logger.Debug(time.Now().Unix(), "<RETURNING>", pc, file, line, ok)
+	return result
 }
 
 func UpdateUserAlertViewWhere(or []string, and []string, in string, span []string, data []byte) {
