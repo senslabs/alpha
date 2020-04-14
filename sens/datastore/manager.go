@@ -56,7 +56,7 @@ func GetCockroachHost() string {
 func GetCockroachPort() string {
 	port := os.Getenv("COCKROACH_PORT")
 	if port == "" {
-		return "26257"
+		return "5432"
 	}
 	return port
 }
@@ -66,7 +66,7 @@ func GetConnectionObsolete() *sqlx.DB {
 		r = ring.New(10)
 		n := r.Len()
 
-		pgurl := fmt.Sprintf("postgresql://root@%s:%s/postgres?ssl=false&sslmode=disable", GetCockroachHost(), GetCockroachPort())
+		pgurl := fmt.Sprintf("postgresql://postgres@Sens1234%s:%s/postgres?ssl=false&sslmode=disable", GetCockroachHost(), GetCockroachPort())
 		for i := 0; i < n; i++ {
 			db, err := sqlx.Connect("postgres", pgurl)
 			r.Value = Connection{i, db, err}
@@ -89,7 +89,7 @@ func initdb() {
 			logger.Error(err)
 		}
 	}()
-	pgurl := fmt.Sprintf("postgresql://root@%s:%s/postgres?ssl=false&sslmode=disable", GetCockroachHost(), GetCockroachPort())
+	pgurl := fmt.Sprintf("postgresql://postgres:Sens1234@%s:%s/postgres?sslmode=disable", GetCockroachHost(), GetCockroachPort())
 	db, err = sql.Open("postgres", pgurl)
 	errors.Pie(err)
 }
@@ -97,6 +97,7 @@ func initdb() {
 func GetConnection() *sql.DB {
 	for {
 		if err := db.Ping(); err != nil {
+			logger.Error(err)
 			logger.Error("DB connection failure... Waiting for sometime before retrying")
 			time.Sleep(5 * time.Second)
 			initdb()
