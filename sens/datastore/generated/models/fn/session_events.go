@@ -88,7 +88,7 @@ func BatchInsertSessionEvent(data []byte) {
 		fmt.Fprint(insert, ")")
 	}
 
-	fmt.Fprint(insert, " ON CONFLICT(user_id,started_at,key) DO UPDATE SET (", strings.Join(fields, ", "), ") = (EXCLUDED.", strings.Join(fields, ", EXCLUDED."), ")")
+	fmt.Fprint(insert, " ON CONFLICT(user_id,key,started_at) DO UPDATE SET (", strings.Join(fields, ", "), ") = (EXCLUDED.", strings.Join(fields, ", EXCLUDED."), ")")
 
 
 	logger.Debug(insert.String())

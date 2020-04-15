@@ -88,7 +88,7 @@ func BatchInsertOpUserAccessGroup(data []byte) {
 		fmt.Fprint(insert, ")")
 	}
 
-	fmt.Fprint(insert, " ON CONFLICT(access_group,op_id) DO UPDATE SET (", strings.Join(fields, ", "), ") = (EXCLUDED.", strings.Join(fields, ", EXCLUDED."), ")")
+	fmt.Fprint(insert, " ON CONFLICT(op_id,access_group) DO UPDATE SET (", strings.Join(fields, ", "), ") = (EXCLUDED.", strings.Join(fields, ", EXCLUDED."), ")")
 
 
 	logger.Debug(insert.String())

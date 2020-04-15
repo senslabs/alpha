@@ -88,7 +88,7 @@ func BatchInsertSessionPropertie(data []byte) {
 		fmt.Fprint(insert, ")")
 	}
 
-	fmt.Fprint(insert, " ON CONFLICT(key,session_id) DO UPDATE SET (", strings.Join(fields, ", "), ") = (EXCLUDED.", strings.Join(fields, ", EXCLUDED."), ")")
+	fmt.Fprint(insert, " ON CONFLICT(session_id,key) DO UPDATE SET (", strings.Join(fields, ", "), ") = (EXCLUDED.", strings.Join(fields, ", EXCLUDED."), ")")
 
 
 	logger.Debug(insert.String())

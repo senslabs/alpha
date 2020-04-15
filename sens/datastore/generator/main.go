@@ -18,9 +18,9 @@ import (
 
 const (
 	host     = "localhost"
-	port     = 5432
-	user     = "postgres"
-	password = "Sens1234"
+	port     = 26257
+	user     = "root"
+	password = "nahinhai"
 	dbname   = "postgres"
 )
 
@@ -95,13 +95,14 @@ type FieldConstraint struct {
 func GetConstraintMap(db *sqlx.DB) map[string][]string {
 	var constraints []FieldConstraint
 	// query := `SELECT table_name, column_name, constraint_name FROM information_schema.constraint_column_usage WHERE table_catalog = 'postgres' AND constraint_name ='primary'`
-	query := `SELECT kcu.table_name, kcu.column_name, tco.constraint_name
+	query := `SELECT DISTINCT kcu.table_name, kcu.column_name, tco.constraint_name
 	FROM information_schema.table_constraints tco
 	JOIN information_schema.key_column_usage kcu 
 		 ON kcu.constraint_name = tco.constraint_name
 		 AND kcu.constraint_schema = tco.constraint_schema
 		 AND kcu.constraint_name = tco.constraint_name
-		 WHERE tco.constraint_type = 'PRIMARY KEY' ORDER BY kcu.table_schema, kcu.table_name`
+		 WHERE tco.constraint_type = 'PRIMARY KEY'`
+	//  ORDER BY kcu.table_schema, kcu.table_name`
 
 	err := db.Select(&constraints, query)
 	if err != nil {
@@ -268,6 +269,7 @@ func GenerateApi(table string, model string, hasId bool) {
 }
 
 func GenerateMain(models []string) {
+	log.Printf("%#v", models)
 	t, err := template.ParseFiles("templates/main.tpl")
 	if err != nil {
 		log.Fatal(err)
@@ -290,6 +292,7 @@ func Generate(schema string) {
 	defer db.Close()
 
 	mis := GetModelInfo(db, schema)
+	log.Printf("%#v", mis)
 	GenerateModels(db, schema, mis)
 	GenerateFunctions(db, schema, mis)
 

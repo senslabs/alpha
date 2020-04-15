@@ -88,7 +88,7 @@ func BatchInsertOrgEndpoint(data []byte) {
 		fmt.Fprint(insert, ")")
 	}
 
-	fmt.Fprint(insert, " ON CONFLICT(endpoint_id,org_id) DO UPDATE SET (", strings.Join(fields, ", "), ") = (EXCLUDED.", strings.Join(fields, ", EXCLUDED."), ")")
+	fmt.Fprint(insert, " ON CONFLICT(org_id,endpoint_id) DO UPDATE SET (", strings.Join(fields, ", "), ") = (EXCLUDED.", strings.Join(fields, ", EXCLUDED."), ")")
 
 
 	logger.Debug(insert.String())
