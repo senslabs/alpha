@@ -35,6 +35,7 @@ func PerformR(req *retryablehttp.Request, params HttpParams, headers HttpParams)
 	} else if b, err := ioutil.ReadAll(res.Body); err != nil {
 		return http.StatusInternalServerError, nil, errors.FromError(errors.GO_ERROR, err)
 	} else {
+		defer res.Body.Close()
 		return res.StatusCode, b, nil
 	}
 }
@@ -65,6 +66,7 @@ func Perform(req *retryablehttp.Request, params HttpParams, headers HttpParams, 
 	} else if err := types.JsonUnmarshalFromReader(res.Body, response); err != nil {
 		return http.StatusInternalServerError, err
 	} else {
+		defer res.Body.Close()
 		return res.StatusCode, nil
 	}
 }
