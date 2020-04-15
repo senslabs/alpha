@@ -165,6 +165,36 @@ func RowsToMap(r *sql.Rows, reverseFieldMap map[string]string, typeMap map[strin
 	return result
 }
 
+func RowsToMapReflect(rows *sql.Rows) []map[string]interface{} {
+	columns, err := rows.Columns()
+	errors.Pie(err)
+
+	var result []map[string]interface{}
+	values := make([]interface{}, len(columns))
+	valuePtrs := make([]interface{}, len(columns))
+	for rows.Next() {
+		for i := range columns {
+			valuePtrs[i] = &values[i]
+		}
+		rows.Scan(valuePtrs...)
+
+		m := map[string]interface{}{}
+		for i, col := range columns {
+			var v interface{}
+			val := values[i]
+			b, ok := val.([]byte)
+			if ok {
+				v = string(b)
+			} else {
+				v = val
+			}
+			m[col] = fmt.Sprintf("%s", v)
+		}
+		result = append(result, m)
+	}
+	return result
+}
+
 func TRACE(seq int, msg string) {
 	_, f, _, _ := runtime.Caller(1)
 	logger.Debugf("%d: [%s] :: %s in (%s)", seq, time.Now(), msg, filepath.Base(f))
