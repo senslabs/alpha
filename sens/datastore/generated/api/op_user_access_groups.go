@@ -74,5 +74,6 @@ func FindOpUserAccessGroup(w http.ResponseWriter, r *http.Request) {
 	order := values.Get("order")
 
 	m := fn.FindOpUserAccessGroup(or, and, in, span, limit, column, order)
+	logger.Debugf("RESPONSE of FindOpUserAccessGroup: %#v", m)
 	types.MarshalInto(m, w)
 }

@@ -74,5 +74,6 @@ func FindDeviceActivitie(w http.ResponseWriter, r *http.Request) {
 	order := values.Get("order")
 
 	m := fn.FindDeviceActivitie(or, and, in, span, limit, column, order)
+	logger.Debugf("RESPONSE of FindDeviceActivitie: %#v", m)
 	types.MarshalInto(m, w)
 }

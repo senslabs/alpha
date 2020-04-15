@@ -74,5 +74,6 @@ func FindAuthDetailView(w http.ResponseWriter, r *http.Request) {
 	order := values.Get("order")
 
 	m := fn.FindAuthDetailView(or, and, in, span, limit, column, order)
+	logger.Debugf("RESPONSE of FindAuthDetailView: %#v", m)
 	types.MarshalInto(m, w)
 }

@@ -74,5 +74,6 @@ func FindSessionRecord(w http.ResponseWriter, r *http.Request) {
 	order := values.Get("order")
 
 	m := fn.FindSessionRecord(or, and, in, span, limit, column, order)
+	logger.Debugf("RESPONSE of FindSessionRecord: %#v", m)
 	types.MarshalInto(m, w)
 }

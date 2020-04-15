@@ -74,5 +74,6 @@ func FindMeditationView(w http.ResponseWriter, r *http.Request) {
 	order := values.Get("order")
 
 	m := fn.FindMeditationView(or, and, in, span, limit, column, order)
+	logger.Debugf("RESPONSE of FindMeditationView: %#v", m)
 	types.MarshalInto(m, w)
 }

@@ -74,5 +74,6 @@ func FindUserSetting(w http.ResponseWriter, r *http.Request) {
 	order := values.Get("order")
 
 	m := fn.FindUserSetting(or, and, in, span, limit, column, order)
+	logger.Debugf("RESPONSE of FindUserSetting: %#v", m)
 	types.MarshalInto(m, w)
 }

@@ -74,5 +74,6 @@ func FindOrgEndpoint(w http.ResponseWriter, r *http.Request) {
 	order := values.Get("order")
 
 	m := fn.FindOrgEndpoint(or, and, in, span, limit, column, order)
+	logger.Debugf("RESPONSE of FindOrgEndpoint: %#v", m)
 	types.MarshalInto(m, w)
 }

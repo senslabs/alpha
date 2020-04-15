@@ -74,5 +74,6 @@ func FindUserAlertView(w http.ResponseWriter, r *http.Request) {
 	order := values.Get("order")
 
 	m := fn.FindUserAlertView(or, and, in, span, limit, column, order)
+	logger.Debugf("RESPONSE of FindUserAlertView: %#v", m)
 	types.MarshalInto(m, w)
 }

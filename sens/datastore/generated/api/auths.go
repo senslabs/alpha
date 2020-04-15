@@ -74,5 +74,6 @@ func FindAuth(w http.ResponseWriter, r *http.Request) {
 	order := values.Get("order")
 
 	m := fn.FindAuth(or, and, in, span, limit, column, order)
+	logger.Debugf("RESPONSE of FindAuth: %#v", m)
 	types.MarshalInto(m, w)
 }

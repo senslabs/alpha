@@ -74,5 +74,6 @@ func FindUserEndpointAccessGroup(w http.ResponseWriter, r *http.Request) {
 	order := values.Get("order")
 
 	m := fn.FindUserEndpointAccessGroup(or, and, in, span, limit, column, order)
+	logger.Debugf("RESPONSE of FindUserEndpointAccessGroup: %#v", m)
 	types.MarshalInto(m, w)
 }

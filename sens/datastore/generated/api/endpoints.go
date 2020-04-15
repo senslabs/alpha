@@ -74,5 +74,6 @@ func FindEndpoint(w http.ResponseWriter, r *http.Request) {
 	order := values.Get("order")
 
 	m := fn.FindEndpoint(or, and, in, span, limit, column, order)
+	logger.Debugf("RESPONSE of FindEndpoint: %#v", m)
 	types.MarshalInto(m, w)
 }

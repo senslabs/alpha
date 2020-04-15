@@ -95,5 +95,6 @@ func Find{{.Model}}(w http.ResponseWriter, r *http.Request) {
 	order := values.Get("order")
 
 	m := fn.Find{{.Model}}(or, and, in, span, limit, column, order)
+	logger.Debugf("RESPONSE of Find{{.Model}}: %#v", m)
 	types.MarshalInto(m, w)
 }

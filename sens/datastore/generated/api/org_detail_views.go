@@ -74,5 +74,6 @@ func FindOrgDetailView(w http.ResponseWriter, r *http.Request) {
 	order := values.Get("order")
 
 	m := fn.FindOrgDetailView(or, and, in, span, limit, column, order)
+	logger.Debugf("RESPONSE of FindOrgDetailView: %#v", m)
 	types.MarshalInto(m, w)
 }

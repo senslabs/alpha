@@ -74,5 +74,6 @@ func FindUserSleepView(w http.ResponseWriter, r *http.Request) {
 	order := values.Get("order")
 
 	m := fn.FindUserSleepView(or, and, in, span, limit, column, order)
+	logger.Debugf("RESPONSE of FindUserSleepView: %#v", m)
 	types.MarshalInto(m, w)
 }

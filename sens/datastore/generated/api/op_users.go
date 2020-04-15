@@ -74,5 +74,6 @@ func FindOpUser(w http.ResponseWriter, r *http.Request) {
 	order := values.Get("order")
 
 	m := fn.FindOpUser(or, and, in, span, limit, column, order)
+	logger.Debugf("RESPONSE of FindOpUser: %#v", m)
 	types.MarshalInto(m, w)
 }

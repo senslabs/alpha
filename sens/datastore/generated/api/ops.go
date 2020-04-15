@@ -74,5 +74,6 @@ func FindOp(w http.ResponseWriter, r *http.Request) {
 	order := values.Get("order")
 
 	m := fn.FindOp(or, and, in, span, limit, column, order)
+	logger.Debugf("RESPONSE of FindOp: %#v", m)
 	types.MarshalInto(m, w)
 }

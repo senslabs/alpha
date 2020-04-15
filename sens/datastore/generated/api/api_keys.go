@@ -74,5 +74,6 @@ func FindApiKey(w http.ResponseWriter, r *http.Request) {
 	order := values.Get("order")
 
 	m := fn.FindApiKey(or, and, in, span, limit, column, order)
+	logger.Debugf("RESPONSE of FindApiKey: %#v", m)
 	types.MarshalInto(m, w)
 }

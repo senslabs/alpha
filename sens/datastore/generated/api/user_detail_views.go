@@ -74,5 +74,6 @@ func FindUserDetailView(w http.ResponseWriter, r *http.Request) {
 	order := values.Get("order")
 
 	m := fn.FindUserDetailView(or, and, in, span, limit, column, order)
+	logger.Debugf("RESPONSE of FindUserDetailView: %#v", m)
 	types.MarshalInto(m, w)
 }

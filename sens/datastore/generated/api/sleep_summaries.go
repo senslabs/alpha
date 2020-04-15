@@ -74,5 +74,6 @@ func FindSleepSummarie(w http.ResponseWriter, r *http.Request) {
 	order := values.Get("order")
 
 	m := fn.FindSleepSummarie(or, and, in, span, limit, column, order)
+	logger.Debugf("RESPONSE of FindSleepSummarie: %#v", m)
 	types.MarshalInto(m, w)
 }
