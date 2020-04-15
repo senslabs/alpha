@@ -119,7 +119,7 @@ func UpdateVitalBaseline(id string, data []byte) {
 		}
 	}
 	values = append(values, id)
-	fmt.Fprint(update, " WHERE alert_id = $", phi)
+	fmt.Fprint(update, " WHERE vital_baseline_id = $", phi)
 
 	logger.Debug(update.String())
 
@@ -134,7 +134,7 @@ func UpdateVitalBaseline(id string, data []byte) {
 func SelectVitalBaseline(id string) map[string]interface{} {
 	db := datastore.GetConnection()
 
-	stmt, err := db.Prepare("SELECT * FROM vital_baselines WHERE alert_id = $1")
+	stmt, err := db.Prepare("SELECT * FROM vital_baselines WHERE vital_baseline_id = $1")
 	defer stmt.Close()
 	errors.Pie(err)
 

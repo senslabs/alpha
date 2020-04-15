@@ -119,7 +119,7 @@ func UpdateSession(id string, data []byte) {
 		}
 	}
 	values = append(values, id)
-	fmt.Fprint(update, " WHERE alert_id = $", phi)
+	fmt.Fprint(update, " WHERE session_id = $", phi)
 
 	logger.Debug(update.String())
 
@@ -134,7 +134,7 @@ func UpdateSession(id string, data []byte) {
 func SelectSession(id string) map[string]interface{} {
 	db := datastore.GetConnection()
 
-	stmt, err := db.Prepare("SELECT * FROM sessions WHERE alert_id = $1")
+	stmt, err := db.Prepare("SELECT * FROM sessions WHERE session_id = $1")
 	defer stmt.Close()
 	errors.Pie(err)
 

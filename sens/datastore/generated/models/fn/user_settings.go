@@ -119,7 +119,7 @@ func UpdateUserSetting(id string, data []byte) {
 		}
 	}
 	values = append(values, id)
-	fmt.Fprint(update, " WHERE alert_id = $", phi)
+	fmt.Fprint(update, " WHERE user_setting_id = $", phi)
 
 	logger.Debug(update.String())
 
@@ -134,7 +134,7 @@ func UpdateUserSetting(id string, data []byte) {
 func SelectUserSetting(id string) map[string]interface{} {
 	db := datastore.GetConnection()
 
-	stmt, err := db.Prepare("SELECT * FROM user_settings WHERE alert_id = $1")
+	stmt, err := db.Prepare("SELECT * FROM user_settings WHERE user_setting_id = $1")
 	defer stmt.Close()
 	errors.Pie(err)
 

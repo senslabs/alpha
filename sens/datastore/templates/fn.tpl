@@ -123,7 +123,7 @@ func Update{{.Model}}(id string, data []byte) {
 		}
 	}
 	values = append(values, id)
-	fmt.Fprint(update, " WHERE alert_id = $", phi)
+	fmt.Fprint(update, " WHERE {{.Table | singular}}_id = $", phi)
 
 	logger.Debug(update.String())
 
@@ -138,7 +138,7 @@ func Update{{.Model}}(id string, data []byte) {
 func Select{{.Model}}(id string) map[string]interface{} {
 	db := datastore.GetConnection()
 
-	stmt, err := db.Prepare("SELECT * FROM {{.Table}} WHERE alert_id = $1")
+	stmt, err := db.Prepare("SELECT * FROM {{.Table}} WHERE {{.Table | singular}}_id = $1")
 	defer stmt.Close()
 	errors.Pie(err)
 
