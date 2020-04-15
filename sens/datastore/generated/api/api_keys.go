@@ -17,6 +17,9 @@ func ApiKeyMain(r *mux.Router) {
 	r.HandleFunc("/api/api-keys/create", CreateApiKey)
 	r.HandleFunc("/api/api-keys/batch/create", BatchCreateApiKey)
 	
+	r.HandleFunc("/api/api-keys/{id}/update", UpdateApiKey)
+	r.HandleFunc("/api/api-keys/{id}/get", GetApiKey)
+    
 	r.HandleFunc("/api/api-keys/update", UpdateApiKeyWhere)
 	r.HandleFunc("/api/api-keys/find", FindApiKey).Queries("limit", "{limit}")
 }
@@ -46,6 +49,24 @@ func BatchCreateApiKey(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+
+func UpdateApiKey(w http.ResponseWriter, r *http.Request) {
+	defer ApiKeyRecovery(w)
+	vars := mux.Vars(r)
+	id := vars["id"]
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	fn.UpdateApiKey(id, data)
+	w.WriteHeader(http.StatusOK)
+}
+
+func GetApiKey(w http.ResponseWriter, r *http.Request) {
+	defer ApiKeyRecovery(w)
+	vars := mux.Vars(r)
+	id := vars["id"]
+	m := fn.SelectApiKey(id)
+	types.MarshalInto(m, w)
+}
 
 
 func UpdateApiKeyWhere(w http.ResponseWriter, r *http.Request) {

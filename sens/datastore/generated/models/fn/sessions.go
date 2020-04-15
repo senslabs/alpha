@@ -36,6 +36,8 @@ func InsertSession(data []byte) string {
 	fmt.Fprint(insert, ph, ")")
 
 	
+	fmt.Fprint(insert, " returning session_id")
+	
 
 	db := datastore.GetConnection()
 
@@ -46,9 +48,10 @@ func InsertSession(data []byte) string {
 	errors.Pie(err)
 
 	
-	_, err = stmt.Exec(values...)
-	errors.Pie(err)
-	return ""
+	var id string
+	r := stmt.QueryRow(values...)
+	errors.Pie(r.Scan(&id))
+	return id
 	
 }
 
@@ -97,6 +100,53 @@ func BatchInsertSession(data []byte) {
 }
 
 
+
+func UpdateSession(id string, data []byte) {
+	var j map[string]interface{}
+	types.Unmarshal(data, &j)
+
+	phi := 1
+	comma := ""
+	var values []interface{}
+	fieldMap := models.GetSessionFieldMap()
+	update := bytes.NewBufferString("UPDATE sessions SET ")
+	for k, v := range j {
+		if f, ok := fieldMap[k]; ok {
+			fmt.Fprint(update, comma, f, " = $", phi)
+			values = append(values, v)
+			comma = ", "
+			phi++
+		}
+	}
+	values = append(values, id)
+	fmt.Fprint(update, " WHERE alert_id = $", phi)
+
+	logger.Debug(update.String())
+
+	db := datastore.GetConnection()
+	stmt, err := db.Prepare(update.String())
+	defer stmt.Close()
+	errors.Pie(err)
+	_, err = stmt.Exec(values...)
+	errors.Pie(err)
+}
+
+func SelectSession(id string) map[string]interface{} {
+	db := datastore.GetConnection()
+
+	stmt, err := db.Prepare("SELECT * FROM sessions WHERE alert_id = $1")
+	defer stmt.Close()
+	errors.Pie(err)
+
+	r, err := stmt.Query(id)
+	errors.Pie(err)
+
+	result := datastore.RowsToMap(r, models.GetSessionReverseFieldMap(), models.GetSessionTypeMap())
+	if len(result) == 0 {
+		return map[string]interface{}{}
+	}
+	return result[0]
+}
 
 
 func buildSessionWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {

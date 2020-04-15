@@ -93,7 +93,15 @@ type FieldConstraint struct {
 //Update if a model has id or nit
 func GetConstraintMap(db *sqlx.DB) map[string][]string {
 	var constraints []FieldConstraint
-	query := `SELECT table_name, column_name, constraint_name FROM information_schema.constraint_column_usage WHERE table_catalog = 'postgres' AND constraint_name ='primary'`
+	// query := `SELECT table_name, column_name, constraint_name FROM information_schema.constraint_column_usage WHERE table_catalog = 'postgres' AND constraint_name ='primary'`
+	query := `SELECT kcu.table_name, kcu.column_name, tco.constraint_name
+	FROM information_schema.table_constraints tco
+	JOIN information_schema.key_column_usage kcu 
+		 ON kcu.constraint_name = tco.constraint_name
+		 AND kcu.constraint_schema = tco.constraint_schema
+		 AND kcu.constraint_name = tco.constraint_name
+		 WHERE tco.constraint_type = 'PRIMARY KEY' ORDER BY kcu.table_schema, kcu.table_name`
+
 	err := db.Select(&constraints, query)
 	if err != nil {
 		log.Fatal(err)

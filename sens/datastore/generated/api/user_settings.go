@@ -17,6 +17,9 @@ func UserSettingMain(r *mux.Router) {
 	r.HandleFunc("/api/user-settings/create", CreateUserSetting)
 	r.HandleFunc("/api/user-settings/batch/create", BatchCreateUserSetting)
 	
+	r.HandleFunc("/api/user-settings/{id}/update", UpdateUserSetting)
+	r.HandleFunc("/api/user-settings/{id}/get", GetUserSetting)
+    
 	r.HandleFunc("/api/user-settings/update", UpdateUserSettingWhere)
 	r.HandleFunc("/api/user-settings/find", FindUserSetting).Queries("limit", "{limit}")
 }
@@ -46,6 +49,24 @@ func BatchCreateUserSetting(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+
+func UpdateUserSetting(w http.ResponseWriter, r *http.Request) {
+	defer UserSettingRecovery(w)
+	vars := mux.Vars(r)
+	id := vars["id"]
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	fn.UpdateUserSetting(id, data)
+	w.WriteHeader(http.StatusOK)
+}
+
+func GetUserSetting(w http.ResponseWriter, r *http.Request) {
+	defer UserSettingRecovery(w)
+	vars := mux.Vars(r)
+	id := vars["id"]
+	m := fn.SelectUserSetting(id)
+	types.MarshalInto(m, w)
+}
 
 
 func UpdateUserSettingWhere(w http.ResponseWriter, r *http.Request) {

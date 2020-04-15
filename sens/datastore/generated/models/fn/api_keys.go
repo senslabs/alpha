@@ -36,6 +36,8 @@ func InsertApiKey(data []byte) string {
 	fmt.Fprint(insert, ph, ")")
 
 	
+	fmt.Fprint(insert, " returning api_key_id")
+	
 
 	db := datastore.GetConnection()
 
@@ -46,9 +48,10 @@ func InsertApiKey(data []byte) string {
 	errors.Pie(err)
 
 	
-	_, err = stmt.Exec(values...)
-	errors.Pie(err)
-	return ""
+	var id string
+	r := stmt.QueryRow(values...)
+	errors.Pie(r.Scan(&id))
+	return id
 	
 }
 
@@ -97,6 +100,53 @@ func BatchInsertApiKey(data []byte) {
 }
 
 
+
+func UpdateApiKey(id string, data []byte) {
+	var j map[string]interface{}
+	types.Unmarshal(data, &j)
+
+	phi := 1
+	comma := ""
+	var values []interface{}
+	fieldMap := models.GetApiKeyFieldMap()
+	update := bytes.NewBufferString("UPDATE api_keys SET ")
+	for k, v := range j {
+		if f, ok := fieldMap[k]; ok {
+			fmt.Fprint(update, comma, f, " = $", phi)
+			values = append(values, v)
+			comma = ", "
+			phi++
+		}
+	}
+	values = append(values, id)
+	fmt.Fprint(update, " WHERE alert_id = $", phi)
+
+	logger.Debug(update.String())
+
+	db := datastore.GetConnection()
+	stmt, err := db.Prepare(update.String())
+	defer stmt.Close()
+	errors.Pie(err)
+	_, err = stmt.Exec(values...)
+	errors.Pie(err)
+}
+
+func SelectApiKey(id string) map[string]interface{} {
+	db := datastore.GetConnection()
+
+	stmt, err := db.Prepare("SELECT * FROM api_keys WHERE alert_id = $1")
+	defer stmt.Close()
+	errors.Pie(err)
+
+	r, err := stmt.Query(id)
+	errors.Pie(err)
+
+	result := datastore.RowsToMap(r, models.GetApiKeyReverseFieldMap(), models.GetApiKeyTypeMap())
+	if len(result) == 0 {
+		return map[string]interface{}{}
+	}
+	return result[0]
+}
 
 
 func buildApiKeyWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {

@@ -17,6 +17,9 @@ func OrgMain(r *mux.Router) {
 	r.HandleFunc("/api/orgs/create", CreateOrg)
 	r.HandleFunc("/api/orgs/batch/create", BatchCreateOrg)
 	
+	r.HandleFunc("/api/orgs/{id}/update", UpdateOrg)
+	r.HandleFunc("/api/orgs/{id}/get", GetOrg)
+    
 	r.HandleFunc("/api/orgs/update", UpdateOrgWhere)
 	r.HandleFunc("/api/orgs/find", FindOrg).Queries("limit", "{limit}")
 }
@@ -46,6 +49,24 @@ func BatchCreateOrg(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+
+func UpdateOrg(w http.ResponseWriter, r *http.Request) {
+	defer OrgRecovery(w)
+	vars := mux.Vars(r)
+	id := vars["id"]
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	fn.UpdateOrg(id, data)
+	w.WriteHeader(http.StatusOK)
+}
+
+func GetOrg(w http.ResponseWriter, r *http.Request) {
+	defer OrgRecovery(w)
+	vars := mux.Vars(r)
+	id := vars["id"]
+	m := fn.SelectOrg(id)
+	types.MarshalInto(m, w)
+}
 
 
 func UpdateOrgWhere(w http.ResponseWriter, r *http.Request) {

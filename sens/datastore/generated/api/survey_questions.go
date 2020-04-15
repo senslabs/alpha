@@ -17,6 +17,9 @@ func SurveyQuestionMain(r *mux.Router) {
 	r.HandleFunc("/api/survey-questions/create", CreateSurveyQuestion)
 	r.HandleFunc("/api/survey-questions/batch/create", BatchCreateSurveyQuestion)
 	
+	r.HandleFunc("/api/survey-questions/{id}/update", UpdateSurveyQuestion)
+	r.HandleFunc("/api/survey-questions/{id}/get", GetSurveyQuestion)
+    
 	r.HandleFunc("/api/survey-questions/update", UpdateSurveyQuestionWhere)
 	r.HandleFunc("/api/survey-questions/find", FindSurveyQuestion).Queries("limit", "{limit}")
 }
@@ -46,6 +49,24 @@ func BatchCreateSurveyQuestion(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+
+func UpdateSurveyQuestion(w http.ResponseWriter, r *http.Request) {
+	defer SurveyQuestionRecovery(w)
+	vars := mux.Vars(r)
+	id := vars["id"]
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	fn.UpdateSurveyQuestion(id, data)
+	w.WriteHeader(http.StatusOK)
+}
+
+func GetSurveyQuestion(w http.ResponseWriter, r *http.Request) {
+	defer SurveyQuestionRecovery(w)
+	vars := mux.Vars(r)
+	id := vars["id"]
+	m := fn.SelectSurveyQuestion(id)
+	types.MarshalInto(m, w)
+}
 
 
 func UpdateSurveyQuestionWhere(w http.ResponseWriter, r *http.Request) {

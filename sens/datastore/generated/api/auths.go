@@ -17,6 +17,9 @@ func AuthMain(r *mux.Router) {
 	r.HandleFunc("/api/auths/create", CreateAuth)
 	r.HandleFunc("/api/auths/batch/create", BatchCreateAuth)
 	
+	r.HandleFunc("/api/auths/{id}/update", UpdateAuth)
+	r.HandleFunc("/api/auths/{id}/get", GetAuth)
+    
 	r.HandleFunc("/api/auths/update", UpdateAuthWhere)
 	r.HandleFunc("/api/auths/find", FindAuth).Queries("limit", "{limit}")
 }
@@ -46,6 +49,24 @@ func BatchCreateAuth(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+
+func UpdateAuth(w http.ResponseWriter, r *http.Request) {
+	defer AuthRecovery(w)
+	vars := mux.Vars(r)
+	id := vars["id"]
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	fn.UpdateAuth(id, data)
+	w.WriteHeader(http.StatusOK)
+}
+
+func GetAuth(w http.ResponseWriter, r *http.Request) {
+	defer AuthRecovery(w)
+	vars := mux.Vars(r)
+	id := vars["id"]
+	m := fn.SelectAuth(id)
+	types.MarshalInto(m, w)
+}
 
 
 func UpdateAuthWhere(w http.ResponseWriter, r *http.Request) {
