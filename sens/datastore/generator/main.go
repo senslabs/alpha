@@ -28,6 +28,7 @@ type ModelInfo struct {
 	Table string
 	Model string
 	HasId bool
+	Pk    []string
 }
 
 func GetModelInfo(db *sqlx.DB, schema string) []*ModelInfo {
@@ -163,8 +164,9 @@ func GenerateModel(db *sqlx.DB, schema string, mi *ModelInfo) string {
 	return st
 }
 
-func UpdateIdInfo(db *sqlx.DB, constraintsMap map[string][]string, mi *ModelInfo) {
+func UpdatePkInfo(db *sqlx.DB, constraintsMap map[string][]string, mi *ModelInfo) {
 	mi.HasId = len(constraintsMap[mi.Table]) == 1
+	mi.Pk = constraintsMap[mi.Table]
 }
 
 //Generate for all tables
@@ -172,7 +174,7 @@ func GenerateModels(db *sqlx.DB, schema string, mis []*ModelInfo) {
 	ms := []string{}
 	constraintsMap := GetConstraintMap(db)
 	for _, mi := range mis {
-		UpdateIdInfo(db, constraintsMap, mi)
+		UpdatePkInfo(db, constraintsMap, mi)
 		fmt.Printf("Table: %s, HasId: %t\n", mi.Table, mi.HasId)
 		m := GenerateModel(db, schema, mi)
 		ms = append(ms, m)
@@ -216,6 +218,7 @@ func GenerateFunction(schema string, mi *ModelInfo) {
 		"Table": mi.Table,
 		"Model": mi.Model,
 		"HasId": mi.HasId,
+		"Pk":    strings.Join(mi.Pk, ","),
 	})
 	if err != nil {
 		log.Fatal(err)

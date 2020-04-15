@@ -3,6 +3,7 @@ package fn
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"math/rand"
 
 	"github.com/lib/pq"
@@ -61,13 +62,15 @@ func BatchInsertApiKey(data []byte) {
 
 	comma := ""
 	var keys []string
+	var fields []string
 	fieldMap := models.GetApiKeyFieldMap()
 	typeMap := models.GetApiKeyTypeMap()
-	insert := bytes.NewBufferString("UPSERT INTO api_keys(")
+	insert := bytes.NewBufferString("INSERT INTO api_keys(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
 			keys = append(keys, k)
+			fields = append(fields, f)
 			comma = ", "
 		}
 	}
@@ -87,6 +90,9 @@ func BatchInsertApiKey(data []byte) {
 		}
 		fmt.Fprint(insert, ")")
 	}
+
+	fmt.Fprint(insert, " ON CONFLICT(api_key_id) DO UPDATE SET (", strings.Join(fields, ", "), ") = (EXCLUDED.", strings.Join(fields, ", EXCLUDED."), ")")
+
 
 	logger.Debug(insert.String())
 

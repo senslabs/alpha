@@ -25,7 +25,6 @@ func TestInsert(t *testing.T) {
 
 func TestBatchInsert(t *testing.T) {
 	logger.InitConsoleLogger()
-	os.Setenv("COCKROACH_PORT", "26256")
 	os.Setenv("LOG_LEVEL", "DEBUG")
 	body := `[
 		{
@@ -39,7 +38,7 @@ func TestBatchInsert(t *testing.T) {
 		{
 			"Key": "Points",
 			"UserId": "208cf5c8-0fa9-47d6-9ed8-ef5cdd2cb5d6",
-			"Timestamp": 1528236412,
+			"Timestamp": 1528236413,
 			"Properties": {
 				"heart": 22
 			}
@@ -47,7 +46,7 @@ func TestBatchInsert(t *testing.T) {
 		{
 			"Key": "Points",
 			"UserId": "208cf5c8-0fa9-47d6-9ed8-ef5cdd2cb5d6",
-			"Timestamp": 1528236413,
+			"Timestamp": 1528236414,
 			"Properties": {
 				"heart": 25
 			}

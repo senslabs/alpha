@@ -3,6 +3,7 @@ package fn
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"math/rand"
 
 	"github.com/lib/pq"
@@ -58,13 +59,15 @@ func BatchInsertUserMeditationView(data []byte) {
 
 	comma := ""
 	var keys []string
+	var fields []string
 	fieldMap := models.GetUserMeditationViewFieldMap()
 	typeMap := models.GetUserMeditationViewTypeMap()
-	insert := bytes.NewBufferString("UPSERT INTO user_meditation_views(")
+	insert := bytes.NewBufferString("INSERT INTO user_meditation_views(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
 			keys = append(keys, k)
+			fields = append(fields, f)
 			comma = ", "
 		}
 	}
@@ -84,6 +87,9 @@ func BatchInsertUserMeditationView(data []byte) {
 		}
 		fmt.Fprint(insert, ")")
 	}
+
+	fmt.Fprint(insert, " ON CONFLICT() DO UPDATE SET (", strings.Join(fields, ", "), ") = (EXCLUDED.", strings.Join(fields, ", EXCLUDED."), ")")
+
 
 	logger.Debug(insert.String())
 

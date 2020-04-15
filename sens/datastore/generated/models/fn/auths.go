@@ -3,6 +3,7 @@ package fn
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"math/rand"
 
 	"github.com/lib/pq"
@@ -61,13 +62,15 @@ func BatchInsertAuth(data []byte) {
 
 	comma := ""
 	var keys []string
+	var fields []string
 	fieldMap := models.GetAuthFieldMap()
 	typeMap := models.GetAuthTypeMap()
-	insert := bytes.NewBufferString("UPSERT INTO auths(")
+	insert := bytes.NewBufferString("INSERT INTO auths(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
 			keys = append(keys, k)
+			fields = append(fields, f)
 			comma = ", "
 		}
 	}
@@ -87,6 +90,9 @@ func BatchInsertAuth(data []byte) {
 		}
 		fmt.Fprint(insert, ")")
 	}
+
+	fmt.Fprint(insert, " ON CONFLICT(auth_id) DO UPDATE SET (", strings.Join(fields, ", "), ") = (EXCLUDED.", strings.Join(fields, ", EXCLUDED."), ")")
+
 
 	logger.Debug(insert.String())
 

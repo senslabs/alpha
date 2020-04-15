@@ -3,6 +3,7 @@ package fn
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"math/rand"
 
 	"github.com/lib/pq"
@@ -58,13 +59,15 @@ func BatchInsertSessionEvent(data []byte) {
 
 	comma := ""
 	var keys []string
+	var fields []string
 	fieldMap := models.GetSessionEventFieldMap()
 	typeMap := models.GetSessionEventTypeMap()
-	insert := bytes.NewBufferString("UPSERT INTO session_events(")
+	insert := bytes.NewBufferString("INSERT INTO session_events(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
 			keys = append(keys, k)
+			fields = append(fields, f)
 			comma = ", "
 		}
 	}
@@ -84,6 +87,9 @@ func BatchInsertSessionEvent(data []byte) {
 		}
 		fmt.Fprint(insert, ")")
 	}
+
+	fmt.Fprint(insert, " ON CONFLICT(user_id,started_at,key) DO UPDATE SET (", strings.Join(fields, ", "), ") = (EXCLUDED.", strings.Join(fields, ", EXCLUDED."), ")")
+
 
 	logger.Debug(insert.String())
 

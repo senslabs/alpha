@@ -3,6 +3,7 @@ package fn
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"math/rand"
 
 	"github.com/lib/pq"
@@ -58,13 +59,15 @@ func BatchInsertOpUserAccessGroup(data []byte) {
 
 	comma := ""
 	var keys []string
+	var fields []string
 	fieldMap := models.GetOpUserAccessGroupFieldMap()
 	typeMap := models.GetOpUserAccessGroupTypeMap()
-	insert := bytes.NewBufferString("UPSERT INTO op_user_access_groups(")
+	insert := bytes.NewBufferString("INSERT INTO op_user_access_groups(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
 			keys = append(keys, k)
+			fields = append(fields, f)
 			comma = ", "
 		}
 	}
@@ -84,6 +87,9 @@ func BatchInsertOpUserAccessGroup(data []byte) {
 		}
 		fmt.Fprint(insert, ")")
 	}
+
+	fmt.Fprint(insert, " ON CONFLICT(access_group,op_id) DO UPDATE SET (", strings.Join(fields, ", "), ") = (EXCLUDED.", strings.Join(fields, ", EXCLUDED."), ")")
+
 
 	logger.Debug(insert.String())
 

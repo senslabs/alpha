@@ -3,6 +3,7 @@ package fn
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"math/rand"
 
 	"github.com/lib/pq"
@@ -65,13 +66,15 @@ func BatchInsert{{.Model}}(data []byte) {
 
 	comma := ""
 	var keys []string
+	var fields []string
 	fieldMap := models.Get{{.Model}}FieldMap()
 	typeMap := models.Get{{.Model}}TypeMap()
-	insert := bytes.NewBufferString("UPSERT INTO {{.Table}}(")
+	insert := bytes.NewBufferString("INSERT INTO {{.Table}}(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
 			keys = append(keys, k)
+			fields = append(fields, f)
 			comma = ", "
 		}
 	}
@@ -91,6 +94,9 @@ func BatchInsert{{.Model}}(data []byte) {
 		}
 		fmt.Fprint(insert, ")")
 	}
+
+	fmt.Fprint(insert, " ON CONFLICT({{.Pk}}) DO UPDATE SET (", strings.Join(fields, ", "), ") = (EXCLUDED.", strings.Join(fields, ", EXCLUDED."), ")")
+
 
 	logger.Debug(insert.String())
 
