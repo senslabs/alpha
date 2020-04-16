@@ -109,8 +109,11 @@ func ConvertFieldValue(column string, v interface{}, typeMap map[string]string) 
 
 func getValue(column string, v interface{}, typeMap map[string]string) interface{} {
 	v = *(v.(*interface{}))
-	t := typeMap[column]
+	if v == nil {
+		return nil
+	}
 
+	t := typeMap[column]
 	switch t {
 	case "*string":
 	case "*int64":
