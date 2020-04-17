@@ -14,15 +14,15 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func InsertUserMeditationView(data []byte) string {
+func InsertOrgActivitySummaryView(data []byte) string {
 	j := types.UnmarshalMap(data)
 
 	phi := 1
 	comma := ""
 	var values []interface{}
-	fieldMap := models.GetUserMeditationViewFieldMap()
-	typeMap := models.GetUserMeditationViewTypeMap()
-	insert := bytes.NewBufferString("INSERT INTO user_meditation_views(")
+	fieldMap := models.GetOrgActivitySummaryViewFieldMap()
+	typeMap := models.GetOrgActivitySummaryViewTypeMap()
+	insert := bytes.NewBufferString("INSERT INTO org_activity_summary_views(")
 	ph := bytes.NewBufferString("VALUES(")
 	for k, v := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -53,16 +53,16 @@ func InsertUserMeditationView(data []byte) string {
 	
 }
 
-func BatchInsertUserMeditationView(data []byte) {
+func BatchInsertOrgActivitySummaryView(data []byte) {
 	var j []map[string]interface{}
 	types.Unmarshal(data, &j)
 
 	comma := ""
 	var keys []string
 	var fields []string
-	fieldMap := models.GetUserMeditationViewFieldMap()
-	typeMap := models.GetUserMeditationViewTypeMap()
-	insert := bytes.NewBufferString("INSERT INTO user_meditation_views(")
+	fieldMap := models.GetOrgActivitySummaryViewFieldMap()
+	typeMap := models.GetOrgActivitySummaryViewTypeMap()
+	insert := bytes.NewBufferString("INSERT INTO org_activity_summary_views(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
@@ -105,12 +105,12 @@ func BatchInsertUserMeditationView(data []byte) {
 
 
 
-func buildUserMeditationViewWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {
+func buildOrgActivitySummaryViewWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
 	ins := datastore.ParseInParams(in)
-	fieldMap := models.GetUserMeditationViewFieldMap()
+	fieldMap := models.GetOrgActivitySummaryViewFieldMap()
 
 	phi := len(*values) + 1
 	cond := ""
@@ -160,11 +160,11 @@ func buildUserMeditationViewWhereClause(query *bytes.Buffer, or []string, and []
 	fmt.Fprint(query, "1 = 1)")
 }
 
-func FindUserMeditationView(or []string, and []string, in string, span []string, limit string, column string, order string) []map[string]interface{} {
-	query := bytes.NewBufferString("SELECT * FROM user_meditation_views WHERE ")
-	fieldMap := models.GetUserMeditationViewFieldMap()
+func FindOrgActivitySummaryView(or []string, and []string, in string, span []string, limit string, column string, order string) []map[string]interface{} {
+	query := bytes.NewBufferString("SELECT * FROM org_activity_summary_views WHERE ")
+	fieldMap := models.GetOrgActivitySummaryViewFieldMap()
 	var values []interface{}
-	buildUserMeditationViewWhereClause(query, or, and, in, span, &values)
+	buildOrgActivitySummaryViewWhereClause(query, or, and, in, span, &values)
 	if column == "" {
 		column = "created_at"
 	}
@@ -192,17 +192,17 @@ func FindUserMeditationView(or []string, and []string, in string, span []string,
 	datastore.TRACE(seq, "4: <AFTER QUERY>")
 	errors.Pie(err)
 
-	result := datastore.RowsToMap(r, models.GetUserMeditationViewReverseFieldMap(), models.GetUserMeditationViewTypeMap())
+	result := datastore.RowsToMap(r, models.GetOrgActivitySummaryViewReverseFieldMap(), models.GetOrgActivitySummaryViewTypeMap())
 	datastore.TRACE(seq, "5: <RETURNING>")
 	return result
 }
 
-func UpdateUserMeditationViewWhere(or []string, and []string, in string, span []string, data []byte) {
+func UpdateOrgActivitySummaryViewWhere(or []string, and []string, in string, span []string, data []byte) {
 	var values []interface{}
 	j := types.UnmarshalMap(data)
-	fieldMap := models.GetUserMeditationViewFieldMap()
-	typeMap := models.GetUserMeditationViewTypeMap()
-	update := bytes.NewBufferString("UPDATE user_meditation_views SET ")
+	fieldMap := models.GetOrgActivitySummaryViewFieldMap()
+	typeMap := models.GetOrgActivitySummaryViewTypeMap()
+	update := bytes.NewBufferString("UPDATE org_activity_summary_views SET ")
 
 	phi := 1
 	comma := ""
@@ -216,7 +216,7 @@ func UpdateUserMeditationViewWhere(or []string, and []string, in string, span []
 	}
 
 	fmt.Fprint(update, " WHERE ")
-	buildUserMeditationViewWhereClause(update, or, and, in, span, &values)
+	buildOrgActivitySummaryViewWhereClause(update, or, and, in, span, &values)
 
 	logger.Debug(update.String())
 	logger.Debugf("Values: %#v", values)

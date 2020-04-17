@@ -186,42 +186,6 @@ WHERE
     'Score'
   );
 
-CREATE VIEW org_sleep_views AS
-SELECT
-  s.user_id,
-  (s.ended_at - s.started_at) AS duration,
-  json_build_object(sp.key, sp.value) AS properties,
-  sp.session_id
-FROM session_properties sp
-JOIN sessions s ON sp.session_id = s.session_id
-WHERE
-  s.session_type = 'Sleep' AND
-  sp.key IN (
-    'HeartRate',
-    'BreathRate',
-    'LastSyncedAt',
-    'Stress',
-    'Score'
-  );
-
-CREATE VIEW org_meditation_views AS
-SELECT
-  s.user_id,
-  (s.ended_at - s.started_at) AS duration,
-  json_build_object(sp.key, sp.value) AS properties,
-  sp.session_id
-FROM session_properties sp
-JOIN sessions s ON sp.session_id = s.session_id
-WHERE
-  s.session_type = 'Meditation' AND
-  sp.key IN (
-    'HeartRate',
-    'BreathRate',
-    'LastSyncedAt',
-    'Stress',
-    'Score'
-  );
-
 -- ACTIVITIES
 CREATE VIEW org_activity_views AS 
 SELECT t.activity_type, t.timestamp, t.user_id, u.org_id FROM

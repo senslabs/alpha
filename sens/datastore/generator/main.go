@@ -308,6 +308,7 @@ func Generate(schema string) {
 func main() {
 	log.SetFlags(log.Lshortfile)
 	schema := os.Args[1]
+	os.Mkdir("generated", 0777)
 	os.Mkdir("generated/api", 0777)
 	os.Mkdir("generated/main", 0777)
 	os.Mkdir("generated/models", 0777)

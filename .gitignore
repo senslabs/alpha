@@ -9,3 +9,4 @@ sens/datastore/generated/main/main
 *.test
 sens/.DS_Store
 sens/.DS_Store
+sens/datastore/generated/.DS_Store
