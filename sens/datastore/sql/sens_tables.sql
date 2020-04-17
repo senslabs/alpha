@@ -178,16 +178,16 @@ CREATE TABLE "session_settings" (
 CREATE TABLE "vital_baselines" (
   "vital_baseline_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "user_id" uuid,
-  "key" text,
-  "created_at" int,
-  "lower_limit" int,
-  "upper_limit" int
+  "key" text NOT NULL,
+  "created_at" int DEFAULT (now()::int),
+  "lower_limit" int NOT NULL,
+  "upper_limit" int NOT NULL
 );
 
 CREATE TABLE "session_events" (
   "user_id" uuid,
   "key" text,
-  "started_at" int,
+  "started_at" int NOT NULL,
   "ended_at" int,
   "properties" jsonb,
   PRIMARY KEY ("user_id", "key", "started_at")

@@ -14,15 +14,15 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func InsertUserAlertView(data []byte) string {
+func InsertOrgMeditationView(data []byte) string {
 	j := types.UnmarshalMap(data)
 
 	phi := 1
 	comma := ""
 	var values []interface{}
-	fieldMap := models.GetUserAlertViewFieldMap()
-	typeMap := models.GetUserAlertViewTypeMap()
-	insert := bytes.NewBufferString("INSERT INTO user_alert_views(")
+	fieldMap := models.GetOrgMeditationViewFieldMap()
+	typeMap := models.GetOrgMeditationViewTypeMap()
+	insert := bytes.NewBufferString("INSERT INTO org_meditation_views(")
 	ph := bytes.NewBufferString("VALUES(")
 	for k, v := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -53,16 +53,16 @@ func InsertUserAlertView(data []byte) string {
 	
 }
 
-func BatchInsertUserAlertView(data []byte) {
+func BatchInsertOrgMeditationView(data []byte) {
 	var j []map[string]interface{}
 	types.Unmarshal(data, &j)
 
 	comma := ""
 	var keys []string
 	var fields []string
-	fieldMap := models.GetUserAlertViewFieldMap()
-	typeMap := models.GetUserAlertViewTypeMap()
-	insert := bytes.NewBufferString("INSERT INTO user_alert_views(")
+	fieldMap := models.GetOrgMeditationViewFieldMap()
+	typeMap := models.GetOrgMeditationViewTypeMap()
+	insert := bytes.NewBufferString("INSERT INTO org_meditation_views(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
@@ -105,12 +105,12 @@ func BatchInsertUserAlertView(data []byte) {
 
 
 
-func buildUserAlertViewWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {
+func buildOrgMeditationViewWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
 	ins := datastore.ParseInParams(in)
-	fieldMap := models.GetUserAlertViewFieldMap()
+	fieldMap := models.GetOrgMeditationViewFieldMap()
 
 	phi := len(*values) + 1
 	cond := ""
@@ -160,11 +160,11 @@ func buildUserAlertViewWhereClause(query *bytes.Buffer, or []string, and []strin
 	fmt.Fprint(query, "1 = 1)")
 }
 
-func FindUserAlertView(or []string, and []string, in string, span []string, limit string, column string, order string) []map[string]interface{} {
-	query := bytes.NewBufferString("SELECT * FROM user_alert_views WHERE ")
-	fieldMap := models.GetUserAlertViewFieldMap()
+func FindOrgMeditationView(or []string, and []string, in string, span []string, limit string, column string, order string) []map[string]interface{} {
+	query := bytes.NewBufferString("SELECT * FROM org_meditation_views WHERE ")
+	fieldMap := models.GetOrgMeditationViewFieldMap()
 	var values []interface{}
-	buildUserAlertViewWhereClause(query, or, and, in, span, &values)
+	buildOrgMeditationViewWhereClause(query, or, and, in, span, &values)
 	if column == "" {
 		column = "created_at"
 	}
@@ -192,17 +192,17 @@ func FindUserAlertView(or []string, and []string, in string, span []string, limi
 	datastore.TRACE(seq, "4: <AFTER QUERY>")
 	errors.Pie(err)
 
-	result := datastore.RowsToMap(r, models.GetUserAlertViewReverseFieldMap(), models.GetUserAlertViewTypeMap())
+	result := datastore.RowsToMap(r, models.GetOrgMeditationViewReverseFieldMap(), models.GetOrgMeditationViewTypeMap())
 	datastore.TRACE(seq, "5: <RETURNING>")
 	return result
 }
 
-func UpdateUserAlertViewWhere(or []string, and []string, in string, span []string, data []byte) {
+func UpdateOrgMeditationViewWhere(or []string, and []string, in string, span []string, data []byte) {
 	var values []interface{}
 	j := types.UnmarshalMap(data)
-	fieldMap := models.GetUserAlertViewFieldMap()
-	typeMap := models.GetUserAlertViewTypeMap()
-	update := bytes.NewBufferString("UPDATE user_alert_views SET ")
+	fieldMap := models.GetOrgMeditationViewFieldMap()
+	typeMap := models.GetOrgMeditationViewTypeMap()
+	update := bytes.NewBufferString("UPDATE org_meditation_views SET ")
 
 	phi := 1
 	comma := ""
@@ -216,7 +216,7 @@ func UpdateUserAlertViewWhere(or []string, and []string, in string, span []strin
 	}
 
 	fmt.Fprint(update, " WHERE ")
-	buildUserAlertViewWhereClause(update, or, and, in, span, &values)
+	buildOrgMeditationViewWhereClause(update, or, and, in, span, &values)
 
 	logger.Debug(update.String())
 	logger.Debugf("Values: %#v", values)

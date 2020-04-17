@@ -14,15 +14,15 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func InsertUserSummaryView(data []byte) string {
+func InsertOrgSleepSummaryView(data []byte) string {
 	j := types.UnmarshalMap(data)
 
 	phi := 1
 	comma := ""
 	var values []interface{}
-	fieldMap := models.GetUserSummaryViewFieldMap()
-	typeMap := models.GetUserSummaryViewTypeMap()
-	insert := bytes.NewBufferString("INSERT INTO user_summary_views(")
+	fieldMap := models.GetOrgSleepSummaryViewFieldMap()
+	typeMap := models.GetOrgSleepSummaryViewTypeMap()
+	insert := bytes.NewBufferString("INSERT INTO org_sleep_summary_views(")
 	ph := bytes.NewBufferString("VALUES(")
 	for k, v := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -53,16 +53,16 @@ func InsertUserSummaryView(data []byte) string {
 	
 }
 
-func BatchInsertUserSummaryView(data []byte) {
+func BatchInsertOrgSleepSummaryView(data []byte) {
 	var j []map[string]interface{}
 	types.Unmarshal(data, &j)
 
 	comma := ""
 	var keys []string
 	var fields []string
-	fieldMap := models.GetUserSummaryViewFieldMap()
-	typeMap := models.GetUserSummaryViewTypeMap()
-	insert := bytes.NewBufferString("INSERT INTO user_summary_views(")
+	fieldMap := models.GetOrgSleepSummaryViewFieldMap()
+	typeMap := models.GetOrgSleepSummaryViewTypeMap()
+	insert := bytes.NewBufferString("INSERT INTO org_sleep_summary_views(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
@@ -105,12 +105,12 @@ func BatchInsertUserSummaryView(data []byte) {
 
 
 
-func buildUserSummaryViewWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {
+func buildOrgSleepSummaryViewWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
 	ins := datastore.ParseInParams(in)
-	fieldMap := models.GetUserSummaryViewFieldMap()
+	fieldMap := models.GetOrgSleepSummaryViewFieldMap()
 
 	phi := len(*values) + 1
 	cond := ""
@@ -160,11 +160,11 @@ func buildUserSummaryViewWhereClause(query *bytes.Buffer, or []string, and []str
 	fmt.Fprint(query, "1 = 1)")
 }
 
-func FindUserSummaryView(or []string, and []string, in string, span []string, limit string, column string, order string) []map[string]interface{} {
-	query := bytes.NewBufferString("SELECT * FROM user_summary_views WHERE ")
-	fieldMap := models.GetUserSummaryViewFieldMap()
+func FindOrgSleepSummaryView(or []string, and []string, in string, span []string, limit string, column string, order string) []map[string]interface{} {
+	query := bytes.NewBufferString("SELECT * FROM org_sleep_summary_views WHERE ")
+	fieldMap := models.GetOrgSleepSummaryViewFieldMap()
 	var values []interface{}
-	buildUserSummaryViewWhereClause(query, or, and, in, span, &values)
+	buildOrgSleepSummaryViewWhereClause(query, or, and, in, span, &values)
 	if column == "" {
 		column = "created_at"
 	}
@@ -192,17 +192,17 @@ func FindUserSummaryView(or []string, and []string, in string, span []string, li
 	datastore.TRACE(seq, "4: <AFTER QUERY>")
 	errors.Pie(err)
 
-	result := datastore.RowsToMap(r, models.GetUserSummaryViewReverseFieldMap(), models.GetUserSummaryViewTypeMap())
+	result := datastore.RowsToMap(r, models.GetOrgSleepSummaryViewReverseFieldMap(), models.GetOrgSleepSummaryViewTypeMap())
 	datastore.TRACE(seq, "5: <RETURNING>")
 	return result
 }
 
-func UpdateUserSummaryViewWhere(or []string, and []string, in string, span []string, data []byte) {
+func UpdateOrgSleepSummaryViewWhere(or []string, and []string, in string, span []string, data []byte) {
 	var values []interface{}
 	j := types.UnmarshalMap(data)
-	fieldMap := models.GetUserSummaryViewFieldMap()
-	typeMap := models.GetUserSummaryViewTypeMap()
-	update := bytes.NewBufferString("UPDATE user_summary_views SET ")
+	fieldMap := models.GetOrgSleepSummaryViewFieldMap()
+	typeMap := models.GetOrgSleepSummaryViewTypeMap()
+	update := bytes.NewBufferString("UPDATE org_sleep_summary_views SET ")
 
 	phi := 1
 	comma := ""
@@ -216,7 +216,7 @@ func UpdateUserSummaryViewWhere(or []string, and []string, in string, span []str
 	}
 
 	fmt.Fprint(update, " WHERE ")
-	buildUserSummaryViewWhereClause(update, or, and, in, span, &values)
+	buildOrgSleepSummaryViewWhereClause(update, or, and, in, span, &values)
 
 	logger.Debug(update.String())
 	logger.Debugf("Values: %#v", values)

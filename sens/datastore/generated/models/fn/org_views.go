@@ -14,15 +14,15 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func InsertSleepSummarie(data []byte) string {
+func InsertOrgView(data []byte) string {
 	j := types.UnmarshalMap(data)
 
 	phi := 1
 	comma := ""
 	var values []interface{}
-	fieldMap := models.GetSleepSummarieFieldMap()
-	typeMap := models.GetSleepSummarieTypeMap()
-	insert := bytes.NewBufferString("INSERT INTO sleep_summaries(")
+	fieldMap := models.GetOrgViewFieldMap()
+	typeMap := models.GetOrgViewTypeMap()
+	insert := bytes.NewBufferString("INSERT INTO org_views(")
 	ph := bytes.NewBufferString("VALUES(")
 	for k, v := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -53,16 +53,16 @@ func InsertSleepSummarie(data []byte) string {
 	
 }
 
-func BatchInsertSleepSummarie(data []byte) {
+func BatchInsertOrgView(data []byte) {
 	var j []map[string]interface{}
 	types.Unmarshal(data, &j)
 
 	comma := ""
 	var keys []string
 	var fields []string
-	fieldMap := models.GetSleepSummarieFieldMap()
-	typeMap := models.GetSleepSummarieTypeMap()
-	insert := bytes.NewBufferString("INSERT INTO sleep_summaries(")
+	fieldMap := models.GetOrgViewFieldMap()
+	typeMap := models.GetOrgViewTypeMap()
+	insert := bytes.NewBufferString("INSERT INTO org_views(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
@@ -105,12 +105,12 @@ func BatchInsertSleepSummarie(data []byte) {
 
 
 
-func buildSleepSummarieWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {
+func buildOrgViewWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
 	ins := datastore.ParseInParams(in)
-	fieldMap := models.GetSleepSummarieFieldMap()
+	fieldMap := models.GetOrgViewFieldMap()
 
 	phi := len(*values) + 1
 	cond := ""
@@ -160,11 +160,11 @@ func buildSleepSummarieWhereClause(query *bytes.Buffer, or []string, and []strin
 	fmt.Fprint(query, "1 = 1)")
 }
 
-func FindSleepSummarie(or []string, and []string, in string, span []string, limit string, column string, order string) []map[string]interface{} {
-	query := bytes.NewBufferString("SELECT * FROM sleep_summaries WHERE ")
-	fieldMap := models.GetSleepSummarieFieldMap()
+func FindOrgView(or []string, and []string, in string, span []string, limit string, column string, order string) []map[string]interface{} {
+	query := bytes.NewBufferString("SELECT * FROM org_views WHERE ")
+	fieldMap := models.GetOrgViewFieldMap()
 	var values []interface{}
-	buildSleepSummarieWhereClause(query, or, and, in, span, &values)
+	buildOrgViewWhereClause(query, or, and, in, span, &values)
 	if column == "" {
 		column = "created_at"
 	}
@@ -192,17 +192,17 @@ func FindSleepSummarie(or []string, and []string, in string, span []string, limi
 	datastore.TRACE(seq, "4: <AFTER QUERY>")
 	errors.Pie(err)
 
-	result := datastore.RowsToMap(r, models.GetSleepSummarieReverseFieldMap(), models.GetSleepSummarieTypeMap())
+	result := datastore.RowsToMap(r, models.GetOrgViewReverseFieldMap(), models.GetOrgViewTypeMap())
 	datastore.TRACE(seq, "5: <RETURNING>")
 	return result
 }
 
-func UpdateSleepSummarieWhere(or []string, and []string, in string, span []string, data []byte) {
+func UpdateOrgViewWhere(or []string, and []string, in string, span []string, data []byte) {
 	var values []interface{}
 	j := types.UnmarshalMap(data)
-	fieldMap := models.GetSleepSummarieFieldMap()
-	typeMap := models.GetSleepSummarieTypeMap()
-	update := bytes.NewBufferString("UPDATE sleep_summaries SET ")
+	fieldMap := models.GetOrgViewFieldMap()
+	typeMap := models.GetOrgViewTypeMap()
+	update := bytes.NewBufferString("UPDATE org_views SET ")
 
 	phi := 1
 	comma := ""
@@ -216,7 +216,7 @@ func UpdateSleepSummarieWhere(or []string, and []string, in string, span []strin
 	}
 
 	fmt.Fprint(update, " WHERE ")
-	buildSleepSummarieWhereClause(update, or, and, in, span, &values)
+	buildOrgViewWhereClause(update, or, and, in, span, &values)
 
 	logger.Debug(update.String())
 	logger.Debugf("Values: %#v", values)

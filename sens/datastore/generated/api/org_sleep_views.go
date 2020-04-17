@@ -13,15 +13,15 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func SleepSummarieMain(r *mux.Router) {
-	r.HandleFunc("/api/sleep-summaries/create", CreateSleepSummarie)
-	r.HandleFunc("/api/sleep-summaries/batch/create", BatchCreateSleepSummarie)
+func OrgSleepViewMain(r *mux.Router) {
+	r.HandleFunc("/api/org-sleep-views/create", CreateOrgSleepView)
+	r.HandleFunc("/api/org-sleep-views/batch/create", BatchCreateOrgSleepView)
 	
-	r.HandleFunc("/api/sleep-summaries/update", UpdateSleepSummarieWhere)
-	r.HandleFunc("/api/sleep-summaries/find", FindSleepSummarie).Queries("limit", "{limit}")
+	r.HandleFunc("/api/org-sleep-views/update", UpdateOrgSleepViewWhere)
+	r.HandleFunc("/api/org-sleep-views/find", FindOrgSleepView).Queries("limit", "{limit}")
 }
 
-func SleepSummarieRecovery(w http.ResponseWriter) {
+func OrgSleepViewRecovery(w http.ResponseWriter) {
 	if r := recover(); r != nil {
 		err := r.(error)
 		logger.Error(err)
@@ -29,27 +29,27 @@ func SleepSummarieRecovery(w http.ResponseWriter) {
 	}
 }
 
-func CreateSleepSummarie(w http.ResponseWriter, r *http.Request) {
-	defer SleepSummarieRecovery(w)
+func CreateOrgSleepView(w http.ResponseWriter, r *http.Request) {
+	defer OrgSleepViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
-	id := fn.InsertSleepSummarie(data)
+	id := fn.InsertOrgSleepView(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
 }
 
-func BatchCreateSleepSummarie(w http.ResponseWriter, r *http.Request) {
-	defer SleepSummarieRecovery(w)
+func BatchCreateOrgSleepView(w http.ResponseWriter, r *http.Request) {
+	defer OrgSleepViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
-	fn.BatchInsertSleepSummarie(data)
+	fn.BatchInsertOrgSleepView(data)
 	w.WriteHeader(http.StatusOK)
 }
 
 
 
-func UpdateSleepSummarieWhere(w http.ResponseWriter, r *http.Request) {
-	defer SleepSummarieRecovery(w)
+func UpdateOrgSleepViewWhere(w http.ResponseWriter, r *http.Request) {
+	defer OrgSleepViewRecovery(w)
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -58,12 +58,12 @@ func UpdateSleepSummarieWhere(w http.ResponseWriter, r *http.Request) {
 
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
-	fn.UpdateSleepSummarieWhere(or, and, in, span, data)
+	fn.UpdateOrgSleepViewWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)
 }
 
-func FindSleepSummarie(w http.ResponseWriter, r *http.Request) {
-	defer SleepSummarieRecovery(w)
+func FindOrgSleepView(w http.ResponseWriter, r *http.Request) {
+	defer OrgSleepViewRecovery(w)
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -73,7 +73,7 @@ func FindSleepSummarie(w http.ResponseWriter, r *http.Request) {
 	column := values.Get("column")
 	order := values.Get("order")
 
-	m := fn.FindSleepSummarie(or, and, in, span, limit, column, order)
-	logger.Debugf("RESPONSE of FindSleepSummarie: %#v", m)
+	m := fn.FindOrgSleepView(or, and, in, span, limit, column, order)
+	logger.Debugf("RESPONSE of FindOrgSleepView: %#v", m)
 	types.MarshalInto(m, w)
 }

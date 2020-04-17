@@ -14,15 +14,15 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func InsertUserDetailView(data []byte) string {
+func InsertOrgSessionRecordView(data []byte) string {
 	j := types.UnmarshalMap(data)
 
 	phi := 1
 	comma := ""
 	var values []interface{}
-	fieldMap := models.GetUserDetailViewFieldMap()
-	typeMap := models.GetUserDetailViewTypeMap()
-	insert := bytes.NewBufferString("INSERT INTO user_detail_views(")
+	fieldMap := models.GetOrgSessionRecordViewFieldMap()
+	typeMap := models.GetOrgSessionRecordViewTypeMap()
+	insert := bytes.NewBufferString("INSERT INTO org_session_record_views(")
 	ph := bytes.NewBufferString("VALUES(")
 	for k, v := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -53,16 +53,16 @@ func InsertUserDetailView(data []byte) string {
 	
 }
 
-func BatchInsertUserDetailView(data []byte) {
+func BatchInsertOrgSessionRecordView(data []byte) {
 	var j []map[string]interface{}
 	types.Unmarshal(data, &j)
 
 	comma := ""
 	var keys []string
 	var fields []string
-	fieldMap := models.GetUserDetailViewFieldMap()
-	typeMap := models.GetUserDetailViewTypeMap()
-	insert := bytes.NewBufferString("INSERT INTO user_detail_views(")
+	fieldMap := models.GetOrgSessionRecordViewFieldMap()
+	typeMap := models.GetOrgSessionRecordViewTypeMap()
+	insert := bytes.NewBufferString("INSERT INTO org_session_record_views(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
@@ -105,12 +105,12 @@ func BatchInsertUserDetailView(data []byte) {
 
 
 
-func buildUserDetailViewWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {
+func buildOrgSessionRecordViewWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
 	ins := datastore.ParseInParams(in)
-	fieldMap := models.GetUserDetailViewFieldMap()
+	fieldMap := models.GetOrgSessionRecordViewFieldMap()
 
 	phi := len(*values) + 1
 	cond := ""
@@ -160,11 +160,11 @@ func buildUserDetailViewWhereClause(query *bytes.Buffer, or []string, and []stri
 	fmt.Fprint(query, "1 = 1)")
 }
 
-func FindUserDetailView(or []string, and []string, in string, span []string, limit string, column string, order string) []map[string]interface{} {
-	query := bytes.NewBufferString("SELECT * FROM user_detail_views WHERE ")
-	fieldMap := models.GetUserDetailViewFieldMap()
+func FindOrgSessionRecordView(or []string, and []string, in string, span []string, limit string, column string, order string) []map[string]interface{} {
+	query := bytes.NewBufferString("SELECT * FROM org_session_record_views WHERE ")
+	fieldMap := models.GetOrgSessionRecordViewFieldMap()
 	var values []interface{}
-	buildUserDetailViewWhereClause(query, or, and, in, span, &values)
+	buildOrgSessionRecordViewWhereClause(query, or, and, in, span, &values)
 	if column == "" {
 		column = "created_at"
 	}
@@ -192,17 +192,17 @@ func FindUserDetailView(or []string, and []string, in string, span []string, lim
 	datastore.TRACE(seq, "4: <AFTER QUERY>")
 	errors.Pie(err)
 
-	result := datastore.RowsToMap(r, models.GetUserDetailViewReverseFieldMap(), models.GetUserDetailViewTypeMap())
+	result := datastore.RowsToMap(r, models.GetOrgSessionRecordViewReverseFieldMap(), models.GetOrgSessionRecordViewTypeMap())
 	datastore.TRACE(seq, "5: <RETURNING>")
 	return result
 }
 
-func UpdateUserDetailViewWhere(or []string, and []string, in string, span []string, data []byte) {
+func UpdateOrgSessionRecordViewWhere(or []string, and []string, in string, span []string, data []byte) {
 	var values []interface{}
 	j := types.UnmarshalMap(data)
-	fieldMap := models.GetUserDetailViewFieldMap()
-	typeMap := models.GetUserDetailViewTypeMap()
-	update := bytes.NewBufferString("UPDATE user_detail_views SET ")
+	fieldMap := models.GetOrgSessionRecordViewFieldMap()
+	typeMap := models.GetOrgSessionRecordViewTypeMap()
+	update := bytes.NewBufferString("UPDATE org_session_record_views SET ")
 
 	phi := 1
 	comma := ""
@@ -216,7 +216,7 @@ func UpdateUserDetailViewWhere(or []string, and []string, in string, span []stri
 	}
 
 	fmt.Fprint(update, " WHERE ")
-	buildUserDetailViewWhereClause(update, or, and, in, span, &values)
+	buildOrgSessionRecordViewWhereClause(update, or, and, in, span, &values)
 
 	logger.Debug(update.String())
 	logger.Debugf("Values: %#v", values)

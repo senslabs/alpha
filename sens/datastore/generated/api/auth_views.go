@@ -13,15 +13,15 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func SleepViewMain(r *mux.Router) {
-	r.HandleFunc("/api/sleep-views/create", CreateSleepView)
-	r.HandleFunc("/api/sleep-views/batch/create", BatchCreateSleepView)
+func AuthViewMain(r *mux.Router) {
+	r.HandleFunc("/api/auth-views/create", CreateAuthView)
+	r.HandleFunc("/api/auth-views/batch/create", BatchCreateAuthView)
 	
-	r.HandleFunc("/api/sleep-views/update", UpdateSleepViewWhere)
-	r.HandleFunc("/api/sleep-views/find", FindSleepView).Queries("limit", "{limit}")
+	r.HandleFunc("/api/auth-views/update", UpdateAuthViewWhere)
+	r.HandleFunc("/api/auth-views/find", FindAuthView).Queries("limit", "{limit}")
 }
 
-func SleepViewRecovery(w http.ResponseWriter) {
+func AuthViewRecovery(w http.ResponseWriter) {
 	if r := recover(); r != nil {
 		err := r.(error)
 		logger.Error(err)
@@ -29,27 +29,27 @@ func SleepViewRecovery(w http.ResponseWriter) {
 	}
 }
 
-func CreateSleepView(w http.ResponseWriter, r *http.Request) {
-	defer SleepViewRecovery(w)
+func CreateAuthView(w http.ResponseWriter, r *http.Request) {
+	defer AuthViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
-	id := fn.InsertSleepView(data)
+	id := fn.InsertAuthView(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
 }
 
-func BatchCreateSleepView(w http.ResponseWriter, r *http.Request) {
-	defer SleepViewRecovery(w)
+func BatchCreateAuthView(w http.ResponseWriter, r *http.Request) {
+	defer AuthViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
-	fn.BatchInsertSleepView(data)
+	fn.BatchInsertAuthView(data)
 	w.WriteHeader(http.StatusOK)
 }
 
 
 
-func UpdateSleepViewWhere(w http.ResponseWriter, r *http.Request) {
-	defer SleepViewRecovery(w)
+func UpdateAuthViewWhere(w http.ResponseWriter, r *http.Request) {
+	defer AuthViewRecovery(w)
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -58,12 +58,12 @@ func UpdateSleepViewWhere(w http.ResponseWriter, r *http.Request) {
 
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
-	fn.UpdateSleepViewWhere(or, and, in, span, data)
+	fn.UpdateAuthViewWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)
 }
 
-func FindSleepView(w http.ResponseWriter, r *http.Request) {
-	defer SleepViewRecovery(w)
+func FindAuthView(w http.ResponseWriter, r *http.Request) {
+	defer AuthViewRecovery(w)
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -73,7 +73,7 @@ func FindSleepView(w http.ResponseWriter, r *http.Request) {
 	column := values.Get("column")
 	order := values.Get("order")
 
-	m := fn.FindSleepView(or, and, in, span, limit, column, order)
-	logger.Debugf("RESPONSE of FindSleepView: %#v", m)
+	m := fn.FindAuthView(or, and, in, span, limit, column, order)
+	logger.Debugf("RESPONSE of FindAuthView: %#v", m)
 	types.MarshalInto(m, w)
 }

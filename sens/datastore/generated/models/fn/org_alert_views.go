@@ -14,15 +14,15 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func InsertOpDetailView(data []byte) string {
+func InsertOrgAlertView(data []byte) string {
 	j := types.UnmarshalMap(data)
 
 	phi := 1
 	comma := ""
 	var values []interface{}
-	fieldMap := models.GetOpDetailViewFieldMap()
-	typeMap := models.GetOpDetailViewTypeMap()
-	insert := bytes.NewBufferString("INSERT INTO op_detail_views(")
+	fieldMap := models.GetOrgAlertViewFieldMap()
+	typeMap := models.GetOrgAlertViewTypeMap()
+	insert := bytes.NewBufferString("INSERT INTO org_alert_views(")
 	ph := bytes.NewBufferString("VALUES(")
 	for k, v := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -53,16 +53,16 @@ func InsertOpDetailView(data []byte) string {
 	
 }
 
-func BatchInsertOpDetailView(data []byte) {
+func BatchInsertOrgAlertView(data []byte) {
 	var j []map[string]interface{}
 	types.Unmarshal(data, &j)
 
 	comma := ""
 	var keys []string
 	var fields []string
-	fieldMap := models.GetOpDetailViewFieldMap()
-	typeMap := models.GetOpDetailViewTypeMap()
-	insert := bytes.NewBufferString("INSERT INTO op_detail_views(")
+	fieldMap := models.GetOrgAlertViewFieldMap()
+	typeMap := models.GetOrgAlertViewTypeMap()
+	insert := bytes.NewBufferString("INSERT INTO org_alert_views(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
@@ -105,12 +105,12 @@ func BatchInsertOpDetailView(data []byte) {
 
 
 
-func buildOpDetailViewWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {
+func buildOrgAlertViewWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
 	ins := datastore.ParseInParams(in)
-	fieldMap := models.GetOpDetailViewFieldMap()
+	fieldMap := models.GetOrgAlertViewFieldMap()
 
 	phi := len(*values) + 1
 	cond := ""
@@ -160,11 +160,11 @@ func buildOpDetailViewWhereClause(query *bytes.Buffer, or []string, and []string
 	fmt.Fprint(query, "1 = 1)")
 }
 
-func FindOpDetailView(or []string, and []string, in string, span []string, limit string, column string, order string) []map[string]interface{} {
-	query := bytes.NewBufferString("SELECT * FROM op_detail_views WHERE ")
-	fieldMap := models.GetOpDetailViewFieldMap()
+func FindOrgAlertView(or []string, and []string, in string, span []string, limit string, column string, order string) []map[string]interface{} {
+	query := bytes.NewBufferString("SELECT * FROM org_alert_views WHERE ")
+	fieldMap := models.GetOrgAlertViewFieldMap()
 	var values []interface{}
-	buildOpDetailViewWhereClause(query, or, and, in, span, &values)
+	buildOrgAlertViewWhereClause(query, or, and, in, span, &values)
 	if column == "" {
 		column = "created_at"
 	}
@@ -192,17 +192,17 @@ func FindOpDetailView(or []string, and []string, in string, span []string, limit
 	datastore.TRACE(seq, "4: <AFTER QUERY>")
 	errors.Pie(err)
 
-	result := datastore.RowsToMap(r, models.GetOpDetailViewReverseFieldMap(), models.GetOpDetailViewTypeMap())
+	result := datastore.RowsToMap(r, models.GetOrgAlertViewReverseFieldMap(), models.GetOrgAlertViewTypeMap())
 	datastore.TRACE(seq, "5: <RETURNING>")
 	return result
 }
 
-func UpdateOpDetailViewWhere(or []string, and []string, in string, span []string, data []byte) {
+func UpdateOrgAlertViewWhere(or []string, and []string, in string, span []string, data []byte) {
 	var values []interface{}
 	j := types.UnmarshalMap(data)
-	fieldMap := models.GetOpDetailViewFieldMap()
-	typeMap := models.GetOpDetailViewTypeMap()
-	update := bytes.NewBufferString("UPDATE op_detail_views SET ")
+	fieldMap := models.GetOrgAlertViewFieldMap()
+	typeMap := models.GetOrgAlertViewTypeMap()
+	update := bytes.NewBufferString("UPDATE org_alert_views SET ")
 
 	phi := 1
 	comma := ""
@@ -216,7 +216,7 @@ func UpdateOpDetailViewWhere(or []string, and []string, in string, span []string
 	}
 
 	fmt.Fprint(update, " WHERE ")
-	buildOpDetailViewWhereClause(update, or, and, in, span, &values)
+	buildOrgAlertViewWhereClause(update, or, and, in, span, &values)
 
 	logger.Debug(update.String())
 	logger.Debugf("Values: %#v", values)

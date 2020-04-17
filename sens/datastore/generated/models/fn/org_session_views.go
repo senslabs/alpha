@@ -14,15 +14,15 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func InsertAuthDetailView(data []byte) string {
+func InsertOrgSessionView(data []byte) string {
 	j := types.UnmarshalMap(data)
 
 	phi := 1
 	comma := ""
 	var values []interface{}
-	fieldMap := models.GetAuthDetailViewFieldMap()
-	typeMap := models.GetAuthDetailViewTypeMap()
-	insert := bytes.NewBufferString("INSERT INTO auth_detail_views(")
+	fieldMap := models.GetOrgSessionViewFieldMap()
+	typeMap := models.GetOrgSessionViewTypeMap()
+	insert := bytes.NewBufferString("INSERT INTO org_session_views(")
 	ph := bytes.NewBufferString("VALUES(")
 	for k, v := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -53,16 +53,16 @@ func InsertAuthDetailView(data []byte) string {
 	
 }
 
-func BatchInsertAuthDetailView(data []byte) {
+func BatchInsertOrgSessionView(data []byte) {
 	var j []map[string]interface{}
 	types.Unmarshal(data, &j)
 
 	comma := ""
 	var keys []string
 	var fields []string
-	fieldMap := models.GetAuthDetailViewFieldMap()
-	typeMap := models.GetAuthDetailViewTypeMap()
-	insert := bytes.NewBufferString("INSERT INTO auth_detail_views(")
+	fieldMap := models.GetOrgSessionViewFieldMap()
+	typeMap := models.GetOrgSessionViewTypeMap()
+	insert := bytes.NewBufferString("INSERT INTO org_session_views(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
@@ -105,12 +105,12 @@ func BatchInsertAuthDetailView(data []byte) {
 
 
 
-func buildAuthDetailViewWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {
+func buildOrgSessionViewWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
 	ins := datastore.ParseInParams(in)
-	fieldMap := models.GetAuthDetailViewFieldMap()
+	fieldMap := models.GetOrgSessionViewFieldMap()
 
 	phi := len(*values) + 1
 	cond := ""
@@ -160,11 +160,11 @@ func buildAuthDetailViewWhereClause(query *bytes.Buffer, or []string, and []stri
 	fmt.Fprint(query, "1 = 1)")
 }
 
-func FindAuthDetailView(or []string, and []string, in string, span []string, limit string, column string, order string) []map[string]interface{} {
-	query := bytes.NewBufferString("SELECT * FROM auth_detail_views WHERE ")
-	fieldMap := models.GetAuthDetailViewFieldMap()
+func FindOrgSessionView(or []string, and []string, in string, span []string, limit string, column string, order string) []map[string]interface{} {
+	query := bytes.NewBufferString("SELECT * FROM org_session_views WHERE ")
+	fieldMap := models.GetOrgSessionViewFieldMap()
 	var values []interface{}
-	buildAuthDetailViewWhereClause(query, or, and, in, span, &values)
+	buildOrgSessionViewWhereClause(query, or, and, in, span, &values)
 	if column == "" {
 		column = "created_at"
 	}
@@ -192,17 +192,17 @@ func FindAuthDetailView(or []string, and []string, in string, span []string, lim
 	datastore.TRACE(seq, "4: <AFTER QUERY>")
 	errors.Pie(err)
 
-	result := datastore.RowsToMap(r, models.GetAuthDetailViewReverseFieldMap(), models.GetAuthDetailViewTypeMap())
+	result := datastore.RowsToMap(r, models.GetOrgSessionViewReverseFieldMap(), models.GetOrgSessionViewTypeMap())
 	datastore.TRACE(seq, "5: <RETURNING>")
 	return result
 }
 
-func UpdateAuthDetailViewWhere(or []string, and []string, in string, span []string, data []byte) {
+func UpdateOrgSessionViewWhere(or []string, and []string, in string, span []string, data []byte) {
 	var values []interface{}
 	j := types.UnmarshalMap(data)
-	fieldMap := models.GetAuthDetailViewFieldMap()
-	typeMap := models.GetAuthDetailViewTypeMap()
-	update := bytes.NewBufferString("UPDATE auth_detail_views SET ")
+	fieldMap := models.GetOrgSessionViewFieldMap()
+	typeMap := models.GetOrgSessionViewTypeMap()
+	update := bytes.NewBufferString("UPDATE org_session_views SET ")
 
 	phi := 1
 	comma := ""
@@ -216,7 +216,7 @@ func UpdateAuthDetailViewWhere(or []string, and []string, in string, span []stri
 	}
 
 	fmt.Fprint(update, " WHERE ")
-	buildAuthDetailViewWhereClause(update, or, and, in, span, &values)
+	buildOrgSessionViewWhereClause(update, or, and, in, span, &values)
 
 	logger.Debug(update.String())
 	logger.Debugf("Values: %#v", values)

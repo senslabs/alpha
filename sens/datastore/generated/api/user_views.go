@@ -13,15 +13,15 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func OrgDetailViewMain(r *mux.Router) {
-	r.HandleFunc("/api/org-detail-views/create", CreateOrgDetailView)
-	r.HandleFunc("/api/org-detail-views/batch/create", BatchCreateOrgDetailView)
+func UserViewMain(r *mux.Router) {
+	r.HandleFunc("/api/user-views/create", CreateUserView)
+	r.HandleFunc("/api/user-views/batch/create", BatchCreateUserView)
 	
-	r.HandleFunc("/api/org-detail-views/update", UpdateOrgDetailViewWhere)
-	r.HandleFunc("/api/org-detail-views/find", FindOrgDetailView).Queries("limit", "{limit}")
+	r.HandleFunc("/api/user-views/update", UpdateUserViewWhere)
+	r.HandleFunc("/api/user-views/find", FindUserView).Queries("limit", "{limit}")
 }
 
-func OrgDetailViewRecovery(w http.ResponseWriter) {
+func UserViewRecovery(w http.ResponseWriter) {
 	if r := recover(); r != nil {
 		err := r.(error)
 		logger.Error(err)
@@ -29,27 +29,27 @@ func OrgDetailViewRecovery(w http.ResponseWriter) {
 	}
 }
 
-func CreateOrgDetailView(w http.ResponseWriter, r *http.Request) {
-	defer OrgDetailViewRecovery(w)
+func CreateUserView(w http.ResponseWriter, r *http.Request) {
+	defer UserViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
-	id := fn.InsertOrgDetailView(data)
+	id := fn.InsertUserView(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
 }
 
-func BatchCreateOrgDetailView(w http.ResponseWriter, r *http.Request) {
-	defer OrgDetailViewRecovery(w)
+func BatchCreateUserView(w http.ResponseWriter, r *http.Request) {
+	defer UserViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
-	fn.BatchInsertOrgDetailView(data)
+	fn.BatchInsertUserView(data)
 	w.WriteHeader(http.StatusOK)
 }
 
 
 
-func UpdateOrgDetailViewWhere(w http.ResponseWriter, r *http.Request) {
-	defer OrgDetailViewRecovery(w)
+func UpdateUserViewWhere(w http.ResponseWriter, r *http.Request) {
+	defer UserViewRecovery(w)
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -58,12 +58,12 @@ func UpdateOrgDetailViewWhere(w http.ResponseWriter, r *http.Request) {
 
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
-	fn.UpdateOrgDetailViewWhere(or, and, in, span, data)
+	fn.UpdateUserViewWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)
 }
 
-func FindOrgDetailView(w http.ResponseWriter, r *http.Request) {
-	defer OrgDetailViewRecovery(w)
+func FindUserView(w http.ResponseWriter, r *http.Request) {
+	defer UserViewRecovery(w)
 	values := r.URL.Query()
 	span := values["span"]
 	or := values["or"]
@@ -73,7 +73,7 @@ func FindOrgDetailView(w http.ResponseWriter, r *http.Request) {
 	column := values.Get("column")
 	order := values.Get("order")
 
-	m := fn.FindOrgDetailView(or, and, in, span, limit, column, order)
-	logger.Debugf("RESPONSE of FindOrgDetailView: %#v", m)
+	m := fn.FindUserView(or, and, in, span, limit, column, order)
+	logger.Debugf("RESPONSE of FindUserView: %#v", m)
 	types.MarshalInto(m, w)
 }

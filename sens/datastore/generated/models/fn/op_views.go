@@ -14,15 +14,15 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func InsertSleepView(data []byte) string {
+func InsertOpView(data []byte) string {
 	j := types.UnmarshalMap(data)
 
 	phi := 1
 	comma := ""
 	var values []interface{}
-	fieldMap := models.GetSleepViewFieldMap()
-	typeMap := models.GetSleepViewTypeMap()
-	insert := bytes.NewBufferString("INSERT INTO sleep_views(")
+	fieldMap := models.GetOpViewFieldMap()
+	typeMap := models.GetOpViewTypeMap()
+	insert := bytes.NewBufferString("INSERT INTO op_views(")
 	ph := bytes.NewBufferString("VALUES(")
 	for k, v := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -53,16 +53,16 @@ func InsertSleepView(data []byte) string {
 	
 }
 
-func BatchInsertSleepView(data []byte) {
+func BatchInsertOpView(data []byte) {
 	var j []map[string]interface{}
 	types.Unmarshal(data, &j)
 
 	comma := ""
 	var keys []string
 	var fields []string
-	fieldMap := models.GetSleepViewFieldMap()
-	typeMap := models.GetSleepViewTypeMap()
-	insert := bytes.NewBufferString("INSERT INTO sleep_views(")
+	fieldMap := models.GetOpViewFieldMap()
+	typeMap := models.GetOpViewTypeMap()
+	insert := bytes.NewBufferString("INSERT INTO op_views(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
@@ -105,12 +105,12 @@ func BatchInsertSleepView(data []byte) {
 
 
 
-func buildSleepViewWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {
+func buildOpViewWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
 	ins := datastore.ParseInParams(in)
-	fieldMap := models.GetSleepViewFieldMap()
+	fieldMap := models.GetOpViewFieldMap()
 
 	phi := len(*values) + 1
 	cond := ""
@@ -160,11 +160,11 @@ func buildSleepViewWhereClause(query *bytes.Buffer, or []string, and []string, i
 	fmt.Fprint(query, "1 = 1)")
 }
 
-func FindSleepView(or []string, and []string, in string, span []string, limit string, column string, order string) []map[string]interface{} {
-	query := bytes.NewBufferString("SELECT * FROM sleep_views WHERE ")
-	fieldMap := models.GetSleepViewFieldMap()
+func FindOpView(or []string, and []string, in string, span []string, limit string, column string, order string) []map[string]interface{} {
+	query := bytes.NewBufferString("SELECT * FROM op_views WHERE ")
+	fieldMap := models.GetOpViewFieldMap()
 	var values []interface{}
-	buildSleepViewWhereClause(query, or, and, in, span, &values)
+	buildOpViewWhereClause(query, or, and, in, span, &values)
 	if column == "" {
 		column = "created_at"
 	}
@@ -192,17 +192,17 @@ func FindSleepView(or []string, and []string, in string, span []string, limit st
 	datastore.TRACE(seq, "4: <AFTER QUERY>")
 	errors.Pie(err)
 
-	result := datastore.RowsToMap(r, models.GetSleepViewReverseFieldMap(), models.GetSleepViewTypeMap())
+	result := datastore.RowsToMap(r, models.GetOpViewReverseFieldMap(), models.GetOpViewTypeMap())
 	datastore.TRACE(seq, "5: <RETURNING>")
 	return result
 }
 
-func UpdateSleepViewWhere(or []string, and []string, in string, span []string, data []byte) {
+func UpdateOpViewWhere(or []string, and []string, in string, span []string, data []byte) {
 	var values []interface{}
 	j := types.UnmarshalMap(data)
-	fieldMap := models.GetSleepViewFieldMap()
-	typeMap := models.GetSleepViewTypeMap()
-	update := bytes.NewBufferString("UPDATE sleep_views SET ")
+	fieldMap := models.GetOpViewFieldMap()
+	typeMap := models.GetOpViewTypeMap()
+	update := bytes.NewBufferString("UPDATE op_views SET ")
 
 	phi := 1
 	comma := ""
@@ -216,7 +216,7 @@ func UpdateSleepViewWhere(or []string, and []string, in string, span []string, d
 	}
 
 	fmt.Fprint(update, " WHERE ")
-	buildSleepViewWhereClause(update, or, and, in, span, &values)
+	buildOpViewWhereClause(update, or, and, in, span, &values)
 
 	logger.Debug(update.String())
 	logger.Debugf("Values: %#v", values)

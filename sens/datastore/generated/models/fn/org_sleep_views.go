@@ -14,15 +14,15 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func InsertUserSessionView(data []byte) string {
+func InsertOrgSleepView(data []byte) string {
 	j := types.UnmarshalMap(data)
 
 	phi := 1
 	comma := ""
 	var values []interface{}
-	fieldMap := models.GetUserSessionViewFieldMap()
-	typeMap := models.GetUserSessionViewTypeMap()
-	insert := bytes.NewBufferString("INSERT INTO user_session_views(")
+	fieldMap := models.GetOrgSleepViewFieldMap()
+	typeMap := models.GetOrgSleepViewTypeMap()
+	insert := bytes.NewBufferString("INSERT INTO org_sleep_views(")
 	ph := bytes.NewBufferString("VALUES(")
 	for k, v := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -53,16 +53,16 @@ func InsertUserSessionView(data []byte) string {
 	
 }
 
-func BatchInsertUserSessionView(data []byte) {
+func BatchInsertOrgSleepView(data []byte) {
 	var j []map[string]interface{}
 	types.Unmarshal(data, &j)
 
 	comma := ""
 	var keys []string
 	var fields []string
-	fieldMap := models.GetUserSessionViewFieldMap()
-	typeMap := models.GetUserSessionViewTypeMap()
-	insert := bytes.NewBufferString("INSERT INTO user_session_views(")
+	fieldMap := models.GetOrgSleepViewFieldMap()
+	typeMap := models.GetOrgSleepViewTypeMap()
+	insert := bytes.NewBufferString("INSERT INTO org_sleep_views(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
@@ -105,12 +105,12 @@ func BatchInsertUserSessionView(data []byte) {
 
 
 
-func buildUserSessionViewWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {
+func buildOrgSleepViewWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
 	ins := datastore.ParseInParams(in)
-	fieldMap := models.GetUserSessionViewFieldMap()
+	fieldMap := models.GetOrgSleepViewFieldMap()
 
 	phi := len(*values) + 1
 	cond := ""
@@ -160,11 +160,11 @@ func buildUserSessionViewWhereClause(query *bytes.Buffer, or []string, and []str
 	fmt.Fprint(query, "1 = 1)")
 }
 
-func FindUserSessionView(or []string, and []string, in string, span []string, limit string, column string, order string) []map[string]interface{} {
-	query := bytes.NewBufferString("SELECT * FROM user_session_views WHERE ")
-	fieldMap := models.GetUserSessionViewFieldMap()
+func FindOrgSleepView(or []string, and []string, in string, span []string, limit string, column string, order string) []map[string]interface{} {
+	query := bytes.NewBufferString("SELECT * FROM org_sleep_views WHERE ")
+	fieldMap := models.GetOrgSleepViewFieldMap()
 	var values []interface{}
-	buildUserSessionViewWhereClause(query, or, and, in, span, &values)
+	buildOrgSleepViewWhereClause(query, or, and, in, span, &values)
 	if column == "" {
 		column = "created_at"
 	}
@@ -192,17 +192,17 @@ func FindUserSessionView(or []string, and []string, in string, span []string, li
 	datastore.TRACE(seq, "4: <AFTER QUERY>")
 	errors.Pie(err)
 
-	result := datastore.RowsToMap(r, models.GetUserSessionViewReverseFieldMap(), models.GetUserSessionViewTypeMap())
+	result := datastore.RowsToMap(r, models.GetOrgSleepViewReverseFieldMap(), models.GetOrgSleepViewTypeMap())
 	datastore.TRACE(seq, "5: <RETURNING>")
 	return result
 }
 
-func UpdateUserSessionViewWhere(or []string, and []string, in string, span []string, data []byte) {
+func UpdateOrgSleepViewWhere(or []string, and []string, in string, span []string, data []byte) {
 	var values []interface{}
 	j := types.UnmarshalMap(data)
-	fieldMap := models.GetUserSessionViewFieldMap()
-	typeMap := models.GetUserSessionViewTypeMap()
-	update := bytes.NewBufferString("UPDATE user_session_views SET ")
+	fieldMap := models.GetOrgSleepViewFieldMap()
+	typeMap := models.GetOrgSleepViewTypeMap()
+	update := bytes.NewBufferString("UPDATE org_sleep_views SET ")
 
 	phi := 1
 	comma := ""
@@ -216,7 +216,7 @@ func UpdateUserSessionViewWhere(or []string, and []string, in string, span []str
 	}
 
 	fmt.Fprint(update, " WHERE ")
-	buildUserSessionViewWhereClause(update, or, and, in, span, &values)
+	buildOrgSleepViewWhereClause(update, or, and, in, span, &values)
 
 	logger.Debug(update.String())
 	logger.Debugf("Values: %#v", values)
