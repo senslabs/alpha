@@ -879,3 +879,21 @@ func GetOrgSessionDetailViewReverseFieldMap() map[string]string {
 func GetOrgSessionDetailViewTypeMap() map[string]string {
 	return map[string]string{"Avg": "*float64", "EndedAt": "*int64", "Key": "*string", "Max": "*float64", "Min": "*float64", "OrgId": "*uuid.UUID", "SessionId": "*uuid.UUID", "SessionType": "*string", "StartedAt": "*int64", "Timestamp": "[]byte", "UserId": "*uuid.UUID", "Value": "[]byte"}
 }
+
+type DevicePropertie struct {
+	DeviceId *uuid.UUID `db:"device_id" json:",omitempty"`
+	Key      *string    `db:"key" json:",omitempty"`
+	Value    *string    `db:"value" json:",omitempty"`
+}
+
+func GetDevicePropertieFieldMap() map[string]string {
+	return map[string]string{"DeviceId": "device_id", "Key": "key", "Value": "value"}
+}
+
+func GetDevicePropertieReverseFieldMap() map[string]string {
+	return map[string]string{"device_id": "DeviceId", "key": "Key", "value": "Value"}
+}
+
+func GetDevicePropertieTypeMap() map[string]string {
+	return map[string]string{"DeviceId": "*uuid.UUID", "Key": "*string", "Value": "*string"}
+}

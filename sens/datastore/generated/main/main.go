@@ -56,6 +56,7 @@ func main() {
 	api.OrgQuarterUsageViewMain(r)
 	api.OrgSessionRecordViewMain(r)
 	api.OrgSessionDetailViewMain(r)
+	api.DevicePropertieMain(r)
 	
 	ext.ExtMain(r)
 

@@ -148,6 +148,13 @@ CREATE TABLE "device_activities" (
   PRIMARY KEY ("device_id", "activity_type")
 );
 
+CREATE TABLE "device_properties" (
+  "device_id" uuid NOT NULL,
+  "key" text NOT NULL,
+  "value" text,
+  PRIMARY KEY ("device_id", "key")
+);
+
 CREATE TABLE "alerts" (
   "alert_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "user_id" uuid,
