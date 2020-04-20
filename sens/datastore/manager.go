@@ -171,11 +171,13 @@ func RowsToMapReflect(rows *sql.Rows) []map[string]interface{} {
 		m := map[string]interface{}{}
 		for i, col := range columns {
 			var v interface{}
-			v = *(v.(*interface{}))
-			if v == nil {
-				m[col] = nil
-				continue
+			val := values[i]
+			val = *(val.(*interface{}))
+			if val == nil {
+				m[col] = val
+				return nil
 			}
+
 			b, ok := val.([]byte)
 			if ok {
 				v = string(b)
