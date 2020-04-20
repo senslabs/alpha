@@ -1,10 +1,10 @@
 CREATE TABLE "auths" (
   "auth_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "email" text UNIQUE,
-  "mobile" text UNIQUE NOT NULL,
+  "mobile" text UNIQUE,
   "social" text UNIQUE,
   "first_name" text NOT NULL,
-  "last_name" text NOT NULL,
+  "last_name",
   "created_at" int DEFAULT (now()::int),
   "updated_at" int,
   "is_sens" bool
