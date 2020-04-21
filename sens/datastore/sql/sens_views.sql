@@ -112,8 +112,30 @@ SELECT
 FROM sessions s
 JOIN users u ON u.user_id = s.user_id;
 
+CREATE VIEW org_session_info_views AS
+SELECT
+	osv.user_id,
+	osv.org_id,
+	osv.session_id,
+	osv.session_type,
+	osv.session_name,
+	osv.started_at,
+	osv.ended_at,
+	json_object(array_agg(key), array_agg(value)) AS properties
+FROM
+	org_session_views osv
+JOIN session_properties sp ON
+	sp.session_id = osv.session_id
+GROUP BY osv.user_id,
+	osv.org_id,
+	osv.session_id,
+	osv.session_type,
+	osv.session_name,
+	osv.started_at,
+	osv.ended_at;
+
 CREATE VIEW org_sleep_views AS
-SELECT t.session_id, t.user_id, t.org_id, t.session_name, t.session_type, t.started_at, t.ended_at
+SELECT t.session_id, t.user_id, t.org_id, t.session_name, t.session_type, t.started_at, t.ended_at, t.properties
 FROM
 (
     SELECT
@@ -124,8 +146,9 @@ FROM
     session_name,
     session_type,
     started_at,
-    ended_at
-    FROM org_session_views WHERE session_type = 'Sleep'
+    ended_at,
+    properties
+    FROM org_session_info_views WHERE session_type = 'Sleep'
     ORDER BY
     user_id,
     ended_at DESC
@@ -133,7 +156,7 @@ FROM
 ORDER BY ended_at DESC;
 
 CREATE VIEW org_meditation_views AS
-SELECT t.session_id, t.user_id, t.org_id, t.session_name, t.session_type, t.started_at, t.ended_at
+SELECT t.session_id, t.user_id, t.org_id, t.session_name, t.session_type, t.started_at, t.ended_at, t.properties
 FROM
 (
     SELECT
@@ -144,8 +167,9 @@ FROM
     session_name,
     session_type,
     started_at,
-    ended_at
-    FROM org_session_views WHERE session_type = 'Meditation'
+    ended_at,
+    properties
+    FROM org_session_info_views WHERE session_type = 'Meditation'
     ORDER BY
     user_id,
     ended_at DESC
