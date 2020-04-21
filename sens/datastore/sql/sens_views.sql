@@ -176,39 +176,39 @@ FROM
 ) t
 ORDER BY ended_at DESC;
 
-CREATE VIEW org_sleep_summary_views AS
-SELECT
-  sv.user_id, sv.org_id,
-  (sv.ended_at - sv.started_at) AS duration,
-  json_build_object(sp.key, sp.value) AS properties,
-  sp.session_id
-FROM session_properties sp
-JOIN org_sleep_views sv ON sp.session_id = sv.session_id
-WHERE
-  sp.key IN (
-    'HeartRate',
-    'BreathRate',
-    'LastSyncedAt',
-    'Stress',
-    'Score'
-  );
+-- CREATE VIEW org_sleep_summary_views AS
+-- SELECT
+--   sv.user_id, sv.org_id,
+--   (sv.ended_at - sv.started_at) AS duration,
+--   json_build_object(sp.key, sp.value) AS properties,
+--   sp.session_id
+-- FROM session_properties sp
+-- JOIN org_sleep_views sv ON sp.session_id = sv.session_id
+-- WHERE
+--   sp.key IN (
+--     'HeartRate',
+--     'BreathRate',
+--     'LastSyncedAt',
+--     'Stress',
+--     'Score'
+--   );
 
-CREATE VIEW org_meditation_summary_views AS
-SELECT
-  mv.user_id, mv.org_id,
-  (mv.ended_at - mv.started_at) AS duration,
-  json_build_object(sp.key, sp.value) AS properties,
-  sp.session_id
-FROM session_properties sp
-JOIN org_meditation_views mv ON sp.session_id = mv.session_id
-WHERE
-  sp.key IN (
-    'HeartRate',
-    'BreathRate',
-    'LastSyncedAt',
-    'Stress',
-    'Score'
-  );
+-- CREATE VIEW org_meditation_summary_views AS
+-- SELECT
+--   mv.user_id, mv.org_id,
+--   (mv.ended_at - mv.started_at) AS duration,
+--   json_build_object(sp.key, sp.value) AS properties,
+--   sp.session_id
+-- FROM session_properties sp
+-- JOIN org_meditation_views mv ON sp.session_id = mv.session_id
+-- WHERE
+--   sp.key IN (
+--     'HeartRate',
+--     'BreathRate',
+--     'LastSyncedAt',
+--     'Stress',
+--     'Score'
+--   );
 
 -- ACTIVITIES
 CREATE VIEW org_activity_views AS 
@@ -273,8 +273,7 @@ SELECT
   started_at,
   ended_at,
   key,
-  array_agg(timestamp) as timestamp,
-  array_agg(value) as value,
+  json_object(array_agg(timestamp::text), array_agg(value::text)) as properties,
   min(value),
   max(value),
   avg(value)
