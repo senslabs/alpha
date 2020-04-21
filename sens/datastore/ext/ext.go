@@ -20,11 +20,6 @@ func ExtMain(r *mux.Router) {
 	s.HandleFunc("/activities/get", GetOrgActivites).Queries("days", "{days:[0-9]+}")
 }
 
-// type Activity struct {
-// 	Count        int    `db:"count"`
-// 	ActivityType string `db:"activity_type"`
-// }
-
 func GetOrgActivites(w http.ResponseWriter, r *http.Request) {
 	in := r.URL.Query().Get("in")
 	days := r.URL.Query().Get("days")
@@ -42,7 +37,17 @@ func GetOrgActivites(w http.ResponseWriter, r *http.Request) {
 		errors.Pie(err)
 		rows, err := stmt.Query(when, pq.Array(userIds[1:]))
 		errors.Pie(err)
-		result := datastore.RowsToMapReflect(rows)
+
+		var result []map[string]interface{}
+		var count interface{}
+		var activityType interface{}
+		for rows.Next() {
+			m := map[string]interface{}
+			rows.Scan(&count, &activityType)
+			m["Count"] = count
+			m["ActivityType"] = activityType
+			result = append(result, m)
+		}
 		types.MarshalInto(result, w)
 	}
 }
