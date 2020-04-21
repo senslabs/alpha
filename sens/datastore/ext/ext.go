@@ -42,7 +42,7 @@ func GetOrgActivites(w http.ResponseWriter, r *http.Request) {
 		var count interface{}
 		var activityType interface{}
 		for rows.Next() {
-			m := map[string]interface{}
+			m := map[string]interface{}{}
 			rows.Scan(&count, &activityType)
 			m["Count"] = count
 			m["ActivityType"] = activityType
