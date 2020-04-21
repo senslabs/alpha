@@ -7,11 +7,8 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/lib/pq"
 	"github.com/senslabs/alpha/sens/datastore"
 	"github.com/senslabs/alpha/sens/errors"
-	"github.com/senslabs/alpha/sens/httpclient"
-	"github.com/senslabs/alpha/sens/logger"
 	"github.com/senslabs/alpha/sens/types"
 )
 
@@ -21,21 +18,18 @@ func ExtMain(r *mux.Router) {
 }
 
 func GetOrgActivites(w http.ResponseWriter, r *http.Request) {
-	in := r.URL.Query().Get("in")
-	days := r.URL.Query().Get("days")
-	userIds := strings.Split(in, "^")
-	if len(userIds) < 2 {
-		logger.Error("Too less number of arguments")
-		httpclient.WriteError(w, http.StatusInternalServerError, errors.New(errors.GO_ERROR, "Too less number of arguments"))
-	} else if duration, err := strconv.Atoi(days); err != nil {
-		logger.Error("Too less number of arguments")
-		httpclient.WriteError(w, http.StatusInternalServerError, errors.New(errors.GO_ERROR, "Too less number of arguments"))
-	} else {
+	and := r.URL.Query().Get("and")
+	tokens := strings.Split(and, "^")
+	if len(tokens) == 2 {
+		orgId := tokens[1]
+		days := r.URL.Query().Get("days")
+		duration, err := strconv.Atoi(days)
+		errors.Pie(err)
 		when := time.Now().Add(-time.Duration(duration*24) * time.Hour).Unix()
 		db := datastore.GetConnection()
 		stmt, err := db.Prepare(ACTIVITY_DASHBOARD_QUERY)
 		errors.Pie(err)
-		rows, err := stmt.Query(when, pq.Array(userIds[1:]))
+		rows, err := stmt.Query(when, orgId)
 		errors.Pie(err)
 
 		var result []map[string]interface{}
@@ -49,5 +43,7 @@ func GetOrgActivites(w http.ResponseWriter, r *http.Request) {
 			result = append(result, m)
 		}
 		types.MarshalInto(result, w)
+	} else {
+		w.WriteHeader(http.StatusBadRequest)
 	}
 }
