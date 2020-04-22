@@ -3,6 +3,7 @@ package datastore
 import (
 	"container/ring"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -123,7 +124,9 @@ func getValue(column string, v interface{}, typeMap map[string]string) interface
 		return fmt.Sprintf("%s", v)
 	case "*datastore.RawMessage":
 		if v != nil {
-			return types.UnmarshalMap(v.([]byte))
+			var result interface{}
+			errors.Pie(json.Unmarshal(v.([]byte), &result))
+			return result
 		}
 	}
 	return v

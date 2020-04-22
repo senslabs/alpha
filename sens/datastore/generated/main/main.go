@@ -55,6 +55,8 @@ func main() {
 	api.OrgSessionInfoViewMain(r)
 	api.OrgSleepViewMain(r)
 	api.OrgMeditationViewMain(r)
+	api.OrgSessionEventViewMain(r)
+	api.OrgSessionEventDetailViewMain(r)
 	api.OrgSessionDetailViewMain(r)
 	
 	ext.ExtMain(r)

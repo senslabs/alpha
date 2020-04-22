@@ -67,6 +67,8 @@ func GetFieldType(field FieldInfo) string {
 		return "*float64"
 	case "json", "jsonb":
 		return "*datastore.RawMessage"
+	case "array":
+		return "[]interface{}"
 	default:
 		return "[]byte"
 	}

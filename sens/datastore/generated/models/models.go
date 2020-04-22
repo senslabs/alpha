@@ -856,6 +856,51 @@ func GetOrgMeditationViewTypeMap() map[string]string {
 	return map[string]string{"EndedAt": "*int64", "OrgId": "*uuid.UUID", "Properties": "*datastore.RawMessage", "SessionId": "*uuid.UUID", "SessionName": "*string", "SessionType": "*string", "StartedAt": "*int64", "UserId": "*uuid.UUID"}
 }
 
+type OrgSessionEventView struct {
+	UserId         *uuid.UUID            `db:"user_id" json:",omitempty"`
+	OrgId          *uuid.UUID            `db:"org_id" json:",omitempty"`
+	SessionId      *uuid.UUID            `db:"session_id" json:",omitempty"`
+	SessionType    *string               `db:"session_type" json:",omitempty"`
+	Key            *string               `db:"key" json:",omitempty"`
+	EventStartedAt *int64                `db:"event_started_at" json:",omitempty"`
+	EventEndedAt   *int64                `db:"event_ended_at" json:",omitempty"`
+	Properties     *datastore.RawMessage `db:"properties" json:",omitempty"`
+}
+
+func GetOrgSessionEventViewFieldMap() map[string]string {
+	return map[string]string{"EventEndedAt": "event_ended_at", "EventStartedAt": "event_started_at", "Key": "key", "OrgId": "org_id", "Properties": "properties", "SessionId": "session_id", "SessionType": "session_type", "UserId": "user_id"}
+}
+
+func GetOrgSessionEventViewReverseFieldMap() map[string]string {
+	return map[string]string{"event_ended_at": "EventEndedAt", "event_started_at": "EventStartedAt", "key": "Key", "org_id": "OrgId", "properties": "Properties", "session_id": "SessionId", "session_type": "SessionType", "user_id": "UserId"}
+}
+
+func GetOrgSessionEventViewTypeMap() map[string]string {
+	return map[string]string{"EventEndedAt": "*int64", "EventStartedAt": "*int64", "Key": "*string", "OrgId": "*uuid.UUID", "Properties": "*datastore.RawMessage", "SessionId": "*uuid.UUID", "SessionType": "*string", "UserId": "*uuid.UUID"}
+}
+
+type OrgSessionEventDetailView struct {
+	UserId         *uuid.UUID            `db:"user_id" json:",omitempty"`
+	OrgId          *uuid.UUID            `db:"org_id" json:",omitempty"`
+	SessionId      *uuid.UUID            `db:"session_id" json:",omitempty"`
+	SessionType    *string               `db:"session_type" json:",omitempty"`
+	EventStartedAt *datastore.RawMessage `db:"event_started_at" json:",omitempty"`
+	EventEndedAt   *datastore.RawMessage `db:"event_ended_at" json:",omitempty"`
+	Key            *string               `db:"key" json:",omitempty"`
+}
+
+func GetOrgSessionEventDetailViewFieldMap() map[string]string {
+	return map[string]string{"EventEndedAt": "event_ended_at", "EventStartedAt": "event_started_at", "Key": "key", "OrgId": "org_id", "SessionId": "session_id", "SessionType": "session_type", "UserId": "user_id"}
+}
+
+func GetOrgSessionEventDetailViewReverseFieldMap() map[string]string {
+	return map[string]string{"event_ended_at": "EventEndedAt", "event_started_at": "EventStartedAt", "key": "Key", "org_id": "OrgId", "session_id": "SessionId", "session_type": "SessionType", "user_id": "UserId"}
+}
+
+func GetOrgSessionEventDetailViewTypeMap() map[string]string {
+	return map[string]string{"EventEndedAt": "*datastore.RawMessage", "EventStartedAt": "*datastore.RawMessage", "Key": "*string", "OrgId": "*uuid.UUID", "SessionId": "*uuid.UUID", "SessionType": "*string", "UserId": "*uuid.UUID"}
+}
+
 type OrgSessionDetailView struct {
 	UserId      *uuid.UUID            `db:"user_id" json:",omitempty"`
 	OrgId       *uuid.UUID            `db:"org_id" json:",omitempty"`
@@ -864,20 +909,21 @@ type OrgSessionDetailView struct {
 	StartedAt   *int64                `db:"started_at" json:",omitempty"`
 	EndedAt     *int64                `db:"ended_at" json:",omitempty"`
 	Key         *string               `db:"key" json:",omitempty"`
-	Properties  *datastore.RawMessage `db:"properties" json:",omitempty"`
+	Timestamps  *datastore.RawMessage `db:"timestamps" json:",omitempty"`
+	Values      *datastore.RawMessage `db:"values" json:",omitempty"`
 	Min         *float64              `db:"min" json:",omitempty"`
 	Max         *float64              `db:"max" json:",omitempty"`
 	Avg         *float64              `db:"avg" json:",omitempty"`
 }
 
 func GetOrgSessionDetailViewFieldMap() map[string]string {
-	return map[string]string{"Avg": "avg", "EndedAt": "ended_at", "Key": "key", "Max": "max", "Min": "min", "OrgId": "org_id", "Properties": "properties", "SessionId": "session_id", "SessionType": "session_type", "StartedAt": "started_at", "UserId": "user_id"}
+	return map[string]string{"Avg": "avg", "EndedAt": "ended_at", "Key": "key", "Max": "max", "Min": "min", "OrgId": "org_id", "SessionId": "session_id", "SessionType": "session_type", "StartedAt": "started_at", "Timestamps": "timestamps", "UserId": "user_id", "Values": "values"}
 }
 
 func GetOrgSessionDetailViewReverseFieldMap() map[string]string {
-	return map[string]string{"avg": "Avg", "ended_at": "EndedAt", "key": "Key", "max": "Max", "min": "Min", "org_id": "OrgId", "properties": "Properties", "session_id": "SessionId", "session_type": "SessionType", "started_at": "StartedAt", "user_id": "UserId"}
+	return map[string]string{"avg": "Avg", "ended_at": "EndedAt", "key": "Key", "max": "Max", "min": "Min", "org_id": "OrgId", "session_id": "SessionId", "session_type": "SessionType", "started_at": "StartedAt", "timestamps": "Timestamps", "user_id": "UserId", "values": "Values"}
 }
 
 func GetOrgSessionDetailViewTypeMap() map[string]string {
-	return map[string]string{"Avg": "*float64", "EndedAt": "*int64", "Key": "*string", "Max": "*float64", "Min": "*float64", "OrgId": "*uuid.UUID", "Properties": "*datastore.RawMessage", "SessionId": "*uuid.UUID", "SessionType": "*string", "StartedAt": "*int64", "UserId": "*uuid.UUID"}
+	return map[string]string{"Avg": "*float64", "EndedAt": "*int64", "Key": "*string", "Max": "*float64", "Min": "*float64", "OrgId": "*uuid.UUID", "SessionId": "*uuid.UUID", "SessionType": "*string", "StartedAt": "*int64", "Timestamps": "*datastore.RawMessage", "UserId": "*uuid.UUID", "Values": "*datastore.RawMessage"}
 }

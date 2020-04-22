@@ -273,11 +273,13 @@ SELECT
   started_at,
   ended_at,
   key,
-  json_object(array_agg(timestamp::text), array_agg(value::text)) as properties,
+  json_agg(timestamp) as timestamps,
+  json_agg(value) as values,
   min(value),
   max(value),
   avg(value)
 FROM org_session_record_views
+WHERE key IN ('HeartRate', 'BreathRate', 'Stage', 'Recovery', 'Stress')
 GROUP BY
   user_id,
   org_id,
@@ -285,4 +287,37 @@ GROUP BY
   session_type,
   started_at,
   ended_at,
+  key;
+
+
+CREATE VIEW org_session_event_views AS
+SELECT
+  se.user_id,
+  u.org_id,
+  s.session_id,
+  s.session_type,
+  se.key,
+  se.started_at as event_started_at,
+  se.ended_at as event_ended_at,
+  se.properties
+FROM session_events se
+JOIN sessions s ON s.user_id = se.user_id
+JOIN users u ON u.user_id  = s.user_id 
+WHERE se.started_at >= s.started_at AND se.started_at <= s.ended_at;
+
+CREATE VIEW org_session_event_detail_views AS
+SELECT
+  user_id,
+  org_id,
+  session_id,
+  session_type,
+  json_agg(event_started_at) AS event_started_at,
+  json_agg(event_ended_at) AS event_ended_at,
+  key
+FROM org_session_event_views
+GROUP BY
+  user_id,
+  org_id,
+  session_id,
+  session_type,
   key;
