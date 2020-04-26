@@ -52,12 +52,13 @@ func main() {
 	api.OrgQuarterUsageViewMain(r)
 	api.OrgSessionRecordViewMain(r)
 	api.DevicePropertieMain(r)
-	api.OrgSessionInfoViewMain(r)
-	api.OrgSleepViewMain(r)
-	api.OrgMeditationViewMain(r)
 	api.OrgSessionEventViewMain(r)
 	api.OrgSessionEventDetailViewMain(r)
 	api.OrgSessionDetailViewMain(r)
+	api.OrgSessionInfoViewMain(r)
+	api.OrgSleepViewMain(r)
+	api.OrgMeditationViewMain(r)
+	api.OrgLatestAlertViewMain(r)
 	
 	ext.ExtMain(r)
 
