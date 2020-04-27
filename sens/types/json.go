@@ -3,6 +3,7 @@ package types
 import (
 	"encoding/json"
 	"io"
+	"io/ioutil"
 
 	"github.com/senslabs/alpha/sens/errors"
 	"github.com/senslabs/alpha/sens/logger"
@@ -74,9 +75,19 @@ func UnmarshalFrom(r io.Reader, v interface{}) {
 	errors.Pie(err)
 }
 
-func UnmarshalMap(data []byte) map[string]interface{} {
+func UnmarshalMap(data interface{}) map[string]interface{} {
 	var m map[string]interface{}
-	err := json.Unmarshal(data, &m)
-	errors.Pie(err)
-	return m
+	switch t := data.(type) {
+	case []byte:
+		err := json.Unmarshal(t, &m)
+		errors.Pie(err)
+		return m
+	case io.ReadCloser:
+		b, err := ioutil.ReadAll(t)
+		errors.Pie(err)
+		err = json.Unmarshal(b, &m)
+		errors.Pie(err)
+		return m
+	}
+	return nil
 }
