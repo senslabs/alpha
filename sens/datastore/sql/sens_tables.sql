@@ -18,6 +18,21 @@ CREATE TABLE "orgs" (
   "updated_at" int
 );
 
+CREATE TABLE "org_settings" (
+  "org_setting_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
+  "org_id" uuid,
+  "created_at" int DEFAULT (now()::int),
+  "key" text NOT NULL,
+  "value" text NOT NULL
+);
+
+CREATE TABLE "org_properties" (
+  "org_id" uuid,
+  "key" text NOT NULL,
+  "value" text NOT NULL,
+  PRIMARY KEY ("org_id", "key")
+);
+
 CREATE TABLE "ops" (
   "op_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "auth_id" uuid,
@@ -25,6 +40,21 @@ CREATE TABLE "ops" (
   "created_at" int DEFAULT (now()::int),
   "updated_at" int,
   "status" text
+);
+
+CREATE TABLE "op_settings" (
+  "op_setting_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
+  "op_id" uuid,
+  "created_at" int DEFAULT (now()::int),
+  "key" text NOT NULL,
+  "value" text NOT NULL
+);
+
+CREATE TABLE "op_properties" (
+  "op_id" uuid,
+  "key" text NOT NULL,
+  "value" text NOT NULL,
+  PRIMARY KEY ("op_id", "key")
 );
 
 CREATE TABLE "users" (
@@ -218,9 +248,17 @@ CREATE TABLE "session_properties" (
 
 ALTER TABLE "orgs" ADD FOREIGN KEY ("auth_id") REFERENCES "auths" ("auth_id");
 
+ALTER TABLE "org_settings" ADD FOREIGN KEY ("org_id") REFERENCES "orgs" ("org_id");
+
+ALTER TABLE "org_properties" ADD FOREIGN KEY ("org_id") REFERENCES "orgs" ("org_id");
+
 ALTER TABLE "ops" ADD FOREIGN KEY ("auth_id") REFERENCES "auths" ("auth_id");
 
 ALTER TABLE "ops" ADD FOREIGN KEY ("org_id") REFERENCES "orgs" ("org_id");
+
+ALTER TABLE "op_settings" ADD FOREIGN KEY ("op_id") REFERENCES "ops" ("op_id");
+
+ALTER TABLE "op_properties" ADD FOREIGN KEY ("op_id") REFERENCES "ops" ("op_id");
 
 ALTER TABLE "users" ADD FOREIGN KEY ("auth_id") REFERENCES "auths" ("auth_id");
 
