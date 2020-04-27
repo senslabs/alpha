@@ -15,7 +15,7 @@ import (
 func ExtMain(r *mux.Router) {
 	s := r.PathPrefix("/api/ext").Subrouter()
 	s.HandleFunc("/activities/get", GetOrgActivites).Queries("days", "{days:[0-9]+}")
-	s.HandleFunc("/auths/{id}/delete", DeleteUserAuth)
+	s.HandleFunc("/users/{id}/delete", DeleteUserAuth)
 }
 
 func GetOrgActivites(w http.ResponseWriter, r *http.Request) {
@@ -53,8 +53,8 @@ func DeleteUserAuth(w http.ResponseWriter, r *http.Request) {
 	db := datastore.GetConnection()
 	stmt, err := db.Prepare(ACTIVITY_DASHBOARD_QUERY)
 	errors.Pie(err)
-	authId := mux.Vars(r)["id"]
-	_, err = stmt.Exec(authId)
+	userId := mux.Vars(r)["id"]
+	_, err = stmt.Exec(userId)
 	errors.Pie(err)
 	w.WriteHeader(http.StatusOK)
 }
