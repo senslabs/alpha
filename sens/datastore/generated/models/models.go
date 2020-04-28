@@ -389,24 +389,26 @@ func GetDeviceActivitieTypeMap() map[string]string {
 }
 
 type Alert struct {
-	AlertId   *uuid.UUID `db:"alert_id" json:",omitempty"`
-	UserId    *uuid.UUID `db:"user_id" json:",omitempty"`
-	CreatedAt *int64     `db:"created_at" json:",omitempty"`
-	AlertName *string    `db:"alert_name" json:",omitempty"`
-	Status    *string    `db:"status" json:",omitempty"`
-	Remarks   *string    `db:"remarks" json:",omitempty"`
+	AlertId     *uuid.UUID `db:"alert_id" json:",omitempty"`
+	UserId      *uuid.UUID `db:"user_id" json:",omitempty"`
+	CreatedAt   *int64     `db:"created_at" json:",omitempty"`
+	AlertName   *string    `db:"alert_name" json:",omitempty"`
+	Status      *string    `db:"status" json:",omitempty"`
+	Remarks     *string    `db:"remarks" json:",omitempty"`
+	Valid       *bool      `db:"valid" json:",omitempty"`
+	AlertRuleId *uuid.UUID `db:"alert_rule_id" json:",omitempty"`
 }
 
 func GetAlertFieldMap() map[string]string {
-	return map[string]string{"AlertId": "alert_id", "AlertName": "alert_name", "CreatedAt": "created_at", "Remarks": "remarks", "Status": "status", "UserId": "user_id"}
+	return map[string]string{"AlertId": "alert_id", "AlertName": "alert_name", "AlertRuleId": "alert_rule_id", "CreatedAt": "created_at", "Remarks": "remarks", "Status": "status", "UserId": "user_id", "Valid": "valid"}
 }
 
 func GetAlertReverseFieldMap() map[string]string {
-	return map[string]string{"alert_id": "AlertId", "alert_name": "AlertName", "created_at": "CreatedAt", "remarks": "Remarks", "status": "Status", "user_id": "UserId"}
+	return map[string]string{"alert_id": "AlertId", "alert_name": "AlertName", "alert_rule_id": "AlertRuleId", "created_at": "CreatedAt", "remarks": "Remarks", "status": "Status", "user_id": "UserId", "valid": "Valid"}
 }
 
 func GetAlertTypeMap() map[string]string {
-	return map[string]string{"AlertId": "*uuid.UUID", "AlertName": "*string", "CreatedAt": "*int64", "Remarks": "*string", "Status": "*string", "UserId": "*uuid.UUID"}
+	return map[string]string{"AlertId": "*uuid.UUID", "AlertName": "*string", "AlertRuleId": "*uuid.UUID", "CreatedAt": "*int64", "Remarks": "*string", "Status": "*string", "UserId": "*uuid.UUID", "Valid": "*bool"}
 }
 
 type Session struct {
@@ -947,4 +949,57 @@ func GetOrgLatestAlertViewReverseFieldMap() map[string]string {
 
 func GetOrgLatestAlertViewTypeMap() map[string]string {
 	return map[string]string{"Alerts": "*datastore.RawMessage", "FirstName": "*string", "LastName": "*string", "OrgId": "*uuid.UUID", "Timestamp": "*int64", "UserId": "*uuid.UUID"}
+}
+
+type AlertRule struct {
+	AlertRuleId *uuid.UUID `db:"alert_rule_id" json:",omitempty"`
+	UserId      *uuid.UUID `db:"user_id" json:",omitempty"`
+	AlertName   *string    `db:"alert_name" json:",omitempty"`
+	Key         *string    `db:"key" json:",omitempty"`
+	Duration    *int64     `db:"duration" json:",omitempty"`
+	Enabled     *bool      `db:"enabled" json:",omitempty"`
+	CreatedAt   *int64     `db:"created_at" json:",omitempty"`
+	UpdatedAt   *int64     `db:"updated_at" json:",omitempty"`
+	UpperLimit  *float64   `db:"upper_limit" json:",omitempty"`
+	LowerLimit  *float64   `db:"lower_limit" json:",omitempty"`
+	ValidFrom   *string    `db:"valid_from" json:",omitempty"`
+	ValidFor    *int64     `db:"valid_for" json:",omitempty"`
+}
+
+func GetAlertRuleFieldMap() map[string]string {
+	return map[string]string{"AlertName": "alert_name", "AlertRuleId": "alert_rule_id", "CreatedAt": "created_at", "Duration": "duration", "Enabled": "enabled", "Key": "key", "LowerLimit": "lower_limit", "UpdatedAt": "updated_at", "UpperLimit": "upper_limit", "UserId": "user_id", "ValidFor": "valid_for", "ValidFrom": "valid_from"}
+}
+
+func GetAlertRuleReverseFieldMap() map[string]string {
+	return map[string]string{"alert_name": "AlertName", "alert_rule_id": "AlertRuleId", "created_at": "CreatedAt", "duration": "Duration", "enabled": "Enabled", "key": "Key", "lower_limit": "LowerLimit", "updated_at": "UpdatedAt", "upper_limit": "UpperLimit", "user_id": "UserId", "valid_for": "ValidFor", "valid_from": "ValidFrom"}
+}
+
+func GetAlertRuleTypeMap() map[string]string {
+	return map[string]string{"AlertName": "*string", "AlertRuleId": "*uuid.UUID", "CreatedAt": "*int64", "Duration": "*int64", "Enabled": "*bool", "Key": "*string", "LowerLimit": "*float64", "UpdatedAt": "*int64", "UpperLimit": "*float64", "UserId": "*uuid.UUID", "ValidFor": "*int64", "ValidFrom": "*string"}
+}
+
+type AlertEscalation struct {
+	Id              *uuid.UUID `db:"id" json:",omitempty"`
+	AlertRuleId     *uuid.UUID `db:"alert_rule_id" json:",omitempty"`
+	EscalationGroup *string    `db:"escalation_group" json:",omitempty"`
+	EscalationLevel *int64     `db:"escalation_level" json:",omitempty"`
+	Snooze          *int64     `db:"snooze" json:",omitempty"`
+	Medium          *string    `db:"medium" json:",omitempty"`
+	MediumValue     *string    `db:"medium_value" json:",omitempty"`
+	CreatedAt       *int64     `db:"created_at" json:",omitempty"`
+	Timeout         *int64     `db:"timeout" json:",omitempty"`
+	Status          *string    `db:"status" json:",omitempty"`
+	Rowid           *int64     `db:"rowid" json:",omitempty"`
+}
+
+func GetAlertEscalationFieldMap() map[string]string {
+	return map[string]string{"AlertRuleId": "alert_rule_id", "CreatedAt": "created_at", "EscalationGroup": "escalation_group", "EscalationLevel": "escalation_level", "Id": "id", "Medium": "medium", "MediumValue": "medium_value", "Rowid": "rowid", "Snooze": "snooze", "Status": "status", "Timeout": "timeout"}
+}
+
+func GetAlertEscalationReverseFieldMap() map[string]string {
+	return map[string]string{"alert_rule_id": "AlertRuleId", "created_at": "CreatedAt", "escalation_group": "EscalationGroup", "escalation_level": "EscalationLevel", "id": "Id", "medium": "Medium", "medium_value": "MediumValue", "rowid": "Rowid", "snooze": "Snooze", "status": "Status", "timeout": "Timeout"}
+}
+
+func GetAlertEscalationTypeMap() map[string]string {
+	return map[string]string{"AlertRuleId": "*uuid.UUID", "CreatedAt": "*int64", "EscalationGroup": "*string", "EscalationLevel": "*int64", "Id": "*uuid.UUID", "Medium": "*string", "MediumValue": "*string", "Rowid": "*int64", "Snooze": "*int64", "Status": "*string", "Timeout": "*int64"}
 }
