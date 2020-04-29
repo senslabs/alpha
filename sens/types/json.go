@@ -81,13 +81,26 @@ func UnmarshalMap(data interface{}) map[string]interface{} {
 	case []byte:
 		err := json.Unmarshal(t, &m)
 		errors.Pie(err)
-		return m
 	case io.ReadCloser:
 		b, err := ioutil.ReadAll(t)
 		errors.Pie(err)
 		err = json.Unmarshal(b, &m)
 		errors.Pie(err)
-		return m
 	}
-	return nil
+	return m
+}
+
+func UnmarshalMaps(data interface{}) []map[string]interface{} {
+	var m []map[string]interface{}
+	switch t := data.(type) {
+	case []byte:
+		err := json.Unmarshal(t, &m)
+		errors.Pie(err)
+	case io.ReadCloser:
+		b, err := ioutil.ReadAll(t)
+		errors.Pie(err)
+		err = json.Unmarshal(b, &m)
+		errors.Pie(err)
+	}
+	return m
 }
