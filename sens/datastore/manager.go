@@ -136,7 +136,7 @@ func RowsToMap(r *sql.Rows, reverseFieldMap map[string]string, typeMap map[strin
 	columns, err := r.Columns()
 	errors.Pie(err)
 
-	var result []map[string]interface{}
+	result := []map[string]interface{}{}
 	for r.Next() {
 		temp := make([]interface{}, len(columns))
 		values := make([]interface{}, len(columns))
