@@ -14,15 +14,15 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func InsertVitalBaseline(data []byte) string {
+func InsertBaseline(data []byte) string {
 	j := types.UnmarshalMap(data)
 
 	phi := 1
 	comma := ""
 	var values []interface{}
-	fieldMap := models.GetVitalBaselineFieldMap()
-	typeMap := models.GetVitalBaselineTypeMap()
-	insert := bytes.NewBufferString("INSERT INTO vital_baselines(")
+	fieldMap := models.GetBaselineFieldMap()
+	typeMap := models.GetBaselineTypeMap()
+	insert := bytes.NewBufferString("INSERT INTO baselines(")
 	ph := bytes.NewBufferString("VALUES(")
 	for k, v := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -37,7 +37,7 @@ func InsertVitalBaseline(data []byte) string {
 	fmt.Fprint(insert, ph, ")")
 
 	
-	fmt.Fprint(insert, " returning vital_baseline_id")
+	fmt.Fprint(insert, " returning baseline_id")
 	
 
 	db := datastore.GetConnection()
@@ -56,16 +56,16 @@ func InsertVitalBaseline(data []byte) string {
 	
 }
 
-func BatchInsertVitalBaseline(data []byte) {
+func BatchInsertBaseline(data []byte) {
 	var j []map[string]interface{}
 	types.Unmarshal(data, &j)
 
 	comma := ""
 	var keys []string
 	var fields []string
-	fieldMap := models.GetVitalBaselineFieldMap()
-	typeMap := models.GetVitalBaselineTypeMap()
-	insert := bytes.NewBufferString("INSERT INTO vital_baselines(")
+	fieldMap := models.GetBaselineFieldMap()
+	typeMap := models.GetBaselineTypeMap()
+	insert := bytes.NewBufferString("INSERT INTO baselines(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
@@ -91,7 +91,7 @@ func BatchInsertVitalBaseline(data []byte) {
 		fmt.Fprint(insert, ")")
 	}
 
-	fmt.Fprint(insert, " ON CONFLICT(vital_baseline_id) DO UPDATE SET (", strings.Join(fields, ", "), ") = (EXCLUDED.", strings.Join(fields, ", EXCLUDED."), ")")
+	fmt.Fprint(insert, " ON CONFLICT(baseline_id) DO UPDATE SET (", strings.Join(fields, ", "), ") = (EXCLUDED.", strings.Join(fields, ", EXCLUDED."), ")")
 
 
 	logger.Debug(insert.String())
@@ -107,15 +107,15 @@ func BatchInsertVitalBaseline(data []byte) {
 
 
 
-func UpdateVitalBaseline(id string, data []byte) {
+func UpdateBaseline(id string, data []byte) {
 	var j map[string]interface{}
 	types.Unmarshal(data, &j)
 
 	phi := 1
 	comma := ""
 	var values []interface{}
-	fieldMap := models.GetVitalBaselineFieldMap()
-	update := bytes.NewBufferString("UPDATE vital_baselines SET ")
+	fieldMap := models.GetBaselineFieldMap()
+	update := bytes.NewBufferString("UPDATE baselines SET ")
 	for k, v := range j {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(update, comma, f, " = $", phi)
@@ -125,7 +125,7 @@ func UpdateVitalBaseline(id string, data []byte) {
 		}
 	}
 	values = append(values, id)
-	fmt.Fprint(update, " WHERE vital_baseline_id = $", phi)
+	fmt.Fprint(update, " WHERE baseline_id = $", phi)
 
 	logger.Debug(update.String())
 
@@ -137,17 +137,17 @@ func UpdateVitalBaseline(id string, data []byte) {
 	errors.Pie(err)
 }
 
-func SelectVitalBaseline(id string) map[string]interface{} {
+func SelectBaseline(id string) map[string]interface{} {
 	db := datastore.GetConnection()
 
-	stmt, err := db.Prepare("SELECT * FROM vital_baselines WHERE vital_baseline_id = $1")
+	stmt, err := db.Prepare("SELECT * FROM baselines WHERE baseline_id = $1")
 	defer stmt.Close()
 	errors.Pie(err)
 
 	r, err := stmt.Query(id)
 	errors.Pie(err)
 
-	result := datastore.RowsToMap(r, models.GetVitalBaselineReverseFieldMap(), models.GetVitalBaselineTypeMap())
+	result := datastore.RowsToMap(r, models.GetBaselineReverseFieldMap(), models.GetBaselineTypeMap())
 	if len(result) == 0 {
 		return map[string]interface{}{}
 	}
@@ -155,12 +155,12 @@ func SelectVitalBaseline(id string) map[string]interface{} {
 }
 
 
-func buildVitalBaselineWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {
+func buildBaselineWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
 	ins := datastore.ParseInParams(in)
-	fieldMap := models.GetVitalBaselineFieldMap()
+	fieldMap := models.GetBaselineFieldMap()
 
 	phi := len(*values) + 1
 	cond := ""
@@ -210,11 +210,11 @@ func buildVitalBaselineWhereClause(query *bytes.Buffer, or []string, and []strin
 	fmt.Fprint(query, "1 = 1)")
 }
 
-func FindVitalBaseline(or []string, and []string, in string, span []string, limit string, column string, order string) []map[string]interface{} {
-	query := bytes.NewBufferString("SELECT * FROM vital_baselines WHERE ")
-	fieldMap := models.GetVitalBaselineFieldMap()
+func FindBaseline(or []string, and []string, in string, span []string, limit string, column string, order string) []map[string]interface{} {
+	query := bytes.NewBufferString("SELECT * FROM baselines WHERE ")
+	fieldMap := models.GetBaselineFieldMap()
 	var values []interface{}
-	buildVitalBaselineWhereClause(query, or, and, in, span, &values)
+	buildBaselineWhereClause(query, or, and, in, span, &values)
 	if column == "" {
 		column = "created_at"
 	}
@@ -242,17 +242,17 @@ func FindVitalBaseline(or []string, and []string, in string, span []string, limi
 	datastore.TRACE(seq, "4: <AFTER QUERY>")
 	errors.Pie(err)
 
-	result := datastore.RowsToMap(r, models.GetVitalBaselineReverseFieldMap(), models.GetVitalBaselineTypeMap())
+	result := datastore.RowsToMap(r, models.GetBaselineReverseFieldMap(), models.GetBaselineTypeMap())
 	datastore.TRACE(seq, "5: <RETURNING>")
 	return result
 }
 
-func UpdateVitalBaselineWhere(or []string, and []string, in string, span []string, data []byte) {
+func UpdateBaselineWhere(or []string, and []string, in string, span []string, data []byte) {
 	var values []interface{}
 	j := types.UnmarshalMap(data)
-	fieldMap := models.GetVitalBaselineFieldMap()
-	typeMap := models.GetVitalBaselineTypeMap()
-	update := bytes.NewBufferString("UPDATE vital_baselines SET ")
+	fieldMap := models.GetBaselineFieldMap()
+	typeMap := models.GetBaselineTypeMap()
+	update := bytes.NewBufferString("UPDATE baselines SET ")
 
 	phi := 1
 	comma := ""
@@ -266,7 +266,7 @@ func UpdateVitalBaselineWhere(or []string, and []string, in string, span []strin
 	}
 
 	fmt.Fprint(update, " WHERE ")
-	buildVitalBaselineWhereClause(update, or, and, in, span, &values)
+	buildBaselineWhereClause(update, or, and, in, span, &values)
 
 	logger.Debug(update.String())
 	logger.Debugf("Values: %#v", values)

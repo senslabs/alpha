@@ -453,25 +453,25 @@ func GetSessionSettingTypeMap() map[string]string {
 	return map[string]string{"CreatedAt": "*int64", "Key": "*string", "SessionSettingId": "*uuid.UUID", "SessionType": "*string", "UserId": "*uuid.UUID", "Value": "*string"}
 }
 
-type VitalBaseline struct {
-	VitalBaselineId *uuid.UUID `db:"vital_baseline_id" json:",omitempty"`
-	UserId          *uuid.UUID `db:"user_id" json:",omitempty"`
-	Key             *string    `db:"key" json:",omitempty"`
-	CreatedAt       *int64     `db:"created_at" json:",omitempty"`
-	LowerLimit      *int64     `db:"lower_limit" json:",omitempty"`
-	UpperLimit      *int64     `db:"upper_limit" json:",omitempty"`
+type Baseline struct {
+	BaselineId *uuid.UUID `db:"baseline_id" json:",omitempty"`
+	UserId     *uuid.UUID `db:"user_id" json:",omitempty"`
+	Key        *string    `db:"key" json:",omitempty"`
+	CreatedAt  *int64     `db:"created_at" json:",omitempty"`
+	LowerLimit *int64     `db:"lower_limit" json:",omitempty"`
+	UpperLimit *int64     `db:"upper_limit" json:",omitempty"`
 }
 
-func GetVitalBaselineFieldMap() map[string]string {
-	return map[string]string{"CreatedAt": "created_at", "Key": "key", "LowerLimit": "lower_limit", "UpperLimit": "upper_limit", "UserId": "user_id", "VitalBaselineId": "vital_baseline_id"}
+func GetBaselineFieldMap() map[string]string {
+	return map[string]string{"BaselineId": "baseline_id", "CreatedAt": "created_at", "Key": "key", "LowerLimit": "lower_limit", "UpperLimit": "upper_limit", "UserId": "user_id"}
 }
 
-func GetVitalBaselineReverseFieldMap() map[string]string {
-	return map[string]string{"created_at": "CreatedAt", "key": "Key", "lower_limit": "LowerLimit", "upper_limit": "UpperLimit", "user_id": "UserId", "vital_baseline_id": "VitalBaselineId"}
+func GetBaselineReverseFieldMap() map[string]string {
+	return map[string]string{"baseline_id": "BaselineId", "created_at": "CreatedAt", "key": "Key", "lower_limit": "LowerLimit", "upper_limit": "UpperLimit", "user_id": "UserId"}
 }
 
-func GetVitalBaselineTypeMap() map[string]string {
-	return map[string]string{"CreatedAt": "*int64", "Key": "*string", "LowerLimit": "*int64", "UpperLimit": "*int64", "UserId": "*uuid.UUID", "VitalBaselineId": "*uuid.UUID"}
+func GetBaselineTypeMap() map[string]string {
+	return map[string]string{"BaselineId": "*uuid.UUID", "CreatedAt": "*int64", "Key": "*string", "LowerLimit": "*int64", "UpperLimit": "*int64", "UserId": "*uuid.UUID"}
 }
 
 type SessionEvent struct {
@@ -642,29 +642,6 @@ func GetDeviceViewReverseFieldMap() map[string]string {
 
 func GetDeviceViewTypeMap() map[string]string {
 	return map[string]string{"CreatedAt": "*int64", "DeviceId": "*uuid.UUID", "DeviceName": "*string", "OrgId": "*uuid.UUID", "Status": "*string", "UserId": "*uuid.UUID"}
-}
-
-type OrgAlertView struct {
-	UserId    *uuid.UUID `db:"user_id" json:",omitempty"`
-	OrgId     *uuid.UUID `db:"org_id" json:",omitempty"`
-	FirstName *string    `db:"first_name" json:",omitempty"`
-	LastName  *string    `db:"last_name" json:",omitempty"`
-	CreatedAt *int64     `db:"created_at" json:",omitempty"`
-	AlertName *string    `db:"alert_name" json:",omitempty"`
-	Status    *string    `db:"status" json:",omitempty"`
-	Remarks   *string    `db:"remarks" json:",omitempty"`
-}
-
-func GetOrgAlertViewFieldMap() map[string]string {
-	return map[string]string{"AlertName": "alert_name", "CreatedAt": "created_at", "FirstName": "first_name", "LastName": "last_name", "OrgId": "org_id", "Remarks": "remarks", "Status": "status", "UserId": "user_id"}
-}
-
-func GetOrgAlertViewReverseFieldMap() map[string]string {
-	return map[string]string{"alert_name": "AlertName", "created_at": "CreatedAt", "first_name": "FirstName", "last_name": "LastName", "org_id": "OrgId", "remarks": "Remarks", "status": "Status", "user_id": "UserId"}
-}
-
-func GetOrgAlertViewTypeMap() map[string]string {
-	return map[string]string{"AlertName": "*string", "CreatedAt": "*int64", "FirstName": "*string", "LastName": "*string", "OrgId": "*uuid.UUID", "Remarks": "*string", "Status": "*string", "UserId": "*uuid.UUID"}
 }
 
 type OrgSessionView struct {
@@ -930,27 +907,6 @@ func GetOrgMeditationViewTypeMap() map[string]string {
 	return map[string]string{"EndedAt": "*int64", "OrgId": "*uuid.UUID", "Properties": "*datastore.RawMessage", "SessionId": "*uuid.UUID", "SessionName": "*string", "SessionType": "*string", "StartedAt": "*int64", "UserId": "*uuid.UUID"}
 }
 
-type OrgLatestAlertView struct {
-	UserId    *uuid.UUID            `db:"user_id" json:",omitempty"`
-	OrgId     *uuid.UUID            `db:"org_id" json:",omitempty"`
-	FirstName *string               `db:"first_name" json:",omitempty"`
-	LastName  *string               `db:"last_name" json:",omitempty"`
-	Timestamp *int64                `db:"timestamp" json:",omitempty"`
-	Alerts    *datastore.RawMessage `db:"alerts" json:",omitempty"`
-}
-
-func GetOrgLatestAlertViewFieldMap() map[string]string {
-	return map[string]string{"Alerts": "alerts", "FirstName": "first_name", "LastName": "last_name", "OrgId": "org_id", "Timestamp": "timestamp", "UserId": "user_id"}
-}
-
-func GetOrgLatestAlertViewReverseFieldMap() map[string]string {
-	return map[string]string{"alerts": "Alerts", "first_name": "FirstName", "last_name": "LastName", "org_id": "OrgId", "timestamp": "Timestamp", "user_id": "UserId"}
-}
-
-func GetOrgLatestAlertViewTypeMap() map[string]string {
-	return map[string]string{"Alerts": "*datastore.RawMessage", "FirstName": "*string", "LastName": "*string", "OrgId": "*uuid.UUID", "Timestamp": "*int64", "UserId": "*uuid.UUID"}
-}
-
 type AlertRule struct {
 	AlertRuleId *uuid.UUID `db:"alert_rule_id" json:",omitempty"`
 	UserId      *uuid.UUID `db:"user_id" json:",omitempty"`
@@ -1078,4 +1034,49 @@ func GetOpPropertieReverseFieldMap() map[string]string {
 
 func GetOpPropertieTypeMap() map[string]string {
 	return map[string]string{"Key": "*string", "OpId": "*uuid.UUID", "Value": "*string"}
+}
+
+type OrgAlertView struct {
+	UserId    *uuid.UUID `db:"user_id" json:",omitempty"`
+	OrgId     *uuid.UUID `db:"org_id" json:",omitempty"`
+	AlertId   *uuid.UUID `db:"alert_id" json:",omitempty"`
+	FirstName *string    `db:"first_name" json:",omitempty"`
+	LastName  *string    `db:"last_name" json:",omitempty"`
+	CreatedAt *int64     `db:"created_at" json:",omitempty"`
+	AlertName *string    `db:"alert_name" json:",omitempty"`
+	Status    *string    `db:"status" json:",omitempty"`
+	Remarks   *string    `db:"remarks" json:",omitempty"`
+}
+
+func GetOrgAlertViewFieldMap() map[string]string {
+	return map[string]string{"AlertId": "alert_id", "AlertName": "alert_name", "CreatedAt": "created_at", "FirstName": "first_name", "LastName": "last_name", "OrgId": "org_id", "Remarks": "remarks", "Status": "status", "UserId": "user_id"}
+}
+
+func GetOrgAlertViewReverseFieldMap() map[string]string {
+	return map[string]string{"alert_id": "AlertId", "alert_name": "AlertName", "created_at": "CreatedAt", "first_name": "FirstName", "last_name": "LastName", "org_id": "OrgId", "remarks": "Remarks", "status": "Status", "user_id": "UserId"}
+}
+
+func GetOrgAlertViewTypeMap() map[string]string {
+	return map[string]string{"AlertId": "*uuid.UUID", "AlertName": "*string", "CreatedAt": "*int64", "FirstName": "*string", "LastName": "*string", "OrgId": "*uuid.UUID", "Remarks": "*string", "Status": "*string", "UserId": "*uuid.UUID"}
+}
+
+type OrgLatestAlertView struct {
+	UserId    *uuid.UUID            `db:"user_id" json:",omitempty"`
+	OrgId     *uuid.UUID            `db:"org_id" json:",omitempty"`
+	FirstName *string               `db:"first_name" json:",omitempty"`
+	LastName  *string               `db:"last_name" json:",omitempty"`
+	Timestamp *int64                `db:"timestamp" json:",omitempty"`
+	Alerts    *datastore.RawMessage `db:"alerts" json:",omitempty"`
+}
+
+func GetOrgLatestAlertViewFieldMap() map[string]string {
+	return map[string]string{"Alerts": "alerts", "FirstName": "first_name", "LastName": "last_name", "OrgId": "org_id", "Timestamp": "timestamp", "UserId": "user_id"}
+}
+
+func GetOrgLatestAlertViewReverseFieldMap() map[string]string {
+	return map[string]string{"alerts": "Alerts", "first_name": "FirstName", "last_name": "LastName", "org_id": "OrgId", "timestamp": "Timestamp", "user_id": "UserId"}
+}
+
+func GetOrgLatestAlertViewTypeMap() map[string]string {
+	return map[string]string{"Alerts": "*datastore.RawMessage", "FirstName": "*string", "LastName": "*string", "OrgId": "*uuid.UUID", "Timestamp": "*int64", "UserId": "*uuid.UUID"}
 }

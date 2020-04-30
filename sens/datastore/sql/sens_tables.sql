@@ -212,8 +212,8 @@ CREATE TABLE "session_settings" (
   "value" text
 );
 
-CREATE TABLE "vital_baselines" (
-  "vital_baseline_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
+CREATE TABLE "baselines" (
+  "baseline_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "user_id" uuid,
   "key" text NOT NULL,
   "created_at" int DEFAULT (now()::int),
