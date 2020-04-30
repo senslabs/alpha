@@ -185,15 +185,6 @@ CREATE TABLE "device_properties" (
   PRIMARY KEY ("device_id", "key")
 );
 
-CREATE TABLE "alerts" (
-  "alert_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
-  "user_id" uuid,
-  "created_at" int,
-  "alert_name" text,
-  "status" text,
-  "remarks" text
-);
-
 CREATE TABLE "sessions" (
   "session_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "user_id" uuid,
@@ -244,6 +235,46 @@ CREATE TABLE "session_properties" (
   "key" text,
   "value" text,
   PRIMARY KEY ("session_id", "key")
+);
+
+CREATE TABLE "alert_rules" (
+  "alert_rule_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
+  "user_id" uuid,
+  "alert_name" string,
+  "key" string,
+  "duration" int,
+  "enabled" boolean,
+  "created_at" int,
+  "updated_at" int,
+  "upper_limit" float,
+  "lower_limit" float,
+  "valid_from" string,
+  "valid_for" int
+);
+
+CREATE TABLE "alert_escalations" (
+  "alert_escalation_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
+  "alert_rule_id" uuid,
+  "escalation_group" string,
+  "escalation_level" int,
+  "snooze" int,
+  "medium" string,
+  "medium_value" string,
+  "created_at" int,
+  "timeout" int,
+  "status" string
+);
+
+CREATE TABLE "alerts" (
+  "alert_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
+  "user_id" uuid,
+  "alert_rule_id" uuid NOT NULL,
+  "created_at" int,
+  "alert_name" string,
+  "valid" boolean,
+  "status" string,
+  "remarks" string,
+  "triggered_level" int
 );
 
 ALTER TABLE "orgs" ADD FOREIGN KEY ("auth_id") REFERENCES "auths" ("auth_id");
@@ -317,3 +348,5 @@ ALTER TABLE "session_properties" ADD FOREIGN KEY ("session_id") REFERENCES "sess
 CREATE INDEX ON "sessions" ("ended_at");
 
 CREATE INDEX ON "sessions" ("user_id");
+
+ALTER TABLE "alert_escalations" ADD FOREIGN KEY ("alert_rule_id") REFERENCES "alert_rules" ("alert_rule_id");
