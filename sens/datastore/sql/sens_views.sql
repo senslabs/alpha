@@ -85,6 +85,7 @@ CREATE VIEW org_alert_views AS
 SELECT
   a.user_id,
   u.org_id,
+  a.alert_id,
   au.first_name,
   au.last_name,
   a.created_at,
