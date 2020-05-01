@@ -960,26 +960,6 @@ func GetAlertEscalationTypeMap() map[string]string {
 	return map[string]string{"AlertRuleId": "*uuid.UUID", "CreatedAt": "*int64", "EscalationGroup": "*string", "EscalationLevel": "*int64", "Id": "*uuid.UUID", "Medium": "*string", "MediumValue": "*string", "Rowid": "*int64", "Snooze": "*int64", "Status": "*string", "Timeout": "*int64"}
 }
 
-type OrgSetting struct {
-	OrgSettingId *uuid.UUID `db:"org_setting_id" json:",omitempty"`
-	OrgId        *uuid.UUID `db:"org_id" json:",omitempty"`
-	CreatedAt    *int64     `db:"created_at" json:",omitempty"`
-	Key          *string    `db:"key" json:",omitempty"`
-	Value        *string    `db:"value" json:",omitempty"`
-}
-
-func GetOrgSettingFieldMap() map[string]string {
-	return map[string]string{"CreatedAt": "created_at", "Key": "key", "OrgId": "org_id", "OrgSettingId": "org_setting_id", "Value": "value"}
-}
-
-func GetOrgSettingReverseFieldMap() map[string]string {
-	return map[string]string{"created_at": "CreatedAt", "key": "Key", "org_id": "OrgId", "org_setting_id": "OrgSettingId", "value": "Value"}
-}
-
-func GetOrgSettingTypeMap() map[string]string {
-	return map[string]string{"CreatedAt": "*int64", "Key": "*string", "OrgId": "*uuid.UUID", "OrgSettingId": "*uuid.UUID", "Value": "*string"}
-}
-
 type OrgPropertie struct {
 	OrgId *uuid.UUID `db:"org_id" json:",omitempty"`
 	Key   *string    `db:"key" json:",omitempty"`

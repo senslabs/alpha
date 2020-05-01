@@ -59,7 +59,6 @@ func main() {
 	api.OrgMeditationViewMain(r)
 	api.AlertRuleMain(r)
 	api.AlertEscalationMain(r)
-	api.OrgSettingMain(r)
 	api.OrgPropertieMain(r)
 	api.OpSettingMain(r)
 	api.OpPropertieMain(r)
