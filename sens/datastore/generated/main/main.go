@@ -64,6 +64,7 @@ func main() {
 	api.OpPropertieMain(r)
 	api.OrgAlertViewMain(r)
 	api.OrgLatestAlertViewMain(r)
+	api.OrgSettingMain(r)
 	
 	ext.ExtMain(r)
 
