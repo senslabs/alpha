@@ -68,6 +68,7 @@ func main() {
 	api.UserSessionCountViewMain(r)
 	api.SessionDurationViewMain(r)
 	api.UserSettingViewMain(r)
+	api.BaselineViewMain(r)
 	
 	ext.ExtMain(r)
 

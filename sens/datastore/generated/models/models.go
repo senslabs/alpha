@@ -1136,3 +1136,23 @@ func GetUserSettingViewReverseFieldMap() map[string]string {
 func GetUserSettingViewTypeMap() map[string]string {
 	return map[string]string{"CreatedAt": "*int64", "Key": "*string", "UserId": "*uuid.UUID", "Value": "*string"}
 }
+
+type BaselineView struct {
+	UserId     *uuid.UUID `db:"user_id" json:",omitempty"`
+	CreatedAt  *int64     `db:"created_at" json:",omitempty"`
+	Key        *string    `db:"key" json:",omitempty"`
+	LowerLimit *int64     `db:"lower_limit" json:",omitempty"`
+	UpperLimit *int64     `db:"upper_limit" json:",omitempty"`
+}
+
+func GetBaselineViewFieldMap() map[string]string {
+	return map[string]string{"CreatedAt": "created_at", "Key": "key", "LowerLimit": "lower_limit", "UpperLimit": "upper_limit", "UserId": "user_id"}
+}
+
+func GetBaselineViewReverseFieldMap() map[string]string {
+	return map[string]string{"created_at": "CreatedAt", "key": "Key", "lower_limit": "LowerLimit", "upper_limit": "UpperLimit", "user_id": "UserId"}
+}
+
+func GetBaselineViewTypeMap() map[string]string {
+	return map[string]string{"CreatedAt": "*int64", "Key": "*string", "LowerLimit": "*int64", "UpperLimit": "*int64", "UserId": "*uuid.UUID"}
+}

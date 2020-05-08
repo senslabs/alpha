@@ -439,3 +439,45 @@ GROUP BY
   org_id,
   session_id;
 
+CREATE VIEW user_setting_views AS
+SELECT
+  user_id,
+  created_at,
+  KEY,
+  value
+FROM ( SELECT DISTINCT ON (user_id, KEY)
+    user_id,
+    created_at,
+    KEY,
+    value
+  FROM
+    user_settings us
+  ORDER BY
+    user_id,
+    KEY,
+    created_at) t
+ORDER BY
+  created_at DESC;
+
+CREATE VIEW baseline_views AS
+SELECT
+  user_id,
+  created_at,
+  KEY,
+  lower_limit,
+  upper_limit
+FROM ( SELECT DISTINCT ON (user_id, KEY)
+    user_id,
+    created_at,
+    KEY,
+    lower_limit,
+    upper_limit
+  FROM
+    baselines
+  ORDER BY
+    user_id,
+    KEY,
+    created_at DESC) t
+ORDER BY
+  created_at DESC;
+
