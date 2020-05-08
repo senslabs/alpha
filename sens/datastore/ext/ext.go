@@ -16,6 +16,7 @@ func ExtMain(r *mux.Router) {
 	s := r.PathPrefix("/api/ext").Subrouter()
 	s.HandleFunc("/activities/get", GetOrgActivites).Queries("days", "{days:[0-9]+}")
 	s.HandleFunc("/users/{id}/delete", DeleteUserAuth)
+	s.HandleFunc("/records/avg", GetAvgValues)
 }
 
 func GetOrgActivites(w http.ResponseWriter, r *http.Request) {
@@ -47,6 +48,36 @@ func GetOrgActivites(w http.ResponseWriter, r *http.Request) {
 	} else {
 		w.WriteHeader(http.StatusBadRequest)
 	}
+}
+
+func GetAvgValues(w http.ResponseWriter, r *http.Request) {
+	m := r.URL.Query().Get("minutes")
+	u := r.URL.Query().Get("userId")
+	k := r.URL.Query().Get("key")
+	ll := r.URL.Query().Get("lowerLimit")
+	ul := r.URL.Query().Get("upperLimit")
+
+	duration, err := strconv.ParseInt(m, 10, 64)
+	errors.Pie(err)
+	when := time.Now().Add(-time.Minute * time.Duration(duration)).Unix()
+	db := datastore.GetConnection()
+	stmt, err := db.Prepare(AVG_RECORD_VALUE_QUERY)
+	errors.Pie(err)
+	rows, err := stmt.Query(u, k, when, ll, ul)
+
+	result := []map[string]interface{}{}
+	var userId interface{}
+	var key interface{}
+	var avg interface{}
+	for rows.Next() {
+		m := map[string]interface{}{}
+		rows.Scan(&userId, &key, &avg)
+		m["UserId"] = userId
+		m["Key"] = key
+		m["Avg"] = avg
+		result = append(result, m)
+	}
+	types.MarshalInto(result, w)
 }
 
 func DeleteUserAuth(w http.ResponseWriter, r *http.Request) {

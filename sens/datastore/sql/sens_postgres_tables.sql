@@ -178,8 +178,8 @@ CREATE TABLE "session_settings" (
   "value" text
 );
 
-CREATE TABLE "vital_baselines" (
-  "vital_baseline_id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+CREATE TABLE "baselines" (
+  "baseline_id" uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   "user_id" uuid,
   "key" text,
   "created_at" int,

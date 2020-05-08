@@ -17,6 +17,9 @@ func AlertEscalationMain(r *mux.Router) {
 	r.HandleFunc("/api/alert-escalations/create", CreateAlertEscalation)
 	r.HandleFunc("/api/alert-escalations/batch/create", BatchCreateAlertEscalation)
 	
+	r.HandleFunc("/api/alert-escalations/{id}/update", UpdateAlertEscalation)
+	r.HandleFunc("/api/alert-escalations/{id}/get", GetAlertEscalation)
+    
 	r.HandleFunc("/api/alert-escalations/update", UpdateAlertEscalationWhere)
 	r.HandleFunc("/api/alert-escalations/find", FindAlertEscalation).Queries("limit", "{limit}")
 }
@@ -46,6 +49,24 @@ func BatchCreateAlertEscalation(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+
+func UpdateAlertEscalation(w http.ResponseWriter, r *http.Request) {
+	defer AlertEscalationRecovery(w)
+	vars := mux.Vars(r)
+	id := vars["id"]
+	data, err := ioutil.ReadAll(r.Body)
+	errors.Pie(err)
+	fn.UpdateAlertEscalation(id, data)
+	w.WriteHeader(http.StatusOK)
+}
+
+func GetAlertEscalation(w http.ResponseWriter, r *http.Request) {
+	defer AlertEscalationRecovery(w)
+	vars := mux.Vars(r)
+	id := vars["id"]
+	m := fn.SelectAlertEscalation(id)
+	types.MarshalInto(m, w)
+}
 
 
 func UpdateAlertEscalationWhere(w http.ResponseWriter, r *http.Request) {

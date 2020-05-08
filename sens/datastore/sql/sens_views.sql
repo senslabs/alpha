@@ -105,8 +105,7 @@ SELECT
   last_name,
   max(created_at) AS timestamp,
   json_object(array_agg(created_at::text), array_agg(alert_name)) AS alerts
-FROM (
-  SELECT DISTINCT ON (user_id, alert_name)
+FROM ( SELECT DISTINCT ON (user_id, alert_name)
     user_id,
     org_id,
     first_name,
@@ -118,8 +117,7 @@ FROM (
   ORDER BY
     user_id,
     alert_name,
-    created_at DESC
-  ) t
+    created_at DESC) t
 GROUP BY
   user_id,
   org_id,
@@ -398,4 +396,46 @@ GROUP BY
   session_id,
   session_type,
   KEY;
+
+CREATE VIEW user_session_count_views AS
+SELECT
+  user_id,
+  org_id,
+  count(session_id)
+FROM
+  org_session_views osv
+WHERE
+  session_type = 'Sleep'
+GROUP BY
+  user_id,
+  org_id;
+
+CREATE VIEW session_duration_views AS
+SELECT
+  user_id,
+  org_id,
+  session_id,
+  json_object(array_agg(value::text), array_agg(count::text)),
+  sum(count) AS epochs
+FROM (
+  SELECT
+    user_id,
+    org_id,
+    session_id,
+    value,
+    count(value) AS count
+  FROM
+    org_session_record_views osrv
+  WHERE
+    KEY = 'Stage'
+    AND value != 4
+  GROUP BY
+    user_id,
+    org_id,
+    session_id,
+    value) t
+GROUP BY
+  user_id,
+  org_id,
+  session_id;
 

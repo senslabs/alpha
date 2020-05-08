@@ -14,15 +14,15 @@ import (
 	"github.com/senslabs/alpha/sens/types"
 )
 
-func InsertAlertEscalation(data []byte) string {
+func InsertSessionDurationView(data []byte) string {
 	j := types.UnmarshalMap(data)
 
 	phi := 1
 	comma := ""
 	var values []interface{}
-	fieldMap := models.GetAlertEscalationFieldMap()
-	typeMap := models.GetAlertEscalationTypeMap()
-	insert := bytes.NewBufferString("INSERT INTO alert_escalations(")
+	fieldMap := models.GetSessionDurationViewFieldMap()
+	typeMap := models.GetSessionDurationViewTypeMap()
+	insert := bytes.NewBufferString("INSERT INTO session_duration_views(")
 	ph := bytes.NewBufferString("VALUES(")
 	for k, v := range j {
 		if f, ok := fieldMap[k]; ok {
@@ -37,8 +37,6 @@ func InsertAlertEscalation(data []byte) string {
 	fmt.Fprint(insert, ph, ")")
 
 	
-	fmt.Fprint(insert, " returning alert_escalation_id")
-	
 
 	db := datastore.GetConnection()
 
@@ -49,23 +47,22 @@ func InsertAlertEscalation(data []byte) string {
 	errors.Pie(err)
 
 	
-	var id string
-	r := stmt.QueryRow(values...)
-	errors.Pie(r.Scan(&id))
-	return id
+	_, err = stmt.Exec(values...)
+	errors.Pie(err)
+	return ""
 	
 }
 
-func BatchInsertAlertEscalation(data []byte) {
+func BatchInsertSessionDurationView(data []byte) {
 	var j []map[string]interface{}
 	types.Unmarshal(data, &j)
 
 	comma := ""
 	var keys []string
 	var fields []string
-	fieldMap := models.GetAlertEscalationFieldMap()
-	typeMap := models.GetAlertEscalationTypeMap()
-	insert := bytes.NewBufferString("INSERT INTO alert_escalations(")
+	fieldMap := models.GetSessionDurationViewFieldMap()
+	typeMap := models.GetSessionDurationViewTypeMap()
+	insert := bytes.NewBufferString("INSERT INTO session_duration_views(")
 	for k, _ := range j[0] {
 		if f, ok := fieldMap[k]; ok {
 			fmt.Fprint(insert, comma, f)
@@ -91,7 +88,7 @@ func BatchInsertAlertEscalation(data []byte) {
 		fmt.Fprint(insert, ")")
 	}
 
-	fmt.Fprint(insert, " ON CONFLICT(alert_escalation_id) DO UPDATE SET (", strings.Join(fields, ", "), ") = (EXCLUDED.", strings.Join(fields, ", EXCLUDED."), ")")
+	fmt.Fprint(insert, " ON CONFLICT() DO UPDATE SET (", strings.Join(fields, ", "), ") = (EXCLUDED.", strings.Join(fields, ", EXCLUDED."), ")")
 
 
 	logger.Debug(insert.String())
@@ -107,60 +104,13 @@ func BatchInsertAlertEscalation(data []byte) {
 
 
 
-func UpdateAlertEscalation(id string, data []byte) {
-	var j map[string]interface{}
-	types.Unmarshal(data, &j)
 
-	phi := 1
-	comma := ""
-	var values []interface{}
-	fieldMap := models.GetAlertEscalationFieldMap()
-	update := bytes.NewBufferString("UPDATE alert_escalations SET ")
-	for k, v := range j {
-		if f, ok := fieldMap[k]; ok {
-			fmt.Fprint(update, comma, f, " = $", phi)
-			values = append(values, v)
-			comma = ", "
-			phi++
-		}
-	}
-	values = append(values, id)
-	fmt.Fprint(update, " WHERE alert_escalation_id = $", phi)
-
-	logger.Debug(update.String())
-
-	db := datastore.GetConnection()
-	stmt, err := db.Prepare(update.String())
-	defer stmt.Close()
-	errors.Pie(err)
-	_, err = stmt.Exec(values...)
-	errors.Pie(err)
-}
-
-func SelectAlertEscalation(id string) map[string]interface{} {
-	db := datastore.GetConnection()
-
-	stmt, err := db.Prepare("SELECT * FROM alert_escalations WHERE alert_escalation_id = $1")
-	defer stmt.Close()
-	errors.Pie(err)
-
-	r, err := stmt.Query(id)
-	errors.Pie(err)
-
-	result := datastore.RowsToMap(r, models.GetAlertEscalationReverseFieldMap(), models.GetAlertEscalationTypeMap())
-	if len(result) == 0 {
-		return map[string]interface{}{}
-	}
-	return result[0]
-}
-
-
-func buildAlertEscalationWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {
+func buildSessionDurationViewWhereClause(query *bytes.Buffer, or []string, and []string, in string, span []string, values* []interface{}) {
 	ors := datastore.ParseOrParams(or)
 	ands := datastore.ParseAndParams(and)
 	spans := datastore.ParseSpanParams(span)
 	ins := datastore.ParseInParams(in)
-	fieldMap := models.GetAlertEscalationFieldMap()
+	fieldMap := models.GetSessionDurationViewFieldMap()
 
 	phi := len(*values) + 1
 	cond := ""
@@ -210,11 +160,11 @@ func buildAlertEscalationWhereClause(query *bytes.Buffer, or []string, and []str
 	fmt.Fprint(query, "1 = 1)")
 }
 
-func FindAlertEscalation(or []string, and []string, in string, span []string, limit string, column string, order string) []map[string]interface{} {
-	query := bytes.NewBufferString("SELECT * FROM alert_escalations WHERE ")
-	fieldMap := models.GetAlertEscalationFieldMap()
+func FindSessionDurationView(or []string, and []string, in string, span []string, limit string, column string, order string) []map[string]interface{} {
+	query := bytes.NewBufferString("SELECT * FROM session_duration_views WHERE ")
+	fieldMap := models.GetSessionDurationViewFieldMap()
 	var values []interface{}
-	buildAlertEscalationWhereClause(query, or, and, in, span, &values)
+	buildSessionDurationViewWhereClause(query, or, and, in, span, &values)
 	if column == "" {
 		column = "created_at"
 	}
@@ -242,17 +192,17 @@ func FindAlertEscalation(or []string, and []string, in string, span []string, li
 	datastore.TRACE(seq, "4: <AFTER QUERY>")
 	errors.Pie(err)
 
-	result := datastore.RowsToMap(r, models.GetAlertEscalationReverseFieldMap(), models.GetAlertEscalationTypeMap())
+	result := datastore.RowsToMap(r, models.GetSessionDurationViewReverseFieldMap(), models.GetSessionDurationViewTypeMap())
 	datastore.TRACE(seq, "5: <RETURNING>")
 	return result
 }
 
-func UpdateAlertEscalationWhere(or []string, and []string, in string, span []string, data []byte) {
+func UpdateSessionDurationViewWhere(or []string, and []string, in string, span []string, data []byte) {
 	var values []interface{}
 	j := types.UnmarshalMap(data)
-	fieldMap := models.GetAlertEscalationFieldMap()
-	typeMap := models.GetAlertEscalationTypeMap()
-	update := bytes.NewBufferString("UPDATE alert_escalations SET ")
+	fieldMap := models.GetSessionDurationViewFieldMap()
+	typeMap := models.GetSessionDurationViewTypeMap()
+	update := bytes.NewBufferString("UPDATE session_duration_views SET ")
 
 	phi := 1
 	comma := ""
@@ -266,7 +216,7 @@ func UpdateAlertEscalationWhere(or []string, and []string, in string, span []str
 	}
 
 	fmt.Fprint(update, " WHERE ")
-	buildAlertEscalationWhereClause(update, or, and, in, span, &values)
+	buildSessionDurationViewWhereClause(update, or, and, in, span, &values)
 
 	logger.Debug(update.String())
 	logger.Debugf("Values: %#v", values)
