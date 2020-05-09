@@ -139,6 +139,7 @@ SELECT
 FROM
   sessions s
   JOIN users u ON u.user_id = s.user_id;
+  WHERE state = 'VALID';
 
 CREATE VIEW org_session_info_views AS
 SELECT
@@ -166,8 +167,6 @@ FROM
     avg(value)::text AS value
   FROM
     org_session_record_views osrv
-  WHERE
-    KEY IN ('HeartRate', 'BreathRate')
   GROUP BY
     session_id,
     KEY) sp ON sp.session_id = osv.session_id
@@ -255,7 +254,7 @@ FROM (
   FROM
     sessions
   WHERE
-    session_type = 'Sleep'
+    session_type = 'Sleep' AND state = 'VALID'
   UNION
   SELECT
     session_type AS activity_type,
@@ -264,7 +263,7 @@ FROM (
   FROM
     sessions
   WHERE
-    session_type = 'Meditation'
+    session_type = 'Meditation' AND state = 'VALID'
   UNION
   SELECT
     'Alert' AS activity_type,

@@ -191,7 +191,8 @@ CREATE TABLE "sessions" (
   "session_name" text,
   "session_type" text,
   "started_at" int,
-  "ended_at" int
+  "ended_at" int,
+  "state" text
 );
 
 CREATE TABLE "session_settings" (
