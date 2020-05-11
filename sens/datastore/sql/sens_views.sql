@@ -414,8 +414,8 @@ SELECT
   user_id,
   org_id,
   session_id,
-  json_object(array_agg(value::text), array_agg(count::text)),
-  sum(count) AS epochs
+  json_object(array_agg(value::text), array_agg(count::text)) as stage_epochs,
+  sum(count)::text AS epochs
 FROM (
   SELECT
     user_id,

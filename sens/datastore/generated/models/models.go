@@ -990,26 +990,6 @@ func GetAlertEscalationTypeMap() map[string]string {
 	return map[string]string{"AlertEscalationId": "*uuid.UUID", "AlertRuleId": "*uuid.UUID", "CreatedAt": "*int64", "EscalationGroup": "*string", "EscalationLevel": "*int64", "Medium": "*string", "MediumValue": "*string", "Snooze": "*int64", "Status": "*string", "Timeout": "*int64"}
 }
 
-type SessionDurationView struct {
-	UserId     *uuid.UUID            `db:"user_id" json:",omitempty"`
-	OrgId      *uuid.UUID            `db:"org_id" json:",omitempty"`
-	SessionId  *uuid.UUID            `db:"session_id" json:",omitempty"`
-	JsonObject *datastore.RawMessage `db:"json_object" json:",omitempty"`
-	Epochs     []byte                `db:"epochs" json:",omitempty"`
-}
-
-func GetSessionDurationViewFieldMap() map[string]string {
-	return map[string]string{"Epochs": "epochs", "JsonObject": "json_object", "OrgId": "org_id", "SessionId": "session_id", "UserId": "user_id"}
-}
-
-func GetSessionDurationViewReverseFieldMap() map[string]string {
-	return map[string]string{"epochs": "Epochs", "json_object": "JsonObject", "org_id": "OrgId", "session_id": "SessionId", "user_id": "UserId"}
-}
-
-func GetSessionDurationViewTypeMap() map[string]string {
-	return map[string]string{"Epochs": "[]byte", "JsonObject": "*datastore.RawMessage", "OrgId": "*uuid.UUID", "SessionId": "*uuid.UUID", "UserId": "*uuid.UUID"}
-}
-
 type UserSettingView struct {
 	UserId    *uuid.UUID `db:"user_id" json:",omitempty"`
 	CreatedAt *int64     `db:"created_at" json:",omitempty"`
@@ -1156,4 +1136,24 @@ func GetOrgSleepViewReverseFieldMap() map[string]string {
 
 func GetOrgSleepViewTypeMap() map[string]string {
 	return map[string]string{"EndedAt": "*int64", "OrgId": "*uuid.UUID", "Properties": "*datastore.RawMessage", "SessionId": "*uuid.UUID", "SessionName": "*string", "SessionType": "*string", "StartedAt": "*int64", "UserId": "*uuid.UUID"}
+}
+
+type SessionDurationView struct {
+	UserId      *uuid.UUID            `db:"user_id" json:",omitempty"`
+	OrgId       *uuid.UUID            `db:"org_id" json:",omitempty"`
+	SessionId   *uuid.UUID            `db:"session_id" json:",omitempty"`
+	StageEpochs *datastore.RawMessage `db:"stage_epochs" json:",omitempty"`
+	Epochs      *int64                `db:"epochs" json:",omitempty"`
+}
+
+func GetSessionDurationViewFieldMap() map[string]string {
+	return map[string]string{"Epochs": "epochs", "OrgId": "org_id", "SessionId": "session_id", "StageEpochs": "stage_epochs", "UserId": "user_id"}
+}
+
+func GetSessionDurationViewReverseFieldMap() map[string]string {
+	return map[string]string{"epochs": "Epochs", "org_id": "OrgId", "session_id": "SessionId", "stage_epochs": "StageEpochs", "user_id": "UserId"}
+}
+
+func GetSessionDurationViewTypeMap() map[string]string {
+	return map[string]string{"Epochs": "*int64", "OrgId": "*uuid.UUID", "SessionId": "*uuid.UUID", "StageEpochs": "*datastore.RawMessage", "UserId": "*uuid.UUID"}
 }

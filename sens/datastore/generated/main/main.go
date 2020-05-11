@@ -61,7 +61,6 @@ func main() {
 	api.OrgLatestAlertViewMain(r)
 	api.OrgSettingMain(r)
 	api.AlertEscalationMain(r)
-	api.SessionDurationViewMain(r)
 	api.UserSettingViewMain(r)
 	api.BaselineViewMain(r)
 	api.OrgSessionViewMain(r)
@@ -69,6 +68,7 @@ func main() {
 	api.OrgSessionInfoViewMain(r)
 	api.OrgMeditationViewMain(r)
 	api.OrgSleepViewMain(r)
+	api.SessionDurationViewMain(r)
 	
 	ext.ExtMain(r)
 
