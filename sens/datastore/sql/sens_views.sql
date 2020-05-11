@@ -167,6 +167,7 @@ FROM
     avg(value)::text AS value
   FROM
     org_session_record_views osrv
+    WHERE KEY NOT IN ('Recovery')
   GROUP BY
     session_id,
     KEY) sp ON sp.session_id = osv.session_id
