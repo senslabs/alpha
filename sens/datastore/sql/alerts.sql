@@ -1,6 +1,7 @@
 CREATE TABLE "alert_rules" (
   "alert_rule_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "org_id" uuid,
+  "user_id" uuid,
   "alert_name" string UNIQUE,
   "key" string UNIQUE,
   "duration" int,
@@ -19,6 +20,7 @@ CREATE TABLE "alert_rules" (
 CREATE TABLE "alert_escalations" (
   "alert_escalation_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "org_id" uuid,
+  "user_id" uuid,
   "medium" string,
   "medium_value" string,
   "created_at" int DEFAULT (now()::int),

@@ -1110,6 +1110,7 @@ func GetOrgSleepViewTypeMap() map[string]string {
 type AlertRule struct {
 	AlertRuleId   *uuid.UUID `db:"alert_rule_id" json:",omitempty"`
 	OrgId         *uuid.UUID `db:"org_id" json:",omitempty"`
+	UserId        *uuid.UUID `db:"user_id" json:",omitempty"`
 	AlertName     *string    `db:"alert_name" json:",omitempty"`
 	Key           *string    `db:"key" json:",omitempty"`
 	Duration      *int64     `db:"duration" json:",omitempty"`
@@ -1126,20 +1127,21 @@ type AlertRule struct {
 }
 
 func GetAlertRuleFieldMap() map[string]string {
-	return map[string]string{"AlertName": "alert_name", "AlertRuleId": "alert_rule_id", "CreatedAt": "created_at", "DefaultSnooze": "default_snooze", "Duration": "duration", "Enabled": "enabled", "Key": "key", "LowerLimit": "lower_limit", "OrgId": "org_id", "SnoozedAt": "snoozed_at", "SnoozedFor": "snoozed_for", "UpdatedAt": "updated_at", "UpperLimit": "upper_limit", "ValidFrom": "valid_from", "ValidTill": "valid_till"}
+	return map[string]string{"AlertName": "alert_name", "AlertRuleId": "alert_rule_id", "CreatedAt": "created_at", "DefaultSnooze": "default_snooze", "Duration": "duration", "Enabled": "enabled", "Key": "key", "LowerLimit": "lower_limit", "OrgId": "org_id", "SnoozedAt": "snoozed_at", "SnoozedFor": "snoozed_for", "UpdatedAt": "updated_at", "UpperLimit": "upper_limit", "UserId": "user_id", "ValidFrom": "valid_from", "ValidTill": "valid_till"}
 }
 
 func GetAlertRuleReverseFieldMap() map[string]string {
-	return map[string]string{"alert_name": "AlertName", "alert_rule_id": "AlertRuleId", "created_at": "CreatedAt", "default_snooze": "DefaultSnooze", "duration": "Duration", "enabled": "Enabled", "key": "Key", "lower_limit": "LowerLimit", "org_id": "OrgId", "snoozed_at": "SnoozedAt", "snoozed_for": "SnoozedFor", "updated_at": "UpdatedAt", "upper_limit": "UpperLimit", "valid_from": "ValidFrom", "valid_till": "ValidTill"}
+	return map[string]string{"alert_name": "AlertName", "alert_rule_id": "AlertRuleId", "created_at": "CreatedAt", "default_snooze": "DefaultSnooze", "duration": "Duration", "enabled": "Enabled", "key": "Key", "lower_limit": "LowerLimit", "org_id": "OrgId", "snoozed_at": "SnoozedAt", "snoozed_for": "SnoozedFor", "updated_at": "UpdatedAt", "upper_limit": "UpperLimit", "user_id": "UserId", "valid_from": "ValidFrom", "valid_till": "ValidTill"}
 }
 
 func GetAlertRuleTypeMap() map[string]string {
-	return map[string]string{"AlertName": "*string", "AlertRuleId": "*uuid.UUID", "CreatedAt": "*int64", "DefaultSnooze": "*int64", "Duration": "*int64", "Enabled": "*bool", "Key": "*string", "LowerLimit": "*float64", "OrgId": "*uuid.UUID", "SnoozedAt": "*int64", "SnoozedFor": "*int64", "UpdatedAt": "*int64", "UpperLimit": "*float64", "ValidFrom": "*string", "ValidTill": "*string"}
+	return map[string]string{"AlertName": "*string", "AlertRuleId": "*uuid.UUID", "CreatedAt": "*int64", "DefaultSnooze": "*int64", "Duration": "*int64", "Enabled": "*bool", "Key": "*string", "LowerLimit": "*float64", "OrgId": "*uuid.UUID", "SnoozedAt": "*int64", "SnoozedFor": "*int64", "UpdatedAt": "*int64", "UpperLimit": "*float64", "UserId": "*uuid.UUID", "ValidFrom": "*string", "ValidTill": "*string"}
 }
 
 type AlertEscalation struct {
 	AlertEscalationId *uuid.UUID `db:"alert_escalation_id" json:",omitempty"`
 	OrgId             *uuid.UUID `db:"org_id" json:",omitempty"`
+	UserId            *uuid.UUID `db:"user_id" json:",omitempty"`
 	Medium            *string    `db:"medium" json:",omitempty"`
 	MediumValue       *string    `db:"medium_value" json:",omitempty"`
 	CreatedAt         *int64     `db:"created_at" json:",omitempty"`
@@ -1147,13 +1149,13 @@ type AlertEscalation struct {
 }
 
 func GetAlertEscalationFieldMap() map[string]string {
-	return map[string]string{"AlertEscalationId": "alert_escalation_id", "CreatedAt": "created_at", "Medium": "medium", "MediumValue": "medium_value", "OrgId": "org_id", "Timeout": "timeout"}
+	return map[string]string{"AlertEscalationId": "alert_escalation_id", "CreatedAt": "created_at", "Medium": "medium", "MediumValue": "medium_value", "OrgId": "org_id", "Timeout": "timeout", "UserId": "user_id"}
 }
 
 func GetAlertEscalationReverseFieldMap() map[string]string {
-	return map[string]string{"alert_escalation_id": "AlertEscalationId", "created_at": "CreatedAt", "medium": "Medium", "medium_value": "MediumValue", "org_id": "OrgId", "timeout": "Timeout"}
+	return map[string]string{"alert_escalation_id": "AlertEscalationId", "created_at": "CreatedAt", "medium": "Medium", "medium_value": "MediumValue", "org_id": "OrgId", "timeout": "Timeout", "user_id": "UserId"}
 }
 
 func GetAlertEscalationTypeMap() map[string]string {
-	return map[string]string{"AlertEscalationId": "*uuid.UUID", "CreatedAt": "*int64", "Medium": "*string", "MediumValue": "*string", "OrgId": "*uuid.UUID", "Timeout": "*int64"}
+	return map[string]string{"AlertEscalationId": "*uuid.UUID", "CreatedAt": "*int64", "Medium": "*string", "MediumValue": "*string", "OrgId": "*uuid.UUID", "Timeout": "*int64", "UserId": "*uuid.UUID"}
 }
