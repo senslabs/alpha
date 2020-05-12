@@ -1159,3 +1159,26 @@ func GetAlertEscalationReverseFieldMap() map[string]string {
 func GetAlertEscalationTypeMap() map[string]string {
 	return map[string]string{"AlertEscalationId": "*uuid.UUID", "CreatedAt": "*int64", "Medium": "*string", "MediumValue": "*string", "OrgId": "*uuid.UUID", "Timeout": "*int64", "UserId": "*uuid.UUID"}
 }
+
+type Report struct {
+	ReportId   *uuid.UUID `db:"report_id" json:",omitempty"`
+	UserId     *uuid.UUID `db:"user_id" json:",omitempty"`
+	CreatedAt  *int64     `db:"created_at" json:",omitempty"`
+	ReportType *string    `db:"report_type" json:",omitempty"`
+	ReportDate *int64     `db:"report_date" json:",omitempty"`
+	ReportUrl  *string    `db:"report_url" json:",omitempty"`
+	Status     *string    `db:"status" json:",omitempty"`
+	Unread     *bool      `db:"unread" json:",omitempty"`
+}
+
+func GetReportFieldMap() map[string]string {
+	return map[string]string{"CreatedAt": "created_at", "ReportDate": "report_date", "ReportId": "report_id", "ReportType": "report_type", "ReportUrl": "report_url", "Status": "status", "Unread": "unread", "UserId": "user_id"}
+}
+
+func GetReportReverseFieldMap() map[string]string {
+	return map[string]string{"created_at": "CreatedAt", "report_date": "ReportDate", "report_id": "ReportId", "report_type": "ReportType", "report_url": "ReportUrl", "status": "Status", "unread": "Unread", "user_id": "UserId"}
+}
+
+func GetReportTypeMap() map[string]string {
+	return map[string]string{"CreatedAt": "*int64", "ReportDate": "*int64", "ReportId": "*uuid.UUID", "ReportType": "*string", "ReportUrl": "*string", "Status": "*string", "Unread": "*bool", "UserId": "*uuid.UUID"}
+}

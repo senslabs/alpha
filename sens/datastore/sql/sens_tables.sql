@@ -4,7 +4,7 @@ CREATE TABLE "auths" (
   "mobile" text UNIQUE,
   "social" text UNIQUE,
   "first_name" text NOT NULL,
-  "last_name",
+  "last_name" text,
   "created_at" int DEFAULT (now()::int),
   "updated_at" int,
   "is_sens" bool
@@ -185,14 +185,22 @@ CREATE TABLE "device_properties" (
   PRIMARY KEY ("device_id", "key")
 );
 
+CREATE TABLE "alerts" (
+  "alert_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
+  "user_id" uuid,
+  "created_at" int,
+  "alert_name" text,
+  "status" text,
+  "remarks" text
+);
+
 CREATE TABLE "sessions" (
   "session_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "user_id" uuid,
   "session_name" text,
   "session_type" text,
   "started_at" int,
-  "ended_at" int,
-  "state" text
+  "ended_at" int
 );
 
 CREATE TABLE "session_settings" (
@@ -238,44 +246,15 @@ CREATE TABLE "session_properties" (
   PRIMARY KEY ("session_id", "key")
 );
 
-CREATE TABLE "alert_rules" (
-  "alert_rule_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
+CREATE TABLE "reports" (
+  "report_id" uuid PRIMARY KEY,
   "user_id" uuid,
-  "alert_name" string,
-  "key" string,
-  "duration" int,
-  "enabled" boolean,
-  "created_at" int,
-  "updated_at" int,
-  "upper_limit" float,
-  "lower_limit" float,
-  "valid_from" string,
-  "valid_for" int
-);
-
-CREATE TABLE "alert_escalations" (
-  "alert_escalation_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
-  "alert_rule_id" uuid,
-  "escalation_group" string,
-  "escalation_level" int,
-  "snooze" int,
-  "medium" string,
-  "medium_value" string,
-  "created_at" int,
-  "timeout" int,
-  "status" string
-);
-
-CREATE TABLE "alerts" (
-  "alert_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
-  "user_id" uuid,
-  "alert_rule_id" uuid NOT NULL,
-  "created_at" int,
-  "alert_name" string,
-  "valid" boolean,
-  "status" string,
-  "remarks" string,
-  "triggered_level" int
+  "created_at" int8 DEFAULT (now()::int),
+  "report_type" text,
+  "report_date" int8,
+  "report_url" text,
+  "status" text DEFAULT 'PENDING',
+  "unread" boolean DEFAULT false
 );
 
 ALTER TABLE "orgs" ADD FOREIGN KEY ("auth_id") REFERENCES "auths" ("auth_id");
@@ -338,7 +317,7 @@ ALTER TABLE "sessions" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id"
 
 ALTER TABLE "session_settings" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
 
-ALTER TABLE "vital_baselines" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
+ALTER TABLE "baselines" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
 
 ALTER TABLE "session_events" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
 
@@ -346,8 +325,8 @@ ALTER TABLE "session_records" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("u
 
 ALTER TABLE "session_properties" ADD FOREIGN KEY ("session_id") REFERENCES "sessions" ("session_id");
 
+ALTER TABLE "reports" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
+
 CREATE INDEX ON "sessions" ("ended_at");
 
 CREATE INDEX ON "sessions" ("user_id");
-
-ALTER TABLE "alert_escalations" ADD FOREIGN KEY ("alert_rule_id") REFERENCES "alert_rules" ("alert_rule_id");

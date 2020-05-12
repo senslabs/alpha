@@ -69,6 +69,7 @@ func main() {
 	api.OrgSleepViewMain(r)
 	api.AlertRuleMain(r)
 	api.AlertEscalationMain(r)
+	api.ReportMain(r)
 	
 	ext.ExtMain(r)
 
