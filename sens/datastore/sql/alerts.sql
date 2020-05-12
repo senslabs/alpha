@@ -18,7 +18,7 @@ CREATE TABLE "alert_rules" (
 
 CREATE TABLE "alert_escalations" (
   "alert_escalation_id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
-  "alert_rule_id" uuid,
+  "org_id" uuid,
   "medium" string,
   "medium_value" string,
   "created_at" int DEFAULT (now()::int),
@@ -37,5 +37,3 @@ CREATE TABLE "alerts" (
   "remarks" string,
   "triggered_level" int
 );
-
-ALTER TABLE "alert_escalations" ADD FOREIGN KEY ("alert_rule_id") REFERENCES "alert_rules" ("alert_rule_id");

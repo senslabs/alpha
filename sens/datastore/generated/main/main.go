@@ -59,7 +59,6 @@ func main() {
 	api.OrgAlertViewMain(r)
 	api.OrgLatestAlertViewMain(r)
 	api.OrgSettingMain(r)
-	api.AlertEscalationMain(r)
 	api.UserSettingViewMain(r)
 	api.BaselineViewMain(r)
 	api.OrgSessionViewMain(r)
@@ -69,6 +68,7 @@ func main() {
 	api.OrgMeditationViewMain(r)
 	api.OrgSleepViewMain(r)
 	api.AlertRuleMain(r)
+	api.AlertEscalationMain(r)
 	
 	ext.ExtMain(r)
 

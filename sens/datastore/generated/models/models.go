@@ -939,31 +939,6 @@ func GetOrgSettingTypeMap() map[string]string {
 	return map[string]string{"CreatedAt": "*int64", "Key": "*string", "OrgId": "*uuid.UUID", "OrgSettingId": "*uuid.UUID", "Value": "*string"}
 }
 
-type AlertEscalation struct {
-	AlertEscalationId *uuid.UUID `db:"alert_escalation_id" json:",omitempty"`
-	AlertRuleId       *uuid.UUID `db:"alert_rule_id" json:",omitempty"`
-	EscalationGroup   *string    `db:"escalation_group" json:",omitempty"`
-	EscalationLevel   *int64     `db:"escalation_level" json:",omitempty"`
-	Snooze            *int64     `db:"snooze" json:",omitempty"`
-	Medium            *string    `db:"medium" json:",omitempty"`
-	MediumValue       *string    `db:"medium_value" json:",omitempty"`
-	CreatedAt         *int64     `db:"created_at" json:",omitempty"`
-	Timeout           *int64     `db:"timeout" json:",omitempty"`
-	Status            *string    `db:"status" json:",omitempty"`
-}
-
-func GetAlertEscalationFieldMap() map[string]string {
-	return map[string]string{"AlertEscalationId": "alert_escalation_id", "AlertRuleId": "alert_rule_id", "CreatedAt": "created_at", "EscalationGroup": "escalation_group", "EscalationLevel": "escalation_level", "Medium": "medium", "MediumValue": "medium_value", "Snooze": "snooze", "Status": "status", "Timeout": "timeout"}
-}
-
-func GetAlertEscalationReverseFieldMap() map[string]string {
-	return map[string]string{"alert_escalation_id": "AlertEscalationId", "alert_rule_id": "AlertRuleId", "created_at": "CreatedAt", "escalation_group": "EscalationGroup", "escalation_level": "EscalationLevel", "medium": "Medium", "medium_value": "MediumValue", "snooze": "Snooze", "status": "Status", "timeout": "Timeout"}
-}
-
-func GetAlertEscalationTypeMap() map[string]string {
-	return map[string]string{"AlertEscalationId": "*uuid.UUID", "AlertRuleId": "*uuid.UUID", "CreatedAt": "*int64", "EscalationGroup": "*string", "EscalationLevel": "*int64", "Medium": "*string", "MediumValue": "*string", "Snooze": "*int64", "Status": "*string", "Timeout": "*int64"}
-}
-
 type UserSettingView struct {
 	UserId    *uuid.UUID `db:"user_id" json:",omitempty"`
 	CreatedAt *int64     `db:"created_at" json:",omitempty"`
@@ -1160,4 +1135,25 @@ func GetAlertRuleReverseFieldMap() map[string]string {
 
 func GetAlertRuleTypeMap() map[string]string {
 	return map[string]string{"AlertName": "*string", "AlertRuleId": "*uuid.UUID", "CreatedAt": "*int64", "DefaultSnooze": "*int64", "Duration": "*int64", "Enabled": "*bool", "Key": "*string", "LowerLimit": "*float64", "OrgId": "*uuid.UUID", "SnoozedAt": "*int64", "SnoozedFor": "*int64", "UpdatedAt": "*int64", "UpperLimit": "*float64", "ValidFrom": "*string", "ValidTill": "*string"}
+}
+
+type AlertEscalation struct {
+	AlertEscalationId *uuid.UUID `db:"alert_escalation_id" json:",omitempty"`
+	OrgId             *uuid.UUID `db:"org_id" json:",omitempty"`
+	Medium            *string    `db:"medium" json:",omitempty"`
+	MediumValue       *string    `db:"medium_value" json:",omitempty"`
+	CreatedAt         *int64     `db:"created_at" json:",omitempty"`
+	Timeout           *int64     `db:"timeout" json:",omitempty"`
+}
+
+func GetAlertEscalationFieldMap() map[string]string {
+	return map[string]string{"AlertEscalationId": "alert_escalation_id", "CreatedAt": "created_at", "Medium": "medium", "MediumValue": "medium_value", "OrgId": "org_id", "Timeout": "timeout"}
+}
+
+func GetAlertEscalationReverseFieldMap() map[string]string {
+	return map[string]string{"alert_escalation_id": "AlertEscalationId", "created_at": "CreatedAt", "medium": "Medium", "medium_value": "MediumValue", "org_id": "OrgId", "timeout": "Timeout"}
+}
+
+func GetAlertEscalationTypeMap() map[string]string {
+	return map[string]string{"AlertEscalationId": "*uuid.UUID", "CreatedAt": "*int64", "Medium": "*string", "MediumValue": "*string", "OrgId": "*uuid.UUID", "Timeout": "*int64"}
 }
