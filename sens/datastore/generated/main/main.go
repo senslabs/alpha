@@ -53,7 +53,6 @@ func main() {
 	api.OrgSessionEventViewMain(r)
 	api.OrgSessionEventDetailViewMain(r)
 	api.OrgSessionDetailViewMain(r)
-	api.AlertRuleMain(r)
 	api.OrgPropertieMain(r)
 	api.OpSettingMain(r)
 	api.OpPropertieMain(r)
@@ -65,10 +64,11 @@ func main() {
 	api.BaselineViewMain(r)
 	api.OrgSessionViewMain(r)
 	api.UserSessionCountViewMain(r)
+	api.SessionDurationViewMain(r)
 	api.OrgSessionInfoViewMain(r)
 	api.OrgMeditationViewMain(r)
 	api.OrgSleepViewMain(r)
-	api.SessionDurationViewMain(r)
+	api.AlertRuleMain(r)
 	
 	ext.ExtMain(r)
 
