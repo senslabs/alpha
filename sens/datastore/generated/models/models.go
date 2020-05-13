@@ -1182,3 +1182,27 @@ func GetReportReverseFieldMap() map[string]string {
 func GetReportTypeMap() map[string]string {
 	return map[string]string{"CreatedAt": "*int64", "ReportDate": "*int64", "ReportId": "*uuid.UUID", "ReportType": "*string", "ReportUrl": "*string", "Status": "*string", "Unread": "*bool", "UserId": "*uuid.UUID"}
 }
+
+type ReportView struct {
+	ReportId   *uuid.UUID `db:"report_id" json:",omitempty"`
+	OrgId      *uuid.UUID `db:"org_id" json:",omitempty"`
+	UserId     *uuid.UUID `db:"user_id" json:",omitempty"`
+	CreatedAt  *int64     `db:"created_at" json:",omitempty"`
+	ReportType *string    `db:"report_type" json:",omitempty"`
+	ReportDate *int64     `db:"report_date" json:",omitempty"`
+	ReportUrl  *string    `db:"report_url" json:",omitempty"`
+	Status     *string    `db:"status" json:",omitempty"`
+	Unread     *bool      `db:"unread" json:",omitempty"`
+}
+
+func GetReportViewFieldMap() map[string]string {
+	return map[string]string{"CreatedAt": "created_at", "OrgId": "org_id", "ReportDate": "report_date", "ReportId": "report_id", "ReportType": "report_type", "ReportUrl": "report_url", "Status": "status", "Unread": "unread", "UserId": "user_id"}
+}
+
+func GetReportViewReverseFieldMap() map[string]string {
+	return map[string]string{"created_at": "CreatedAt", "org_id": "OrgId", "report_date": "ReportDate", "report_id": "ReportId", "report_type": "ReportType", "report_url": "ReportUrl", "status": "Status", "unread": "Unread", "user_id": "UserId"}
+}
+
+func GetReportViewTypeMap() map[string]string {
+	return map[string]string{"CreatedAt": "*int64", "OrgId": "*uuid.UUID", "ReportDate": "*int64", "ReportId": "*uuid.UUID", "ReportType": "*string", "ReportUrl": "*string", "Status": "*string", "Unread": "*bool", "UserId": "*uuid.UUID"}
+}

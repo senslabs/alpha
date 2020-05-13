@@ -70,6 +70,7 @@ func main() {
 	api.AlertRuleMain(r)
 	api.AlertEscalationMain(r)
 	api.ReportMain(r)
+	api.ReportViewMain(r)
 	
 	ext.ExtMain(r)
 

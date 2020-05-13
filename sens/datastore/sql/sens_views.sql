@@ -481,3 +481,17 @@ FROM ( SELECT DISTINCT ON (user_id, KEY)
 ORDER BY
   created_at DESC;
 
+CREATE VIEW report_views AS
+SELECT
+r.report_id,
+u.org_id,
+r.user_id,
+r.created_at,
+r.report_type,
+r.report_date,
+r.report_url,
+r.status,
+r.unread
+FROM reports r
+JOIN users u
+ON u.user_id = r.user_id;
