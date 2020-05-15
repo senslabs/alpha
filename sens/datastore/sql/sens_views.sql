@@ -139,7 +139,9 @@ SELECT
 FROM
   sessions s
   JOIN users u ON u.user_id = s.user_id;
-  WHERE state = 'VALID';
+
+WHERE
+  state = 'VALID';
 
 CREATE VIEW org_session_info_views AS
 SELECT
@@ -167,7 +169,8 @@ FROM
     avg(value)::text AS value
   FROM
     org_session_record_views osrv
-    WHERE KEY NOT IN ('Recovery')
+  WHERE
+    KEY NOT IN ('Recovery')
   GROUP BY
     session_id,
     KEY) sp ON sp.session_id = osv.session_id
@@ -255,7 +258,8 @@ FROM (
   FROM
     sessions
   WHERE
-    session_type = 'Sleep' AND state = 'VALID'
+    session_type = 'Sleep'
+    AND state = 'VALID'
   UNION
   SELECT
     session_type AS activity_type,
@@ -264,7 +268,8 @@ FROM (
   FROM
     sessions
   WHERE
-    session_type = 'Meditation' AND state = 'VALID'
+    session_type = 'Meditation'
+    AND state = 'VALID'
   UNION
   SELECT
     'Alert' AS activity_type,
@@ -415,7 +420,7 @@ SELECT
   user_id,
   org_id,
   session_id,
-  json_object(array_agg(value::text), array_agg(count::text)) as stage_epochs,
+  json_object(array_agg(value::text), array_agg(count::text)) AS stage_epochs,
   sum(count)::text AS epochs
 FROM (
   SELECT
@@ -483,15 +488,32 @@ ORDER BY
 
 CREATE VIEW report_views AS
 SELECT
-r.report_id,
-u.org_id,
-r.user_id,
-r.created_at,
-r.report_type,
-r.report_date,
-r.report_url,
-r.status,
-r.unread
-FROM reports r
-JOIN users u
-ON u.user_id = r.user_id;
+  r.report_id,
+  u.org_id,
+  r.user_id,
+  r.created_at,
+  r.report_type,
+  r.report_date,
+  r.report_url,
+  r.status,
+  r.unread
+FROM
+  reports r
+  JOIN users u ON u.user_id = r.user_id;
+
+CREATE VIEW user_dated_session_views AS
+SELECT
+  s.session_id,
+  max(sp.value::int8::timestamp::date) AS date,
+  s.user_id,
+  json_object(array_agg(sp.key), array_agg(sp.value))
+FROM
+  session_properties sp
+  JOIN sessions s ON s.session_id = sp.session_id
+WHERE
+  sp.key IN ('WakeupTime', 'SleepTime', 'Recovery')
+  AND sp.value != 'None' AND sp.value::int8 > 0
+GROUP BY
+  s.session_id,
+  s.user_id;
+

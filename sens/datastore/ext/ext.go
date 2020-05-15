@@ -1,6 +1,7 @@
 package ext
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -17,6 +18,7 @@ func ExtMain(r *mux.Router) {
 	s.HandleFunc("/activities/get", GetOrgActivites).Queries("days", "{days:[0-9]+}")
 	s.HandleFunc("/users/{id}/delete", DeleteUserAuth)
 	s.HandleFunc("/records/avg", GetAvgValues)
+	s.HandleFunc("/users/{id}/trends", GetUserTrends).Queries("from", "{from}", "to", "{to}")
 }
 
 func GetOrgActivites(w http.ResponseWriter, r *http.Request) {
@@ -88,4 +90,57 @@ func DeleteUserAuth(w http.ResponseWriter, r *http.Request) {
 	_, err = stmt.Exec(userId)
 	errors.Pie(err)
 	w.WriteHeader(http.StatusOK)
+}
+
+type sessionViews struct {
+	SessionId  string
+	Date       string
+	UserId     string
+	Timestamps map[string]interface{}
+}
+
+type Trend struct {
+	Date string
+	Key  string
+	Min  float64
+	Avg  float64
+	Max  float64
+}
+
+func GetUserTrends(w http.ResponseWriter, r *http.Request) {
+	userId := r.URL.Query().Get("UserId")
+	from := r.URL.Query().Get("From")
+	to := r.URL.Query().Get("To")
+	db := datastore.GetConnection()
+
+	rows, err := db.Query("SELECT * FROM user_dated_session_views WHERE user_id=$1 AND date >= $2 AND date <= $3", userId, from, to)
+	errors.Pie(err)
+
+	var ss []sessionViews
+	for rows.Next() {
+		s := sessionViews{}
+		var ts []byte
+		rows.Scan(&s.SessionId, &s.Date, &s.UserId, &s.Timestamps)
+		s.Timestamps = types.UnmarshalMap(ts)
+		ss = append(ss, s)
+	}
+
+	i := 1
+	query := []string{}
+	var values []interface{}
+	ph := `SELECT max(timestamp::timestamp::date) AS date, key, min(value), avg(value), max(value) FROM session_records sr WHERE key in ('HeartRate', 'BreathRate') AND value > 0 AND timestamp >= $%d AND timestamp <= $%d AND user_id = $%d GROUP BY key`
+	for _, s := range ss {
+		query = append(query, fmt.Sprintf(ph, i, i+1, i+2))
+		values = append(values, s.Timestamps["SleepTime"], s.Timestamps["WakeupTime"], s.UserId)
+		i = i + 3
+	}
+
+	trends := []Trend{}
+	rows, err = db.Query(strings.Join(query, " UNION "), values...)
+	for rows.Next() {
+		t := Trend{}
+		rows.Scan(&t.Date, &t.Key, &t.Min, &t.Avg, &t.Max)
+		trends = append(trends, t)
+	}
+	types.MarshalInto(trends, w)
 }
