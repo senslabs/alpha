@@ -1206,3 +1206,22 @@ func GetReportViewReverseFieldMap() map[string]string {
 func GetReportViewTypeMap() map[string]string {
 	return map[string]string{"CreatedAt": "*int64", "OrgId": "*uuid.UUID", "ReportDate": "*int64", "ReportId": "*uuid.UUID", "ReportType": "*string", "ReportUrl": "*string", "Status": "*string", "Unread": "*bool", "UserId": "*uuid.UUID"}
 }
+
+type UserDatedSessionView struct {
+	SessionId  *uuid.UUID            `db:"session_id" json:",omitempty"`
+	Date       []byte                `db:"date" json:",omitempty"`
+	UserId     *uuid.UUID            `db:"user_id" json:",omitempty"`
+	Timestamps *datastore.RawMessage `db:"timestamps" json:",omitempty"`
+}
+
+func GetUserDatedSessionViewFieldMap() map[string]string {
+	return map[string]string{"Date": "date", "SessionId": "session_id", "Timestamps": "timestamps", "UserId": "user_id"}
+}
+
+func GetUserDatedSessionViewReverseFieldMap() map[string]string {
+	return map[string]string{"date": "Date", "session_id": "SessionId", "timestamps": "Timestamps", "user_id": "UserId"}
+}
+
+func GetUserDatedSessionViewTypeMap() map[string]string {
+	return map[string]string{"Date": "[]byte", "SessionId": "*uuid.UUID", "Timestamps": "*datastore.RawMessage", "UserId": "*uuid.UUID"}
+}

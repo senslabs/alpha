@@ -71,6 +71,7 @@ func main() {
 	api.AlertEscalationMain(r)
 	api.ReportMain(r)
 	api.ReportViewMain(r)
+	api.UserDatedSessionViewMain(r)
 	
 	ext.ExtMain(r)
 
