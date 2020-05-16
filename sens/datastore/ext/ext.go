@@ -116,22 +116,23 @@ func GetUserTrends(w http.ResponseWriter, r *http.Request) {
 	rows, err := db.Query("SELECT * FROM user_dated_session_views WHERE user_id=$1 AND date >= $2 AND date <= $3", userId, from, to)
 	errors.Pie(err)
 
-	var ss []sessionViews
+	sm := map[string][]sessionViews{}
 	for rows.Next() {
 		s := sessionViews{}
 		var ts []byte
 		rows.Scan(&s.SessionId, &s.Date, &s.UserId, &ts)
 		s.Timestamps = types.UnmarshalMap(ts)
-		ss = append(ss, s)
+		sm[s.Date] = append(sm[s.Date], s)
 	}
 
 	i := 1
 	query := []string{}
 	var values []interface{}
 	ph := `SELECT max(timestamp::timestamp::date) AS date, key, min(value), avg(value), max(value) FROM session_records sr WHERE key in ('HeartRate', 'BreathRate') AND value > 0 AND timestamp >= $%d AND timestamp <= $%d AND user_id = $%d GROUP BY key`
-	for _, s := range ss {
+	for _, ss := range sm {
+		l := len(ss)
 		query = append(query, fmt.Sprintf(ph, i, i+1, i+2))
-		values = append(values, s.Timestamps["SleepTime"], s.Timestamps["WakeupTime"], s.UserId)
+		values = append(values, ss[0].Timestamps["SleepTime"], ss[l-1].Timestamps["WakeupTime"], ss[0].UserId)
 		i = i + 3
 	}
 

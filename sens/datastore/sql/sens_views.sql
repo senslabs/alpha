@@ -501,6 +501,8 @@ FROM
   reports r
   JOIN users u ON u.user_id = r.user_id;
 
+-- TRENDS
+
 CREATE VIEW user_dated_session_views AS
 SELECT
   s.session_id,
@@ -511,9 +513,48 @@ FROM
   session_properties sp
   JOIN sessions s ON s.session_id = sp.session_id
 WHERE
-  sp.key IN ('WakeupTime', 'SleepTime', 'Recovery')
-  AND sp.value != 'None' AND sp.value::int8 > 0
+  sp.key IN ('WakeupTime', 'SleepTime', 'Recovery', 'Stress')
+  AND sp.value != 'None'
+  AND sp.value::int8 > 0
 GROUP BY
   s.session_id,
   s.user_id;
+
+CREATE VIEW longest_sleep_trend_views
+SELECT
+  s.session_id, s.user_id, s.date, s.duration, json_object(array_agg(sp.key), array_agg(sp.value)) AS properties
+  FROM ( SELECT DISTINCT ON (user_id, date)
+      session_id,
+      user_id,
+      date,
+      duration
+    FROM (
+      SELECT
+        s.session_id,
+        s.user_id,
+        max(sp.value::int8::timestamp::date) AS date,
+        array_agg(sp.key) AS keys,
+        array_agg(sp.value::int8)[2] - array_agg(sp.value::int8)[1] AS duration
+      FROM
+        sessions s
+        JOIN session_properties sp ON s.session_id = sp.session_id
+      WHERE
+        sp.key IN ('SleepTime', 'WakeupTime')
+        AND sp.value != 'None'
+        AND sp.value::int8 > 0
+      GROUP BY
+        s.session_id,
+        s.user_id) t
+      ORDER BY
+      user_id,
+      date,
+      duration DESC) s
+  JOIN session_properties sp ON sp.session_id = s.session_id
+WHERE
+  sp.key IN ('SnoringPoints', 'RestfulnessPoints', 'BedTime', 'SleepTime')
+GROUP BY
+  s.session_id,
+  s.user_id,
+  s.date,
+  s.duration;
 

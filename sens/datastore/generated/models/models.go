@@ -1207,6 +1207,26 @@ func GetReportViewTypeMap() map[string]string {
 	return map[string]string{"CreatedAt": "*int64", "OrgId": "*uuid.UUID", "ReportDate": "*int64", "ReportId": "*uuid.UUID", "ReportType": "*string", "ReportUrl": "*string", "Status": "*string", "Unread": "*bool", "UserId": "*uuid.UUID"}
 }
 
+type LongestSleepTrendView struct {
+	SessionId  *uuid.UUID            `db:"session_id" json:",omitempty"`
+	UserId     *uuid.UUID            `db:"user_id" json:",omitempty"`
+	Date       []byte                `db:"date" json:",omitempty"`
+	Duration   *int64                `db:"duration" json:",omitempty"`
+	Properties *datastore.RawMessage `db:"properties" json:",omitempty"`
+}
+
+func GetLongestSleepTrendViewFieldMap() map[string]string {
+	return map[string]string{"Date": "date", "Duration": "duration", "Properties": "properties", "SessionId": "session_id", "UserId": "user_id"}
+}
+
+func GetLongestSleepTrendViewReverseFieldMap() map[string]string {
+	return map[string]string{"date": "Date", "duration": "Duration", "properties": "Properties", "session_id": "SessionId", "user_id": "UserId"}
+}
+
+func GetLongestSleepTrendViewTypeMap() map[string]string {
+	return map[string]string{"Date": "[]byte", "Duration": "*int64", "Properties": "*datastore.RawMessage", "SessionId": "*uuid.UUID", "UserId": "*uuid.UUID"}
+}
+
 type UserDatedSessionView struct {
 	SessionId  *uuid.UUID            `db:"session_id" json:",omitempty"`
 	Date       []byte                `db:"date" json:",omitempty"`
