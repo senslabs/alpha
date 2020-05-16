@@ -18,7 +18,7 @@ func ExtMain(r *mux.Router) {
 	s.HandleFunc("/activities/get", GetOrgActivites).Queries("days", "{days:[0-9]+}")
 	s.HandleFunc("/users/{id}/delete", DeleteUserAuth)
 	s.HandleFunc("/records/avg", GetAvgValues)
-	s.HandleFunc("/users/{id}/trends", GetUserTrends).Queries("from", "{from}", "to", "{to}")
+	s.HandleFunc("/users/{id}/trends", GetUserTrends).Queries("From", "{From}", "To", "{To}")
 }
 
 func GetOrgActivites(w http.ResponseWriter, r *http.Request) {
@@ -108,7 +108,7 @@ type Trend struct {
 }
 
 func GetUserTrends(w http.ResponseWriter, r *http.Request) {
-	userId := r.URL.Query().Get("UserId")
+	userId := mux.Vars(r)["id"]
 	from := r.URL.Query().Get("From")
 	to := r.URL.Query().Get("To")
 	db := datastore.GetConnection()
