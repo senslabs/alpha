@@ -120,7 +120,7 @@ func GetUserTrends(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		s := sessionViews{}
 		var ts []byte
-		rows.Scan(&s.SessionId, &s.Date, &s.UserId, &s.Timestamps)
+		rows.Scan(&s.SessionId, &s.Date, &s.UserId, &ts)
 		s.Timestamps = types.UnmarshalMap(ts)
 		ss = append(ss, s)
 	}
