@@ -136,7 +136,11 @@ func GetUserTrends(w http.ResponseWriter, r *http.Request) {
 	for d, ss := range sm {
 		sz := len(ss)
 		sort.Slice(ss, func(l int, r int) bool {
-			return ss[l].Properties["SleepTime"].(int8) < ss[r].Properties["SleepTime"].(int8)
+			left, err := strconv.ParseInt(ss[l].Properties["SleepTime"].(string), 10, 64)
+			errors.Pie(err)
+			right, err := strconv.ParseInt(ss[l].Properties["SleepTime"].(string), 10, 64)
+			errors.Pie(err)
+			return left < right
 		})
 		query = append(query, fmt.Sprintf(ph, d, i, i+1, i+2))
 		values = append(values, ss[0].Properties["SleepTime"], ss[sz-1].Properties["WakeupTime"], ss[0].UserId)
