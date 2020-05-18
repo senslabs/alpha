@@ -231,7 +231,7 @@ func DeleteOpEndpointAccessGroup(or []string, and []string, in string, span []st
 	q := query.String()
 	logger.Debug(q)
 
-	/*db := datastore.GetConnection()
+	db := datastore.GetConnection()
 	stmt, err := db.Prepare(q)
 	defer stmt.Close()
 	errors.Pie(err)
@@ -240,6 +240,6 @@ func DeleteOpEndpointAccessGroup(or []string, and []string, in string, span []st
 	errors.Pie(err)
 
 	n, err := r.RowsAffected()
-	errors.Pie(err)*/
-	return 0
+	errors.Pie(err)
+	return n
 }
