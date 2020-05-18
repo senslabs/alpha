@@ -149,7 +149,7 @@ func GetUserTrends(w http.ResponseWriter, r *http.Request) {
 	}
 
 	trends := []Trend{}
-	logger.Debug(strings.Join(query, " UNION "))
+	logger.Error(strings.Join(query, " UNION "))
 	rows, err = db.Query(strings.Join(query, " UNION "), values...)
 	errors.Pie(err)
 	for rows.Next() {
