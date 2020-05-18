@@ -133,7 +133,7 @@ func GetUserTrends(w http.ResponseWriter, r *http.Request) {
 	i := 1
 	query := []string{}
 	var values []interface{}
-	ph := `SELECT %s AS date, key, min(value), avg(value), max(value) FROM session_records sr WHERE key in ('HeartRate', 'BreathRate', 'Stress') AND value > 0 AND timestamp >= $%d AND timestamp <= $%d AND user_id = $%d GROUP BY key`
+	ph := `SELECT "%s" AS date, key, min(value), avg(value), max(value) FROM session_records sr WHERE key in ('HeartRate', 'BreathRate', 'Stress') AND value > 0 AND timestamp >= $%d AND timestamp <= $%d AND user_id = $%d GROUP BY key`
 	for d, ss := range sm {
 		sz := len(ss)
 		sort.Slice(ss, func(l int, r int) bool {
