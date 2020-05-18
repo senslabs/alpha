@@ -134,12 +134,12 @@ func GetUserTrends(w http.ResponseWriter, r *http.Request) {
 	var values []interface{}
 	ph := `SELECT %s AS date, key, min(value), avg(value), max(value) FROM session_records sr WHERE key in ('HeartRate', 'BreathRate', 'Stress') AND value > 0 AND timestamp >= $%d AND timestamp <= $%d AND user_id = $%d GROUP BY key`
 	for d, ss := range sm {
-		l := len(ss)
+		sz := len(ss)
 		sort.Slice(ss, func(l int, r int) bool {
 			return ss[l].Properties["SleepTime"].(int8) < ss[r].Properties["SleepTime"].(int8)
 		})
 		query = append(query, fmt.Sprintf(ph, d, i, i+1, i+2))
-		values = append(values, ss[0].Properties["SleepTime"], ss[l-1].Properties["WakeupTime"], ss[0].UserId)
+		values = append(values, ss[0].Properties["SleepTime"], ss[sz-1].Properties["WakeupTime"], ss[0].UserId)
 		i = i + 3
 	}
 
