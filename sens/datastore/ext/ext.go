@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/senslabs/alpha/sens/datastore"
 	"github.com/senslabs/alpha/sens/errors"
+	"github.com/senslabs/alpha/sens/logger"
 	"github.com/senslabs/alpha/sens/types"
 )
 
@@ -148,6 +149,7 @@ func GetUserTrends(w http.ResponseWriter, r *http.Request) {
 	}
 
 	trends := []Trend{}
+	logger.Debug(strings.Join(query, " UNION "))
 	rows, err = db.Query(strings.Join(query, " UNION "), values...)
 	errors.Pie(err)
 	for rows.Next() {
