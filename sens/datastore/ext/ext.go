@@ -149,6 +149,7 @@ func GetUserTrends(w http.ResponseWriter, r *http.Request) {
 
 	trends := []Trend{}
 	rows, err = db.Query(strings.Join(query, " UNION "), values...)
+	errors.Pie(err)
 	for rows.Next() {
 		t := Trend{}
 		rows.Scan(&t.Date, &t.Key, &t.Min, &t.Avg, &t.Max)
