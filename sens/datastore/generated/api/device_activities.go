@@ -19,6 +19,7 @@ func DeviceActivitieMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/device-activities/update", UpdateDeviceActivitieWhere)
 	r.HandleFunc("/api/device-activities/find", FindDeviceActivitie).Queries("limit", "{limit}")
+	r.HandleFunc("/api/device-activities/delete", DeleteDeviceActivitie)
 }
 
 func DeviceActivitieRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindDeviceActivitie(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindDeviceActivitie(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindDeviceActivitie: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteDeviceActivitie(w http.ResponseWriter, r *http.Request) {
+	defer DeviceActivitieRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteDeviceActivitie(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteDeviceActivitie: %d", n)
+	types.MarshalInto(n, w)
 }

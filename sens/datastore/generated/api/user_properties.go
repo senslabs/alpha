@@ -19,6 +19,7 @@ func UserPropertieMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/user-properties/update", UpdateUserPropertieWhere)
 	r.HandleFunc("/api/user-properties/find", FindUserPropertie).Queries("limit", "{limit}")
+	r.HandleFunc("/api/user-properties/delete", DeleteUserPropertie)
 }
 
 func UserPropertieRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindUserPropertie(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindUserPropertie(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindUserPropertie: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteUserPropertie(w http.ResponseWriter, r *http.Request) {
+	defer UserPropertieRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteUserPropertie(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteUserPropertie: %d", n)
+	types.MarshalInto(n, w)
 }

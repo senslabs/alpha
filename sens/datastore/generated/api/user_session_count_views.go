@@ -19,6 +19,7 @@ func UserSessionCountViewMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/user-session-count-views/update", UpdateUserSessionCountViewWhere)
 	r.HandleFunc("/api/user-session-count-views/find", FindUserSessionCountView).Queries("limit", "{limit}")
+	r.HandleFunc("/api/user-session-count-views/delete", DeleteUserSessionCountView)
 }
 
 func UserSessionCountViewRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindUserSessionCountView(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindUserSessionCountView(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindUserSessionCountView: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteUserSessionCountView(w http.ResponseWriter, r *http.Request) {
+	defer UserSessionCountViewRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteUserSessionCountView(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteUserSessionCountView: %d", n)
+	types.MarshalInto(n, w)
 }

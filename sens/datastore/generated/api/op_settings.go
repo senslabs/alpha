@@ -22,6 +22,7 @@ func OpSettingMain(r *mux.Router) {
     
 	r.HandleFunc("/api/op-settings/update", UpdateOpSettingWhere)
 	r.HandleFunc("/api/op-settings/find", FindOpSetting).Queries("limit", "{limit}")
+	r.HandleFunc("/api/op-settings/delete", DeleteOpSetting)
 }
 
 func OpSettingRecovery(w http.ResponseWriter) {
@@ -97,4 +98,17 @@ func FindOpSetting(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindOpSetting(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindOpSetting: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteOpSetting(w http.ResponseWriter, r *http.Request) {
+	defer OpSettingRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteOpSetting(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteOpSetting: %d", n)
+	types.MarshalInto(n, w)
 }

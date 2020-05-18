@@ -19,6 +19,7 @@ func OrgSessionEventViewMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/org-session-event-views/update", UpdateOrgSessionEventViewWhere)
 	r.HandleFunc("/api/org-session-event-views/find", FindOrgSessionEventView).Queries("limit", "{limit}")
+	r.HandleFunc("/api/org-session-event-views/delete", DeleteOrgSessionEventView)
 }
 
 func OrgSessionEventViewRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindOrgSessionEventView(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindOrgSessionEventView(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindOrgSessionEventView: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteOrgSessionEventView(w http.ResponseWriter, r *http.Request) {
+	defer OrgSessionEventViewRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteOrgSessionEventView(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteOrgSessionEventView: %d", n)
+	types.MarshalInto(n, w)
 }

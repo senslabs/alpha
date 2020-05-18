@@ -19,6 +19,7 @@ func OrgPropertieMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/org-properties/update", UpdateOrgPropertieWhere)
 	r.HandleFunc("/api/org-properties/find", FindOrgPropertie).Queries("limit", "{limit}")
+	r.HandleFunc("/api/org-properties/delete", DeleteOrgPropertie)
 }
 
 func OrgPropertieRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindOrgPropertie(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindOrgPropertie(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindOrgPropertie: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteOrgPropertie(w http.ResponseWriter, r *http.Request) {
+	defer OrgPropertieRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteOrgPropertie(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteOrgPropertie: %d", n)
+	types.MarshalInto(n, w)
 }

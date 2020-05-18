@@ -19,6 +19,7 @@ func OpViewMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/op-views/update", UpdateOpViewWhere)
 	r.HandleFunc("/api/op-views/find", FindOpView).Queries("limit", "{limit}")
+	r.HandleFunc("/api/op-views/delete", DeleteOpView)
 }
 
 func OpViewRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindOpView(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindOpView(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindOpView: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteOpView(w http.ResponseWriter, r *http.Request) {
+	defer OpViewRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteOpView(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteOpView: %d", n)
+	types.MarshalInto(n, w)
 }

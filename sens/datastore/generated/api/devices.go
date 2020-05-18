@@ -19,6 +19,7 @@ func DeviceMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/devices/update", UpdateDeviceWhere)
 	r.HandleFunc("/api/devices/find", FindDevice).Queries("limit", "{limit}")
+	r.HandleFunc("/api/devices/delete", DeleteDevice)
 }
 
 func DeviceRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindDevice(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindDevice(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindDevice: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteDevice(w http.ResponseWriter, r *http.Request) {
+	defer DeviceRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteDevice(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteDevice: %d", n)
+	types.MarshalInto(n, w)
 }

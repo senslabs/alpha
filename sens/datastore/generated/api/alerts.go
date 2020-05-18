@@ -22,6 +22,7 @@ func AlertMain(r *mux.Router) {
     
 	r.HandleFunc("/api/alerts/update", UpdateAlertWhere)
 	r.HandleFunc("/api/alerts/find", FindAlert).Queries("limit", "{limit}")
+	r.HandleFunc("/api/alerts/delete", DeleteAlert)
 }
 
 func AlertRecovery(w http.ResponseWriter) {
@@ -97,4 +98,17 @@ func FindAlert(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindAlert(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindAlert: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteAlert(w http.ResponseWriter, r *http.Request) {
+	defer AlertRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteAlert(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteAlert: %d", n)
+	types.MarshalInto(n, w)
 }

@@ -22,6 +22,7 @@ func BaselineMain(r *mux.Router) {
     
 	r.HandleFunc("/api/baselines/update", UpdateBaselineWhere)
 	r.HandleFunc("/api/baselines/find", FindBaseline).Queries("limit", "{limit}")
+	r.HandleFunc("/api/baselines/delete", DeleteBaseline)
 }
 
 func BaselineRecovery(w http.ResponseWriter) {
@@ -97,4 +98,17 @@ func FindBaseline(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindBaseline(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindBaseline: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteBaseline(w http.ResponseWriter, r *http.Request) {
+	defer BaselineRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteBaseline(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteBaseline: %d", n)
+	types.MarshalInto(n, w)
 }

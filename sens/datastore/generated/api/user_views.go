@@ -19,6 +19,7 @@ func UserViewMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/user-views/update", UpdateUserViewWhere)
 	r.HandleFunc("/api/user-views/find", FindUserView).Queries("limit", "{limit}")
+	r.HandleFunc("/api/user-views/delete", DeleteUserView)
 }
 
 func UserViewRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindUserView(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindUserView(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindUserView: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteUserView(w http.ResponseWriter, r *http.Request) {
+	defer UserViewRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteUserView(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteUserView: %d", n)
+	types.MarshalInto(n, w)
 }

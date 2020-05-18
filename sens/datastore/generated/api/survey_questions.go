@@ -22,6 +22,7 @@ func SurveyQuestionMain(r *mux.Router) {
     
 	r.HandleFunc("/api/survey-questions/update", UpdateSurveyQuestionWhere)
 	r.HandleFunc("/api/survey-questions/find", FindSurveyQuestion).Queries("limit", "{limit}")
+	r.HandleFunc("/api/survey-questions/delete", DeleteSurveyQuestion)
 }
 
 func SurveyQuestionRecovery(w http.ResponseWriter) {
@@ -97,4 +98,17 @@ func FindSurveyQuestion(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindSurveyQuestion(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindSurveyQuestion: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteSurveyQuestion(w http.ResponseWriter, r *http.Request) {
+	defer SurveyQuestionRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteSurveyQuestion(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteSurveyQuestion: %d", n)
+	types.MarshalInto(n, w)
 }

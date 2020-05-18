@@ -19,6 +19,7 @@ func UserDatedSessionViewMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/user-dated-session-views/update", UpdateUserDatedSessionViewWhere)
 	r.HandleFunc("/api/user-dated-session-views/find", FindUserDatedSessionView).Queries("limit", "{limit}")
+	r.HandleFunc("/api/user-dated-session-views/delete", DeleteUserDatedSessionView)
 }
 
 func UserDatedSessionViewRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindUserDatedSessionView(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindUserDatedSessionView(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindUserDatedSessionView: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteUserDatedSessionView(w http.ResponseWriter, r *http.Request) {
+	defer UserDatedSessionViewRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteUserDatedSessionView(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteUserDatedSessionView: %d", n)
+	types.MarshalInto(n, w)
 }

@@ -19,6 +19,7 @@ func AuthViewMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/auth-views/update", UpdateAuthViewWhere)
 	r.HandleFunc("/api/auth-views/find", FindAuthView).Queries("limit", "{limit}")
+	r.HandleFunc("/api/auth-views/delete", DeleteAuthView)
 }
 
 func AuthViewRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindAuthView(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindAuthView(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindAuthView: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteAuthView(w http.ResponseWriter, r *http.Request) {
+	defer AuthViewRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteAuthView(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteAuthView: %d", n)
+	types.MarshalInto(n, w)
 }

@@ -19,6 +19,7 @@ func SessionDurationViewMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/session-duration-views/update", UpdateSessionDurationViewWhere)
 	r.HandleFunc("/api/session-duration-views/find", FindSessionDurationView).Queries("limit", "{limit}")
+	r.HandleFunc("/api/session-duration-views/delete", DeleteSessionDurationView)
 }
 
 func SessionDurationViewRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindSessionDurationView(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindSessionDurationView(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindSessionDurationView: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteSessionDurationView(w http.ResponseWriter, r *http.Request) {
+	defer SessionDurationViewRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteSessionDurationView(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteSessionDurationView: %d", n)
+	types.MarshalInto(n, w)
 }

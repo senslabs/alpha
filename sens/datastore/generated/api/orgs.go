@@ -22,6 +22,7 @@ func OrgMain(r *mux.Router) {
     
 	r.HandleFunc("/api/orgs/update", UpdateOrgWhere)
 	r.HandleFunc("/api/orgs/find", FindOrg).Queries("limit", "{limit}")
+	r.HandleFunc("/api/orgs/delete", DeleteOrg)
 }
 
 func OrgRecovery(w http.ResponseWriter) {
@@ -97,4 +98,17 @@ func FindOrg(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindOrg(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindOrg: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteOrg(w http.ResponseWriter, r *http.Request) {
+	defer OrgRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteOrg(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteOrg: %d", n)
+	types.MarshalInto(n, w)
 }

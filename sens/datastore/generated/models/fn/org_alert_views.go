@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"strings"
-	"math/rand"
 
 	"github.com/lib/pq"
 	"github.com/senslabs/alpha/sens/datastore"
@@ -179,21 +178,15 @@ func FindOrgAlertView(or []string, and []string, in string, span []string, limit
 	q := query.String()
 	logger.Debug(q)
 
-	seq := rand.Intn(99999)
-	datastore.TRACE(seq, "1: <BEFORE DB CONNECTION>")
 	db := datastore.GetConnection()
-	datastore.TRACE(seq, "2: <AFTER DB CONNECTION>")
 	stmt, err := db.Prepare(q)
 	defer stmt.Close()
-	datastore.TRACE(seq, "3: <AFTER PREPARED>")
 	errors.Pie(err)
 
 	r, err := stmt.Query(values...)
-	datastore.TRACE(seq, "4: <AFTER QUERY>")
 	errors.Pie(err)
 
 	result := datastore.RowsToMap(r, models.GetOrgAlertViewReverseFieldMap(), models.GetOrgAlertViewTypeMap())
-	datastore.TRACE(seq, "5: <RETURNING>")
 	return result
 }
 
@@ -229,4 +222,24 @@ func UpdateOrgAlertViewWhere(or []string, and []string, in string, span []string
 
 	_, err = stmt.Query(values...)
 	errors.Pie(err)
+}
+
+func DeleteOrgAlertView(or []string, and []string, in string, span []string) int64 {
+	query := bytes.NewBufferString("DELETE FROM org_alert_views WHERE ")
+	var values []interface{}
+	buildOrgAlertViewWhereClause(query, or, and, in, span, &values)
+	q := query.String()
+	logger.Debug(q)
+
+	/*db := datastore.GetConnection()
+	stmt, err := db.Prepare(q)
+	defer stmt.Close()
+	errors.Pie(err)
+
+	r, err := stmt.Exec(values...)
+	errors.Pie(err)
+
+	n, err := r.RowsAffected()
+	errors.Pie(err)*/
+	return 0
 }

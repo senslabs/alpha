@@ -19,6 +19,7 @@ func OrgSleepViewMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/org-sleep-views/update", UpdateOrgSleepViewWhere)
 	r.HandleFunc("/api/org-sleep-views/find", FindOrgSleepView).Queries("limit", "{limit}")
+	r.HandleFunc("/api/org-sleep-views/delete", DeleteOrgSleepView)
 }
 
 func OrgSleepViewRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindOrgSleepView(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindOrgSleepView(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindOrgSleepView: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteOrgSleepView(w http.ResponseWriter, r *http.Request) {
+	defer OrgSleepViewRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteOrgSleepView(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteOrgSleepView: %d", n)
+	types.MarshalInto(n, w)
 }

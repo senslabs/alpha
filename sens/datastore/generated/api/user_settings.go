@@ -22,6 +22,7 @@ func UserSettingMain(r *mux.Router) {
     
 	r.HandleFunc("/api/user-settings/update", UpdateUserSettingWhere)
 	r.HandleFunc("/api/user-settings/find", FindUserSetting).Queries("limit", "{limit}")
+	r.HandleFunc("/api/user-settings/delete", DeleteUserSetting)
 }
 
 func UserSettingRecovery(w http.ResponseWriter) {
@@ -97,4 +98,17 @@ func FindUserSetting(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindUserSetting(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindUserSetting: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteUserSetting(w http.ResponseWriter, r *http.Request) {
+	defer UserSettingRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteUserSetting(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteUserSetting: %d", n)
+	types.MarshalInto(n, w)
 }

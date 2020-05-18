@@ -22,6 +22,7 @@ func ApiKeyMain(r *mux.Router) {
     
 	r.HandleFunc("/api/api-keys/update", UpdateApiKeyWhere)
 	r.HandleFunc("/api/api-keys/find", FindApiKey).Queries("limit", "{limit}")
+	r.HandleFunc("/api/api-keys/delete", DeleteApiKey)
 }
 
 func ApiKeyRecovery(w http.ResponseWriter) {
@@ -97,4 +98,17 @@ func FindApiKey(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindApiKey(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindApiKey: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteApiKey(w http.ResponseWriter, r *http.Request) {
+	defer ApiKeyRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteApiKey(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteApiKey: %d", n)
+	types.MarshalInto(n, w)
 }

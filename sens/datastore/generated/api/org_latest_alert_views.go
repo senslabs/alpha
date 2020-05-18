@@ -19,6 +19,7 @@ func OrgLatestAlertViewMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/org-latest-alert-views/update", UpdateOrgLatestAlertViewWhere)
 	r.HandleFunc("/api/org-latest-alert-views/find", FindOrgLatestAlertView).Queries("limit", "{limit}")
+	r.HandleFunc("/api/org-latest-alert-views/delete", DeleteOrgLatestAlertView)
 }
 
 func OrgLatestAlertViewRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindOrgLatestAlertView(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindOrgLatestAlertView(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindOrgLatestAlertView: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteOrgLatestAlertView(w http.ResponseWriter, r *http.Request) {
+	defer OrgLatestAlertViewRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteOrgLatestAlertView(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteOrgLatestAlertView: %d", n)
+	types.MarshalInto(n, w)
 }

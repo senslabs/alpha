@@ -19,6 +19,7 @@ func DeviceViewMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/device-views/update", UpdateDeviceViewWhere)
 	r.HandleFunc("/api/device-views/find", FindDeviceView).Queries("limit", "{limit}")
+	r.HandleFunc("/api/device-views/delete", DeleteDeviceView)
 }
 
 func DeviceViewRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindDeviceView(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindDeviceView(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindDeviceView: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteDeviceView(w http.ResponseWriter, r *http.Request) {
+	defer DeviceViewRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteDeviceView(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteDeviceView: %d", n)
+	types.MarshalInto(n, w)
 }

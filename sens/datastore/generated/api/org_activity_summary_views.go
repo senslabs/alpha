@@ -19,6 +19,7 @@ func OrgActivitySummaryViewMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/org-activity-summary-views/update", UpdateOrgActivitySummaryViewWhere)
 	r.HandleFunc("/api/org-activity-summary-views/find", FindOrgActivitySummaryView).Queries("limit", "{limit}")
+	r.HandleFunc("/api/org-activity-summary-views/delete", DeleteOrgActivitySummaryView)
 }
 
 func OrgActivitySummaryViewRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindOrgActivitySummaryView(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindOrgActivitySummaryView(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindOrgActivitySummaryView: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteOrgActivitySummaryView(w http.ResponseWriter, r *http.Request) {
+	defer OrgActivitySummaryViewRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteOrgActivitySummaryView(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteOrgActivitySummaryView: %d", n)
+	types.MarshalInto(n, w)
 }

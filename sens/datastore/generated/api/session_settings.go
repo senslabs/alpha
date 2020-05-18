@@ -22,6 +22,7 @@ func SessionSettingMain(r *mux.Router) {
     
 	r.HandleFunc("/api/session-settings/update", UpdateSessionSettingWhere)
 	r.HandleFunc("/api/session-settings/find", FindSessionSetting).Queries("limit", "{limit}")
+	r.HandleFunc("/api/session-settings/delete", DeleteSessionSetting)
 }
 
 func SessionSettingRecovery(w http.ResponseWriter) {
@@ -97,4 +98,17 @@ func FindSessionSetting(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindSessionSetting(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindSessionSetting: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteSessionSetting(w http.ResponseWriter, r *http.Request) {
+	defer SessionSettingRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteSessionSetting(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteSessionSetting: %d", n)
+	types.MarshalInto(n, w)
 }

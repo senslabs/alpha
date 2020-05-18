@@ -19,6 +19,7 @@ func OrgActivityViewMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/org-activity-views/update", UpdateOrgActivityViewWhere)
 	r.HandleFunc("/api/org-activity-views/find", FindOrgActivityView).Queries("limit", "{limit}")
+	r.HandleFunc("/api/org-activity-views/delete", DeleteOrgActivityView)
 }
 
 func OrgActivityViewRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindOrgActivityView(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindOrgActivityView(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindOrgActivityView: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteOrgActivityView(w http.ResponseWriter, r *http.Request) {
+	defer OrgActivityViewRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteOrgActivityView(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteOrgActivityView: %d", n)
+	types.MarshalInto(n, w)
 }

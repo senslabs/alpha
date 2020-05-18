@@ -19,6 +19,7 @@ func OrgQuarterUsageViewMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/org-quarter-usage-views/update", UpdateOrgQuarterUsageViewWhere)
 	r.HandleFunc("/api/org-quarter-usage-views/find", FindOrgQuarterUsageView).Queries("limit", "{limit}")
+	r.HandleFunc("/api/org-quarter-usage-views/delete", DeleteOrgQuarterUsageView)
 }
 
 func OrgQuarterUsageViewRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindOrgQuarterUsageView(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindOrgQuarterUsageView(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindOrgQuarterUsageView: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteOrgQuarterUsageView(w http.ResponseWriter, r *http.Request) {
+	defer OrgQuarterUsageViewRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteOrgQuarterUsageView(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteOrgQuarterUsageView: %d", n)
+	types.MarshalInto(n, w)
 }

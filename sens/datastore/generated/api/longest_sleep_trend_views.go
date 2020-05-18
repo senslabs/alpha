@@ -19,6 +19,7 @@ func LongestSleepTrendViewMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/longest-sleep-trend-views/update", UpdateLongestSleepTrendViewWhere)
 	r.HandleFunc("/api/longest-sleep-trend-views/find", FindLongestSleepTrendView).Queries("limit", "{limit}")
+	r.HandleFunc("/api/longest-sleep-trend-views/delete", DeleteLongestSleepTrendView)
 }
 
 func LongestSleepTrendViewRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindLongestSleepTrendView(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindLongestSleepTrendView(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindLongestSleepTrendView: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteLongestSleepTrendView(w http.ResponseWriter, r *http.Request) {
+	defer LongestSleepTrendViewRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteLongestSleepTrendView(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteLongestSleepTrendView: %d", n)
+	types.MarshalInto(n, w)
 }

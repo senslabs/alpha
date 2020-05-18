@@ -19,6 +19,7 @@ func OpPropertieMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/op-properties/update", UpdateOpPropertieWhere)
 	r.HandleFunc("/api/op-properties/find", FindOpPropertie).Queries("limit", "{limit}")
+	r.HandleFunc("/api/op-properties/delete", DeleteOpPropertie)
 }
 
 func OpPropertieRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindOpPropertie(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindOpPropertie(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindOpPropertie: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteOpPropertie(w http.ResponseWriter, r *http.Request) {
+	defer OpPropertieRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteOpPropertie(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteOpPropertie: %d", n)
+	types.MarshalInto(n, w)
 }

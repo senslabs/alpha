@@ -22,6 +22,7 @@ func OrgSettingMain(r *mux.Router) {
     
 	r.HandleFunc("/api/org-settings/update", UpdateOrgSettingWhere)
 	r.HandleFunc("/api/org-settings/find", FindOrgSetting).Queries("limit", "{limit}")
+	r.HandleFunc("/api/org-settings/delete", DeleteOrgSetting)
 }
 
 func OrgSettingRecovery(w http.ResponseWriter) {
@@ -97,4 +98,17 @@ func FindOrgSetting(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindOrgSetting(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindOrgSetting: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteOrgSetting(w http.ResponseWriter, r *http.Request) {
+	defer OrgSettingRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteOrgSetting(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteOrgSetting: %d", n)
+	types.MarshalInto(n, w)
 }

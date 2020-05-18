@@ -19,6 +19,7 @@ func DevicePropertieMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/device-properties/update", UpdateDevicePropertieWhere)
 	r.HandleFunc("/api/device-properties/find", FindDevicePropertie).Queries("limit", "{limit}")
+	r.HandleFunc("/api/device-properties/delete", DeleteDevicePropertie)
 }
 
 func DevicePropertieRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindDevicePropertie(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindDevicePropertie(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindDevicePropertie: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteDevicePropertie(w http.ResponseWriter, r *http.Request) {
+	defer DevicePropertieRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteDevicePropertie(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteDevicePropertie: %d", n)
+	types.MarshalInto(n, w)
 }

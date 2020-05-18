@@ -19,6 +19,7 @@ func UserSettingViewMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/user-setting-views/update", UpdateUserSettingViewWhere)
 	r.HandleFunc("/api/user-setting-views/find", FindUserSettingView).Queries("limit", "{limit}")
+	r.HandleFunc("/api/user-setting-views/delete", DeleteUserSettingView)
 }
 
 func UserSettingViewRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindUserSettingView(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindUserSettingView(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindUserSettingView: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteUserSettingView(w http.ResponseWriter, r *http.Request) {
+	defer UserSettingViewRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteUserSettingView(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteUserSettingView: %d", n)
+	types.MarshalInto(n, w)
 }

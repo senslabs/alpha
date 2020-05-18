@@ -19,6 +19,7 @@ func SessionRecordMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/session-records/update", UpdateSessionRecordWhere)
 	r.HandleFunc("/api/session-records/find", FindSessionRecord).Queries("limit", "{limit}")
+	r.HandleFunc("/api/session-records/delete", DeleteSessionRecord)
 }
 
 func SessionRecordRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindSessionRecord(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindSessionRecord(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindSessionRecord: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteSessionRecord(w http.ResponseWriter, r *http.Request) {
+	defer SessionRecordRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteSessionRecord(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteSessionRecord: %d", n)
+	types.MarshalInto(n, w)
 }

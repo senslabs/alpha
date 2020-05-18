@@ -19,6 +19,7 @@ func OpEndpointAccessGroupMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/op-endpoint-access-groups/update", UpdateOpEndpointAccessGroupWhere)
 	r.HandleFunc("/api/op-endpoint-access-groups/find", FindOpEndpointAccessGroup).Queries("limit", "{limit}")
+	r.HandleFunc("/api/op-endpoint-access-groups/delete", DeleteOpEndpointAccessGroup)
 }
 
 func OpEndpointAccessGroupRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindOpEndpointAccessGroup(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindOpEndpointAccessGroup(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindOpEndpointAccessGroup: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteOpEndpointAccessGroup(w http.ResponseWriter, r *http.Request) {
+	defer OpEndpointAccessGroupRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteOpEndpointAccessGroup(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteOpEndpointAccessGroup: %d", n)
+	types.MarshalInto(n, w)
 }

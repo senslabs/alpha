@@ -19,6 +19,7 @@ func OpUserMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/op-users/update", UpdateOpUserWhere)
 	r.HandleFunc("/api/op-users/find", FindOpUser).Queries("limit", "{limit}")
+	r.HandleFunc("/api/op-users/delete", DeleteOpUser)
 }
 
 func OpUserRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindOpUser(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindOpUser(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindOpUser: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteOpUser(w http.ResponseWriter, r *http.Request) {
+	defer OpUserRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteOpUser(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteOpUser: %d", n)
+	types.MarshalInto(n, w)
 }

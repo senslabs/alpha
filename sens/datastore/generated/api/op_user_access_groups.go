@@ -19,6 +19,7 @@ func OpUserAccessGroupMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/op-user-access-groups/update", UpdateOpUserAccessGroupWhere)
 	r.HandleFunc("/api/op-user-access-groups/find", FindOpUserAccessGroup).Queries("limit", "{limit}")
+	r.HandleFunc("/api/op-user-access-groups/delete", DeleteOpUserAccessGroup)
 }
 
 func OpUserAccessGroupRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindOpUserAccessGroup(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindOpUserAccessGroup(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindOpUserAccessGroup: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteOpUserAccessGroup(w http.ResponseWriter, r *http.Request) {
+	defer OpUserAccessGroupRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteOpUserAccessGroup(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteOpUserAccessGroup: %d", n)
+	types.MarshalInto(n, w)
 }

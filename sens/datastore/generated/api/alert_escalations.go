@@ -22,6 +22,7 @@ func AlertEscalationMain(r *mux.Router) {
     
 	r.HandleFunc("/api/alert-escalations/update", UpdateAlertEscalationWhere)
 	r.HandleFunc("/api/alert-escalations/find", FindAlertEscalation).Queries("limit", "{limit}")
+	r.HandleFunc("/api/alert-escalations/delete", DeleteAlertEscalation)
 }
 
 func AlertEscalationRecovery(w http.ResponseWriter) {
@@ -97,4 +98,17 @@ func FindAlertEscalation(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindAlertEscalation(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindAlertEscalation: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteAlertEscalation(w http.ResponseWriter, r *http.Request) {
+	defer AlertEscalationRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteAlertEscalation(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteAlertEscalation: %d", n)
+	types.MarshalInto(n, w)
 }

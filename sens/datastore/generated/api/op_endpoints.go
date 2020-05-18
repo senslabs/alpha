@@ -19,6 +19,7 @@ func OpEndpointMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/op-endpoints/update", UpdateOpEndpointWhere)
 	r.HandleFunc("/api/op-endpoints/find", FindOpEndpoint).Queries("limit", "{limit}")
+	r.HandleFunc("/api/op-endpoints/delete", DeleteOpEndpoint)
 }
 
 func OpEndpointRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindOpEndpoint(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindOpEndpoint(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindOpEndpoint: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteOpEndpoint(w http.ResponseWriter, r *http.Request) {
+	defer OpEndpointRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteOpEndpoint(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteOpEndpoint: %d", n)
+	types.MarshalInto(n, w)
 }

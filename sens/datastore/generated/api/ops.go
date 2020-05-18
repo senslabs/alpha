@@ -22,6 +22,7 @@ func OpMain(r *mux.Router) {
     
 	r.HandleFunc("/api/ops/update", UpdateOpWhere)
 	r.HandleFunc("/api/ops/find", FindOp).Queries("limit", "{limit}")
+	r.HandleFunc("/api/ops/delete", DeleteOp)
 }
 
 func OpRecovery(w http.ResponseWriter) {
@@ -97,4 +98,17 @@ func FindOp(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindOp(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindOp: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteOp(w http.ResponseWriter, r *http.Request) {
+	defer OpRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteOp(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteOp: %d", n)
+	types.MarshalInto(n, w)
 }

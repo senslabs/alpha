@@ -22,6 +22,7 @@ func UserMain(r *mux.Router) {
     
 	r.HandleFunc("/api/users/update", UpdateUserWhere)
 	r.HandleFunc("/api/users/find", FindUser).Queries("limit", "{limit}")
+	r.HandleFunc("/api/users/delete", DeleteUser)
 }
 
 func UserRecovery(w http.ResponseWriter) {
@@ -97,4 +98,17 @@ func FindUser(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindUser(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindUser: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteUser(w http.ResponseWriter, r *http.Request) {
+	defer UserRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteUser(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteUser: %d", n)
+	types.MarshalInto(n, w)
 }

@@ -19,6 +19,7 @@ func SessionEventMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/session-events/update", UpdateSessionEventWhere)
 	r.HandleFunc("/api/session-events/find", FindSessionEvent).Queries("limit", "{limit}")
+	r.HandleFunc("/api/session-events/delete", DeleteSessionEvent)
 }
 
 func SessionEventRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindSessionEvent(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindSessionEvent(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindSessionEvent: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteSessionEvent(w http.ResponseWriter, r *http.Request) {
+	defer SessionEventRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteSessionEvent(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteSessionEvent: %d", n)
+	types.MarshalInto(n, w)
 }

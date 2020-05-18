@@ -19,6 +19,7 @@ func OrgEndpointMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/org-endpoints/update", UpdateOrgEndpointWhere)
 	r.HandleFunc("/api/org-endpoints/find", FindOrgEndpoint).Queries("limit", "{limit}")
+	r.HandleFunc("/api/org-endpoints/delete", DeleteOrgEndpoint)
 }
 
 func OrgEndpointRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindOrgEndpoint(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindOrgEndpoint(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindOrgEndpoint: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteOrgEndpoint(w http.ResponseWriter, r *http.Request) {
+	defer OrgEndpointRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteOrgEndpoint(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteOrgEndpoint: %d", n)
+	types.MarshalInto(n, w)
 }

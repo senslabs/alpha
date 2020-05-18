@@ -22,6 +22,7 @@ func AuthMain(r *mux.Router) {
     
 	r.HandleFunc("/api/auths/update", UpdateAuthWhere)
 	r.HandleFunc("/api/auths/find", FindAuth).Queries("limit", "{limit}")
+	r.HandleFunc("/api/auths/delete", DeleteAuth)
 }
 
 func AuthRecovery(w http.ResponseWriter) {
@@ -97,4 +98,17 @@ func FindAuth(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindAuth(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindAuth: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteAuth(w http.ResponseWriter, r *http.Request) {
+	defer AuthRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteAuth(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteAuth: %d", n)
+	types.MarshalInto(n, w)
 }

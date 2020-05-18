@@ -19,6 +19,7 @@ func BaselineViewMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/baseline-views/update", UpdateBaselineViewWhere)
 	r.HandleFunc("/api/baseline-views/find", FindBaselineView).Queries("limit", "{limit}")
+	r.HandleFunc("/api/baseline-views/delete", DeleteBaselineView)
 }
 
 func BaselineViewRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindBaselineView(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindBaselineView(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindBaselineView: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteBaselineView(w http.ResponseWriter, r *http.Request) {
+	defer BaselineViewRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteBaselineView(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteBaselineView: %d", n)
+	types.MarshalInto(n, w)
 }

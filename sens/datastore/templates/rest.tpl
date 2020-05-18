@@ -22,6 +22,7 @@ func {{.Model}}Main(r *mux.Router) {
     {{end}}
 	r.HandleFunc("/api/{{.Path}}/update", Update{{.Model}}Where)
 	r.HandleFunc("/api/{{.Path}}/find", Find{{.Model}}).Queries("limit", "{limit}")
+	r.HandleFunc("/api/{{.Path}}/delete", Delete{{.Model}})
 }
 
 func {{.Model}}Recovery(w http.ResponseWriter) {
@@ -97,4 +98,17 @@ func Find{{.Model}}(w http.ResponseWriter, r *http.Request) {
 	m := fn.Find{{.Model}}(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of Find{{.Model}}: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func Delete{{.Model}}(w http.ResponseWriter, r *http.Request) {
+	defer {{.Model}}Recovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.Delete{{.Model}}(or, and, in, span)
+	logger.Debugf("RESPONSE of Delete{{.Model}}: %d", n)
+	types.MarshalInto(n, w)
 }

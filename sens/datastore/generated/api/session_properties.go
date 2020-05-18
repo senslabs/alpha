@@ -19,6 +19,7 @@ func SessionPropertieMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/session-properties/update", UpdateSessionPropertieWhere)
 	r.HandleFunc("/api/session-properties/find", FindSessionPropertie).Queries("limit", "{limit}")
+	r.HandleFunc("/api/session-properties/delete", DeleteSessionPropertie)
 }
 
 func SessionPropertieRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindSessionPropertie(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindSessionPropertie(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindSessionPropertie: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteSessionPropertie(w http.ResponseWriter, r *http.Request) {
+	defer SessionPropertieRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteSessionPropertie(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteSessionPropertie: %d", n)
+	types.MarshalInto(n, w)
 }

@@ -19,6 +19,7 @@ func ReportViewMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/report-views/update", UpdateReportViewWhere)
 	r.HandleFunc("/api/report-views/find", FindReportView).Queries("limit", "{limit}")
+	r.HandleFunc("/api/report-views/delete", DeleteReportView)
 }
 
 func ReportViewRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindReportView(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindReportView(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindReportView: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteReportView(w http.ResponseWriter, r *http.Request) {
+	defer ReportViewRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteReportView(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteReportView: %d", n)
+	types.MarshalInto(n, w)
 }

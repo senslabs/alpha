@@ -19,6 +19,7 @@ func OrgMeditationViewMain(r *mux.Router) {
 	
 	r.HandleFunc("/api/org-meditation-views/update", UpdateOrgMeditationViewWhere)
 	r.HandleFunc("/api/org-meditation-views/find", FindOrgMeditationView).Queries("limit", "{limit}")
+	r.HandleFunc("/api/org-meditation-views/delete", DeleteOrgMeditationView)
 }
 
 func OrgMeditationViewRecovery(w http.ResponseWriter) {
@@ -76,4 +77,17 @@ func FindOrgMeditationView(w http.ResponseWriter, r *http.Request) {
 	m := fn.FindOrgMeditationView(or, and, in, span, limit, column, order)
 	logger.Debugf("RESPONSE of FindOrgMeditationView: %#v", m)
 	types.MarshalInto(m, w)
+}
+
+func DeleteOrgMeditationView(w http.ResponseWriter, r *http.Request) {
+	defer OrgMeditationViewRecovery(w)
+	values := r.URL.Query()
+	span := values["span"]
+	or := values["or"]
+	and := values["and"]
+	in := values.Get("in")
+
+	n := fn.DeleteOrgMeditationView(or, and, in, span)
+	logger.Debugf("RESPONSE of DeleteOrgMeditationView: %d", n)
+	types.MarshalInto(n, w)
 }
