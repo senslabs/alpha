@@ -24,7 +24,7 @@ func TestA(t *testing.T) {
 		s := sessionViews{}
 		var ts []byte
 		rows.Scan(&s.SessionId, &s.Date, &s.UserId, &ts)
-		s.Timestamps = types.UnmarshalMap(ts)
+		s.Properties = types.UnmarshalMap(ts)
 		ss = append(ss, s)
 	}
 
@@ -34,7 +34,7 @@ func TestA(t *testing.T) {
 	ph := "SELECT max(timestamp::timestamp::date) AS date, key, min(value), avg(value), max(value) FROM session_records sr WHERE key in ('HeartRate', 'BreathRate') AND value > 0 AND timestamp >= $%d AND timestamp <= $%d AND user_id = $%d GROUP BY key"
 	for _, s := range ss {
 		query = append(query, fmt.Sprintf(ph, i, i+1, i+2))
-		values = append(values, s.Timestamps["SleepTime"], s.Timestamps["WakeupTime"], s.UserId)
+		values = append(values, s.Properties["SleepTime"], s.Properties["WakeupTime"], s.UserId)
 		i = i + 3
 	}
 

@@ -56,7 +56,7 @@ func GetOrgActivites(w http.ResponseWriter, r *http.Request) {
 
 func GetAvgValues(w http.ResponseWriter, r *http.Request) {
 	m := r.URL.Query().Get("minutes")
-	u := r.URL.Query().Get("userId")
+	o := r.URL.Query().Get("orgId")
 	k := r.URL.Query().Get("key")
 	ll := r.URL.Query().Get("lowerLimit")
 	ul := r.URL.Query().Get("upperLimit")
@@ -67,7 +67,8 @@ func GetAvgValues(w http.ResponseWriter, r *http.Request) {
 	db := datastore.GetConnection()
 	stmt, err := db.Prepare(AVG_RECORD_VALUE_QUERY)
 	errors.Pie(err)
-	rows, err := stmt.Query(u, k, when, ll, ul)
+	rows, err := stmt.Query(o, k, when, ll, ul)
+	errors.Pie(err)
 
 	result := []map[string]interface{}{}
 	var userId interface{}
