@@ -8,6 +8,6 @@ const (
 	DELETE_USER_QUERY = `DELETE FROM auths WHERE auth_id = (select auth_id from auths where user_id=$1)`
 
 	AVG_RECORD_VALUE_QUERY = `SELECT UserId, Key, Avg FROM
-	(SELECT user_id AS UserId, key AS Key, avg(value) AS Avg FROM session_records WHERE user_id = ANY(SELECT user_id FROM users WHERE org_id=$1) AND key = $2 AND timestamp > $3 GROUP BY user_id, key) t
+	(SELECT user_id::text AS UserId, key AS Key, avg(value) AS Avg FROM session_records WHERE user_id = ANY(SELECT user_id FROM users WHERE org_id=$1) AND key = $2 AND timestamp > $3 GROUP BY user_id, key) t
 	WHERE Avg <= $4 OR Avg >= $5`
 )
