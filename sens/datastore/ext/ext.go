@@ -134,8 +134,8 @@ func GetUserTrends(w http.ResponseWriter, r *http.Request) {
 	i := 1
 	query := []string{}
 	var values []interface{}
-	ph := `SELECT max(timestamp)::timestamp::date as date, key, min(value), avg(value), max(value) FROM session_records sr WHERE key in ('HeartRate', 'BreathRate', 'Stress') AND value > 0 AND timestamp >= $%d AND timestamp <= $%d AND user_id = $%d GROUP BY key`
-	for _, ss := range sm {
+	ph := `SELECT $%d::date, key, min(value), avg(value), max(value) FROM session_records sr WHERE key in ('HeartRate', 'BreathRate', 'Stress') AND value > 0 AND timestamp >= $%d AND timestamp <= $%d AND user_id = $%d GROUP BY key`
+	for d, ss := range sm {
 		sz := len(ss)
 		sort.Slice(ss, func(l int, r int) bool {
 			left, err := strconv.ParseInt(ss[l].Properties["SleepTime"].(string), 10, 64)
@@ -144,10 +144,13 @@ func GetUserTrends(w http.ResponseWriter, r *http.Request) {
 			errors.Pie(err)
 			return left < right
 		})
-		query = append(query, fmt.Sprintf(ph, i, i+1, i+2))
-		values = append(values, ss[0].Properties["SleepTime"], ss[sz-1].Properties["WakeupTime"], ss[0].UserId)
-		i = i + 3
+		query = append(query, fmt.Sprintf(ph, i, i+1, i+2, i+3))
+		values = append(values, d, ss[0].Properties["SleepTime"], ss[sz-1].Properties["WakeupTime"], ss[0].UserId)
+		i = i + 4
 	}
+
+	logger.Debug(strings.Join(query, " UNION "))
+	logger.Debug(values...)
 
 	trends := []Trend{}
 	logger.Error(strings.Join(query, " UNION "))
