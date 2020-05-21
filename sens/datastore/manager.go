@@ -77,7 +77,7 @@ func initdb() {
 		}
 	}()
 	// COCKROACH URL
-	pgurl := fmt.Sprintf("postgresql://root@%s:%s/postgres?ssl=false&sslmode=disable", GetCockroachHost(), GetCockroachPort())
+	pgurl := fmt.Sprintf("postgresql://root@%s:%s/postgres?sslmode=disable", GetCockroachHost(), GetCockroachPort())
 	// POSTGRES URL
 	// pgurl := fmt.Sprintf("postgresql://postgres:Sens1234@%s:%s/postgres?sslmode=disable", GetCockroachHost(), GetCockroachPort())
 	db, err = sql.Open("postgres", pgurl)
