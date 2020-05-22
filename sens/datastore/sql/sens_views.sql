@@ -170,7 +170,7 @@ FROM
   FROM
     org_session_record_views osrv
   WHERE
-    KEY NOT IN ('Recovery')
+    KEY IN ('BreathRate', 'HeartRate', 'Sdnn')
   GROUP BY
     session_id,
     KEY) sp ON sp.session_id = osv.session_id
@@ -502,20 +502,37 @@ FROM
   JOIN users u ON u.user_id = r.user_id;
 
 -- TRENDS
+-- CREATE VIEW user_dated_session_views AS
+-- SELECT
+--   s.session_id,
+--   max(sp.value::int8::timestamp::date) AS date,
+--   s.user_id,
+--   json_object(array_agg(sp.key), array_agg(sp.value))
+-- FROM
+--   session_properties sp
+--   JOIN sessions s ON s.session_id = sp.session_id
+-- WHERE
+--   sp.key IN ('WakeupTime', 'SleepTime', 'Recovery', 'Stress', 'BedTime')
+--   AND sp.value != 'None'
+--   AND sp.value::int8 > 0
+-- GROUP BY
+--   s.session_id,
+--   s.user_id;
 
 CREATE VIEW user_dated_session_views AS
 SELECT
   s.session_id,
-  max(sp.value::int8::timestamp::date) AS date,
+  max(sp.value::int8)::timestamp::date AS date,
   s.user_id,
-  json_object(array_agg(sp.key), array_agg(sp.value))
+  json_object(array_agg(sp.key), array_agg(sp.value)) timestamps
 FROM
   session_properties sp
   JOIN sessions s ON s.session_id = sp.session_id
 WHERE
-  sp.key IN ('WakeupTime', 'SleepTime', 'Recovery', 'Stress')
+  sp.key IN ('WakeupTime', 'SleepTime', 'Stress', 'Recovery', 'SunriseTime', 'BedTime')
   AND sp.value != 'None'
-  AND sp.value::int8 > 0
+  AND sp.value::int8 >= 0
+  AND s.state = 'VALID'
 GROUP BY
   s.session_id,
   s.user_id;
@@ -545,7 +562,7 @@ SELECT
       GROUP BY
         s.session_id,
         s.user_id) t
-      ORDER BY
+    ORDER BY
       user_id,
       date,
       duration DESC) s
@@ -557,4 +574,53 @@ GROUP BY
   s.user_id,
   s.date,
   s.duration;
+
+CREATE VIEW session_views AS
+WITH ranges AS (
+  SELECT
+    s.user_id,
+    s.session_id,
+    st.value AS from_value,
+    wt.value AS to_value
+  FROM
+    sessions s
+    JOIN session_properties st ON st.session_id = s.session_id
+      AND st.key = 'SleepTime'
+    JOIN session_properties wt ON wt.session_id = s.session_id
+      AND wt.key = 'WakeupTime'
+      --where s.user_id in ('6f129b1c-43a6-4771-86f6-1749bfe1a5af', 'e969632c-5e4a-4b3b-abe7-7b58e4f8c797')
+      AND st.value != 'None'
+      AND st.value::int8 > 0
+      AND wt.value != 'None'
+      AND wt.value::int8 > 0
+)
+  SELECT
+    t.user_id,
+    t.session_id,
+    t.wakeup_time,
+    json_object(array_agg(t.key), array_agg(t.avg::text)) AS records,
+    json_object(array_agg(sp.key), array_agg(sp.value)) AS properties
+FROM (
+  SELECT
+    ra.user_id,
+    ra.session_id,
+    ra.to_value::int8 as wakeup_time,
+    rc.key,
+    avg(rc.value)
+  FROM
+    session_records rc
+  JOIN ranges ra ON rc.timestamp >= ra.from_value::int8
+    AND rc.timestamp <= ra.to_value::int8
+    AND rc.user_id = ra.user_id
+WHERE
+--rc.user_id in ('6f129b1c-43a6-4771-86f6-1749bfe1a5af', 'e969632c-5e4a-4b3b-abe7-7b58e4f8c797') and
+KEY IN ('HeartRate', 'BreathRate', 'Stress', 'Sdnn')
+GROUP BY
+  ra.user_id,
+  ra.session_id,
+  rc.key) t
+  JOIN session_properties sp ON sp.session_id = t.session_id
+GROUP BY
+  t.user_id,
+  t.session_id;
 

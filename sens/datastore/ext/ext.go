@@ -9,7 +9,9 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/lib/pq"
 	"github.com/senslabs/alpha/sens/datastore"
+	"github.com/senslabs/alpha/sens/datastore/generated/models"
 	"github.com/senslabs/alpha/sens/errors"
 	"github.com/senslabs/alpha/sens/logger"
 	"github.com/senslabs/alpha/sens/types"
@@ -21,6 +23,7 @@ func ExtMain(r *mux.Router) {
 	s.HandleFunc("/users/{id}/delete", DeleteUserAuth)
 	s.HandleFunc("/records/avg", GetAvgValues)
 	s.HandleFunc("/users/{id}/trends", GetUserTrends).Queries("From", "{From}", "To", "{To}")
+	s.HandleFunc("/users/sessions/summary", GetOrgSleepView).Queries("UserId", "{UserId}")
 }
 
 func GetOrgActivites(w http.ResponseWriter, r *http.Request) {
@@ -162,4 +165,15 @@ func GetUserTrends(w http.ResponseWriter, r *http.Request) {
 		trends = append(trends, t)
 	}
 	types.MarshalInto(trends, w)
+}
+
+func GetOrgSleepView(w http.ResponseWriter, r *http.Request) {
+	db := datastore.GetConnection()
+	stmt, err := db.Prepare(ORG_SESSION_QUERY)
+	errors.Pie(err)
+	userIds := r.URL.Query()["UserId"]
+	rows, err := stmt.Query(pq.Array(userIds))
+	errors.Pie(err)
+	result := datastore.RowsToMap(rows, models.GetSessionViewReverseFieldMap(), models.GetSessionViewTypeMap())
+	types.MarshalInto(result, w)
 }

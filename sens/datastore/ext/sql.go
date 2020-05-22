@@ -10,4 +10,11 @@ const (
 	AVG_RECORD_VALUE_QUERY = `SELECT UserId, Key, Avg FROM
 	(SELECT user_id::text AS UserId, key AS Key, avg(value) AS Avg FROM session_records WHERE user_id = ANY(SELECT user_id FROM users WHERE org_id=$1) AND key = $2 AND timestamp > $3 GROUP BY user_id, key) t
 	WHERE Avg <= $4 OR Avg >= $5`
+
+	ORG_SESSION_QUERY = `select t.user_id, t.session_id, t.wakeup_time, t.records, t.properties from
+	(
+		select distinct on (user_id) user_id, session_id, wakeup_time, records, properties
+		from session_views where user_id = ANY($1)
+		order by user_id, wakeup_time desc
+	) t order by wakeup_time`
 )
