@@ -1,9 +1,9 @@
 package ext
 
 const (
-	ACTIVITY_DASHBOARD_QUERY = `SELECT count(activity_type) AS Count, activity_type AS ActivityType FROM
-	    org_activity_views
-		WHERE timestamp > $1 and org_id = $2 GROUP BY (activity_type)`
+	ACTIVITY_DASHBOARD_QUERY = `SELECT 1 as Days, count(activity_type) AS Count, activity_type AS ActivityType FROM org_activity_views WHERE timestamp >= $1 and org_id = $2 GROUP BY (activity_type)
+	UNION
+	SELECT 7 as Days, count(activity_type) AS Count, activity_type AS ActivityType FROM org_activity_views WHERE timestamp >= $3 and org_id = $4 GROUP BY (activity_type)`
 
 	DELETE_USER_QUERY = `DELETE FROM auths WHERE auth_id = (select auth_id from auths where user_id=$1)`
 

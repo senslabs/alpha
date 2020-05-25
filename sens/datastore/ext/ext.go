@@ -31,22 +31,27 @@ func GetOrgActivites(w http.ResponseWriter, r *http.Request) {
 	tokens := strings.Split(and, "^")
 	if len(tokens) == 2 {
 		orgId := tokens[1]
-		days := r.URL.Query().Get("days")
-		duration, err := strconv.Atoi(days)
-		errors.Pie(err)
-		when := time.Now().Add(-time.Duration(duration*24) * time.Hour).Unix()
+		// days := r.URL.Query().Get("days")
+		// duration, err := strconv.Atoi(days)
+		// errors.Pie(err)
+		// when := time.Now().Add(-time.Duration(duration*24) * time.Hour).Unix()
+		daily := time.Now().Truncate(24 * time.Hour).Unix()
+		weekly := time.Now().Truncate(24 * time.Hour).Add(-6 * 24 * time.Hour).Unix()
 		db := datastore.GetConnection()
 		stmt, err := db.Prepare(ACTIVITY_DASHBOARD_QUERY)
 		errors.Pie(err)
-		rows, err := stmt.Query(when, orgId)
+		rows, err := stmt.Query(daily, orgId, weekly, orgId)
+		logger.Debug(daily, ",", weekly)
 		errors.Pie(err)
 
 		var result []map[string]interface{}
+		var days interface{}
 		var count interface{}
 		var activityType interface{}
 		for rows.Next() {
 			m := map[string]interface{}{}
-			rows.Scan(&count, &activityType)
+			rows.Scan(&days, &count, &activityType)
+			m["Days"] = days
 			m["Count"] = count
 			m["ActivityType"] = activityType
 			result = append(result, m)
