@@ -599,12 +599,12 @@ WITH ranges AS (
     t.session_id,
     t.wakeup_time,
     json_object(array_agg(t.key), array_agg(t.avg::text)) AS records,
-    json_object(array_agg(sp.key), array_agg(sp.value)) AS properties
+  json_object(array_agg(sp.key), array_agg(sp.value)) AS properties
 FROM (
   SELECT
     ra.user_id,
     ra.session_id,
-    ra.to_value::int8 as wakeup_time,
+    ra.to_value::int8 AS wakeup_time,
     rc.key,
     avg(rc.value)
   FROM
@@ -623,4 +623,24 @@ GROUP BY
 GROUP BY
   t.user_id,
   t.session_id;
+
+CREATE VIEW user_baseline_views AS
+SELECT
+  user_id,
+  created_at,
+  KEY,
+  ARRAY[value]::int[] AS value
+FROM
+  user_settings
+WHERE
+  KEY = 'RecommendedRecovery'
+UNION
+SELECT
+  user_id,
+  created_at,
+  KEY,
+  ARRAY (lower_limit,
+    upper_limit)::int[] AS value
+FROM
+  baselines;
 

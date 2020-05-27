@@ -120,7 +120,7 @@ func getValue(column string, v interface{}, typeMap map[string]string) interface
 	case "*int64":
 	case "*bool":
 		return v
-	case "*uuid.UUID":
+	case "*uuid.UUID", "[]interface{}":
 		return fmt.Sprintf("%s", v)
 	case "*datastore.RawMessage":
 		if v != nil {

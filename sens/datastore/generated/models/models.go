@@ -1265,3 +1265,22 @@ func GetSessionViewReverseFieldMap() map[string]string {
 func GetSessionViewTypeMap() map[string]string {
 	return map[string]string{"Properties": "*datastore.RawMessage", "Records": "*datastore.RawMessage", "SessionId": "*uuid.UUID", "UserId": "*uuid.UUID", "WakeupTime": "*int64"}
 }
+
+type UserBaselineView struct {
+	UserId    *uuid.UUID    `db:"user_id" json:",omitempty"`
+	CreatedAt *int64        `db:"created_at" json:",omitempty"`
+	Key       *string       `db:"key" json:",omitempty"`
+	Value     []interface{} `db:"value" json:",omitempty"`
+}
+
+func GetUserBaselineViewFieldMap() map[string]string {
+	return map[string]string{"CreatedAt": "created_at", "Key": "key", "UserId": "user_id", "Value": "value"}
+}
+
+func GetUserBaselineViewReverseFieldMap() map[string]string {
+	return map[string]string{"created_at": "CreatedAt", "key": "Key", "user_id": "UserId", "value": "Value"}
+}
+
+func GetUserBaselineViewTypeMap() map[string]string {
+	return map[string]string{"CreatedAt": "*int64", "Key": "*string", "UserId": "*uuid.UUID", "Value": "[]interface{}"}
+}

@@ -74,6 +74,7 @@ func main() {
 	api.OrgMeditationViewMain(r)
 	api.OrgSleepViewMain(r)
 	api.SessionViewMain(r)
+	api.UserBaselineViewMain(r)
 	
 	ext.ExtMain(r)
 
