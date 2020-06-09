@@ -75,6 +75,7 @@ func main() {
 	api.OrgSleepViewMain(r)
 	api.SessionViewMain(r)
 	api.UserBaselineViewMain(r)
+	api.ResourceMain(r)
 	
 	ext.ExtMain(r)
 

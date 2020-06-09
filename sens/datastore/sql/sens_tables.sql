@@ -257,6 +257,18 @@ CREATE TABLE "reports" (
   "unread" boolean DEFAULT false
 );
 
+CREATE TABLE resources (
+	resource_id UUID NOT NULL DEFAULT gen_random_uuid(),
+	object_type STRING NOT NULL,
+	created_at INT8 NOT NULL DEFAULT now()::INT8,
+	object STRING NULL,
+	key STRING NOT NULL,
+	value STRING NULL,
+	properties JSONB NULL,
+	CONSTRAINT resources_pk PRIMARY KEY (resource_id ASC),
+	FAMILY "primary" (resource_id, object_type, created_at, object, key, value, properties)
+);
+
 ALTER TABLE "orgs" ADD FOREIGN KEY ("auth_id") REFERENCES "auths" ("auth_id");
 
 ALTER TABLE "org_settings" ADD FOREIGN KEY ("org_id") REFERENCES "orgs" ("org_id");
