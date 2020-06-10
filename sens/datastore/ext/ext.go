@@ -1,6 +1,7 @@
 package ext
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"sort"
@@ -24,6 +25,7 @@ func ExtMain(r *mux.Router) {
 	s.HandleFunc("/records/avg", GetAvgValues)
 	s.HandleFunc("/users/{id}/trends", GetUserTrends).Queries("From", "{From}", "To", "{To}")
 	s.HandleFunc("/users/sessions/summary", GetOrgSleepView).Queries("UserId", "{UserId}")
+	s.HandleFunc("/session-records/get", GetSessionRecords).Queries("UserId", "{UserId}", "From", "{From}", "To", "{To}", "Key", "{Key}")
 }
 
 func GetOrgActivites(w http.ResponseWriter, r *http.Request) {
@@ -180,5 +182,35 @@ func GetOrgSleepView(w http.ResponseWriter, r *http.Request) {
 	rows, err := stmt.Query(pq.Array(userIds))
 	errors.Pie(err)
 	result := datastore.RowsToMap(rows, models.GetSessionViewReverseFieldMap(), models.GetSessionViewTypeMap())
+	types.MarshalInto(result, w)
+}
+
+func GetSessionRecords(w http.ResponseWriter, r *http.Request) {
+	db := datastore.GetConnection()
+	stmt, err := db.Prepare(SESSION_RECORD_QUERY)
+	errors.Pie(err)
+	userId := r.URL.Query().Get("UserId")
+	from := r.URL.Query().Get("From")
+	to := r.URL.Query().Get("To")
+	key := r.URL.Query()["Key"]
+
+	fromTime, err := strconv.ParseInt(from, 10, 64)
+	errors.Pie(err)
+	toTime, err := strconv.ParseInt(to, 10, 64)
+	errors.Pie(err)
+	rows, err := stmt.Query(userId, fromTime, toTime, pq.Array(key))
+	errors.Pie(err)
+
+	result := map[string]map[string]interface{}{}
+	for rows.Next() {
+		var key string
+		var timestamps json.RawMessage
+		var values json.RawMessage
+		rows.Scan(&key, &timestamps, &values)
+		result[key] = map[string]interface{}{
+			"Timestamps": timestamps,
+			"Values":     values,
+		}
+	}
 	types.MarshalInto(result, w)
 }

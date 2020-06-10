@@ -17,4 +17,6 @@ const (
 		from session_views where user_id = ANY($1)
 		order by user_id, wakeup_time desc
 	) t order by wakeup_time`
+
+	SESSION_RECORD_QUERY = `select key, json_agg(timestamp) as timestamps, json_agg(value) as values from session_records sr where user_id = $1 and timestamp >= $2 and timestamp <= $3 and key = ANY($4) group by key`
 )
