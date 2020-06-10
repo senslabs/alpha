@@ -76,6 +76,10 @@ func main() {
 	api.SessionViewMain(r)
 	api.UserBaselineViewMain(r)
 	api.ResourceMain(r)
+	api.SleepSummaryViewMain(r)
+	api.MeditationSummaryViewMain(r)
+	api.LatestSleepSummaryViewMain(r)
+	api.LatestMeditationSummaryViewMain(r)
 	
 	ext.ExtMain(r)
 
