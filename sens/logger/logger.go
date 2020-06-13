@@ -164,7 +164,7 @@ func InitLogger(arg interface{}) {
 	if logStore == "file" {
 		InitFileLogger(arg.(string))
 	} else if logStore == "fluentd" {
-		InitConsoleLogger()
+		InitFluentLogger(arg.(string))
 	} else {
 		InitConsoleLogger()
 	}
