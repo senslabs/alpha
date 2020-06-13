@@ -44,10 +44,6 @@ func main() {
 	api.OrgViewMain(r)
 	api.OpViewMain(r)
 	api.UserViewMain(r)
-	api.DeviceViewMain(r)
-	api.OrgActivityViewMain(r)
-	api.OrgActivitySummaryViewMain(r)
-	api.OrgQuarterUsageViewMain(r)
 	api.OrgSessionRecordViewMain(r)
 	api.DevicePropertieMain(r)
 	api.OrgSessionEventViewMain(r)
@@ -80,6 +76,10 @@ func main() {
 	api.MeditationSummaryViewMain(r)
 	api.LatestSleepSummaryViewMain(r)
 	api.LatestMeditationSummaryViewMain(r)
+	api.DeviceViewMain(r)
+	api.OrgActivityViewMain(r)
+	api.OrgActivitySummaryViewMain(r)
+	api.OrgQuarterUsageViewMain(r)
 	
 	ext.ExtMain(r)
 

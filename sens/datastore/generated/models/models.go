@@ -625,84 +625,6 @@ func GetUserViewTypeMap() map[string]string {
 	return map[string]string{"AuthId": "*uuid.UUID", "Email": "*string", "FirstName": "*string", "LastName": "*string", "Mobile": "*string", "OrgId": "*uuid.UUID", "Social": "*string", "UserId": "*uuid.UUID"}
 }
 
-type DeviceView struct {
-	DeviceId   *uuid.UUID `db:"device_id" json:",omitempty"`
-	DeviceName *string    `db:"device_name" json:",omitempty"`
-	OrgId      *uuid.UUID `db:"org_id" json:",omitempty"`
-	UserId     *uuid.UUID `db:"user_id" json:",omitempty"`
-	CreatedAt  *int64     `db:"created_at" json:",omitempty"`
-	Status     *string    `db:"status" json:",omitempty"`
-}
-
-func GetDeviceViewFieldMap() map[string]string {
-	return map[string]string{"CreatedAt": "created_at", "DeviceId": "device_id", "DeviceName": "device_name", "OrgId": "org_id", "Status": "status", "UserId": "user_id"}
-}
-
-func GetDeviceViewReverseFieldMap() map[string]string {
-	return map[string]string{"created_at": "CreatedAt", "device_id": "DeviceId", "device_name": "DeviceName", "org_id": "OrgId", "status": "Status", "user_id": "UserId"}
-}
-
-func GetDeviceViewTypeMap() map[string]string {
-	return map[string]string{"CreatedAt": "*int64", "DeviceId": "*uuid.UUID", "DeviceName": "*string", "OrgId": "*uuid.UUID", "Status": "*string", "UserId": "*uuid.UUID"}
-}
-
-type OrgActivityView struct {
-	ActivityType *string    `db:"activity_type" json:",omitempty"`
-	Timestamp    *int64     `db:"timestamp" json:",omitempty"`
-	UserId       *uuid.UUID `db:"user_id" json:",omitempty"`
-	OrgId        *uuid.UUID `db:"org_id" json:",omitempty"`
-}
-
-func GetOrgActivityViewFieldMap() map[string]string {
-	return map[string]string{"ActivityType": "activity_type", "OrgId": "org_id", "Timestamp": "timestamp", "UserId": "user_id"}
-}
-
-func GetOrgActivityViewReverseFieldMap() map[string]string {
-	return map[string]string{"activity_type": "ActivityType", "org_id": "OrgId", "timestamp": "Timestamp", "user_id": "UserId"}
-}
-
-func GetOrgActivityViewTypeMap() map[string]string {
-	return map[string]string{"ActivityType": "*string", "OrgId": "*uuid.UUID", "Timestamp": "*int64", "UserId": "*uuid.UUID"}
-}
-
-type OrgActivitySummaryView struct {
-	Count        *int64     `db:"count" json:",omitempty"`
-	ActivityType *string    `db:"activity_type" json:",omitempty"`
-	UserId       *uuid.UUID `db:"user_id" json:",omitempty"`
-	OrgId        *uuid.UUID `db:"org_id" json:",omitempty"`
-}
-
-func GetOrgActivitySummaryViewFieldMap() map[string]string {
-	return map[string]string{"ActivityType": "activity_type", "Count": "count", "OrgId": "org_id", "UserId": "user_id"}
-}
-
-func GetOrgActivitySummaryViewReverseFieldMap() map[string]string {
-	return map[string]string{"activity_type": "ActivityType", "count": "Count", "org_id": "OrgId", "user_id": "UserId"}
-}
-
-func GetOrgActivitySummaryViewTypeMap() map[string]string {
-	return map[string]string{"ActivityType": "*string", "Count": "*int64", "OrgId": "*uuid.UUID", "UserId": "*uuid.UUID"}
-}
-
-type OrgQuarterUsageView struct {
-	Count        *int64     `db:"count" json:",omitempty"`
-	ActivityType *string    `db:"activity_type" json:",omitempty"`
-	OrgId        *uuid.UUID `db:"org_id" json:",omitempty"`
-	Date         []byte     `db:"date" json:",omitempty"`
-}
-
-func GetOrgQuarterUsageViewFieldMap() map[string]string {
-	return map[string]string{"ActivityType": "activity_type", "Count": "count", "Date": "date", "OrgId": "org_id"}
-}
-
-func GetOrgQuarterUsageViewReverseFieldMap() map[string]string {
-	return map[string]string{"activity_type": "ActivityType", "count": "Count", "date": "Date", "org_id": "OrgId"}
-}
-
-func GetOrgQuarterUsageViewTypeMap() map[string]string {
-	return map[string]string{"ActivityType": "*string", "Count": "*int64", "Date": "[]byte", "OrgId": "*uuid.UUID"}
-}
-
 type OrgSessionRecordView struct {
 	UserId      *uuid.UUID            `db:"user_id" json:",omitempty"`
 	OrgId       *uuid.UUID            `db:"org_id" json:",omitempty"`
@@ -1379,4 +1301,84 @@ func GetLatestMeditationSummaryViewReverseFieldMap() map[string]string {
 
 func GetLatestMeditationSummaryViewTypeMap() map[string]string {
 	return map[string]string{"Properties": "*datastore.RawMessage", "SessionId": "*uuid.UUID", "UserId": "*uuid.UUID"}
+}
+
+type DeviceView struct {
+	DeviceId   *uuid.UUID            `db:"device_id" json:",omitempty"`
+	DeviceName *string               `db:"device_name" json:",omitempty"`
+	OrgId      *uuid.UUID            `db:"org_id" json:",omitempty"`
+	UserId     *uuid.UUID            `db:"user_id" json:",omitempty"`
+	CreatedAt  *int64                `db:"created_at" json:",omitempty"`
+	Status     *string               `db:"status" json:",omitempty"`
+	SyncedAt   *int64                `db:"synced_at" json:",omitempty"`
+	Properties *datastore.RawMessage `db:"properties" json:",omitempty"`
+}
+
+func GetDeviceViewFieldMap() map[string]string {
+	return map[string]string{"CreatedAt": "created_at", "DeviceId": "device_id", "DeviceName": "device_name", "OrgId": "org_id", "Properties": "properties", "Status": "status", "SyncedAt": "synced_at", "UserId": "user_id"}
+}
+
+func GetDeviceViewReverseFieldMap() map[string]string {
+	return map[string]string{"created_at": "CreatedAt", "device_id": "DeviceId", "device_name": "DeviceName", "org_id": "OrgId", "properties": "Properties", "status": "Status", "synced_at": "SyncedAt", "user_id": "UserId"}
+}
+
+func GetDeviceViewTypeMap() map[string]string {
+	return map[string]string{"CreatedAt": "*int64", "DeviceId": "*uuid.UUID", "DeviceName": "*string", "OrgId": "*uuid.UUID", "Properties": "*datastore.RawMessage", "Status": "*string", "SyncedAt": "*int64", "UserId": "*uuid.UUID"}
+}
+
+type OrgActivityView struct {
+	ActivityType *string    `db:"activity_type" json:",omitempty"`
+	Timestamp    *int64     `db:"timestamp" json:",omitempty"`
+	UserId       *uuid.UUID `db:"user_id" json:",omitempty"`
+	OrgId        *uuid.UUID `db:"org_id" json:",omitempty"`
+}
+
+func GetOrgActivityViewFieldMap() map[string]string {
+	return map[string]string{"ActivityType": "activity_type", "OrgId": "org_id", "Timestamp": "timestamp", "UserId": "user_id"}
+}
+
+func GetOrgActivityViewReverseFieldMap() map[string]string {
+	return map[string]string{"activity_type": "ActivityType", "org_id": "OrgId", "timestamp": "Timestamp", "user_id": "UserId"}
+}
+
+func GetOrgActivityViewTypeMap() map[string]string {
+	return map[string]string{"ActivityType": "*string", "OrgId": "*uuid.UUID", "Timestamp": "*int64", "UserId": "*uuid.UUID"}
+}
+
+type OrgActivitySummaryView struct {
+	Count        *int64     `db:"count" json:",omitempty"`
+	ActivityType *string    `db:"activity_type" json:",omitempty"`
+	UserId       *uuid.UUID `db:"user_id" json:",omitempty"`
+	OrgId        *uuid.UUID `db:"org_id" json:",omitempty"`
+}
+
+func GetOrgActivitySummaryViewFieldMap() map[string]string {
+	return map[string]string{"ActivityType": "activity_type", "Count": "count", "OrgId": "org_id", "UserId": "user_id"}
+}
+
+func GetOrgActivitySummaryViewReverseFieldMap() map[string]string {
+	return map[string]string{"activity_type": "ActivityType", "count": "Count", "org_id": "OrgId", "user_id": "UserId"}
+}
+
+func GetOrgActivitySummaryViewTypeMap() map[string]string {
+	return map[string]string{"ActivityType": "*string", "Count": "*int64", "OrgId": "*uuid.UUID", "UserId": "*uuid.UUID"}
+}
+
+type OrgQuarterUsageView struct {
+	Count        *int64     `db:"count" json:",omitempty"`
+	ActivityType *string    `db:"activity_type" json:",omitempty"`
+	OrgId        *uuid.UUID `db:"org_id" json:",omitempty"`
+	Date         []byte     `db:"date" json:",omitempty"`
+}
+
+func GetOrgQuarterUsageViewFieldMap() map[string]string {
+	return map[string]string{"ActivityType": "activity_type", "Count": "count", "Date": "date", "OrgId": "org_id"}
+}
+
+func GetOrgQuarterUsageViewReverseFieldMap() map[string]string {
+	return map[string]string{"activity_type": "ActivityType", "count": "Count", "date": "Date", "org_id": "OrgId"}
+}
+
+func GetOrgQuarterUsageViewTypeMap() map[string]string {
+	return map[string]string{"ActivityType": "*string", "Count": "*int64", "Date": "[]byte", "OrgId": "*uuid.UUID"}
 }
