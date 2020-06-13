@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -19,6 +20,11 @@ func loggingMiddleware(next http.Handler) http.Handler {
 func main() {
 	r := mux.NewRouter()
 	logger.InitLogger("sens.datastore")
+
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintln(w, "Hello Health!")
+	})
 
 	api.AuthMain(r)
 	api.OrgMain(r)

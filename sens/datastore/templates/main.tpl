@@ -20,6 +20,11 @@ func main() {
 	r := mux.NewRouter()
 	logger.InitLogger("sens.datastore")
 
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintln(w, "Hello Health!")
+	})
+
 	{{range .Models}}api.{{.}}Main(r)
 	{{end}}
 	ext.ExtMain(r)
