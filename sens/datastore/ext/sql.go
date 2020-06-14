@@ -19,4 +19,16 @@ const (
 	) t order by wakeup_time`
 
 	SESSION_RECORD_QUERY = `select key, json_agg(timestamp) as timestamps, json_agg(value) as values from session_records sr where user_id = $1 and timestamp >= $2 and timestamp <= $3 and key = ANY($4) group by key`
+
+	TF_LIST_QUERY = `select t.key as "Key", avg(t.value) as "Value" from (
+		(select key, timestamp, value from session_records where user_id = $1 and key = 'HeartRate' and value > 0 order by timestamp desc limit 5)
+			union
+		(select key, timestamp, value from session_records where user_id = $1 and key = 'BreathRate' and value > 0 order by timestamp desc limit 5)
+			union
+		(select key, timestamp, value from session_records where user_id = $1 and key = 'Sdnn' and value > 0 order by timestamp desc limit 5)
+	) t group by key union (
+		select key as "Key", value as "Value" from session_records where user_id = $1 and key = 'Temperature' and value > 0 order by timestamp desc limit 1
+	) union (
+		select key as "Key", value as "Value" from session_records where user_id = $1 and key = 'Spo2' and value > 0 order by timestamp desc limit 1
+	)`
 )

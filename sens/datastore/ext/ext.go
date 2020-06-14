@@ -1,8 +1,10 @@
 package ext
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"sort"
 	"strconv"
@@ -25,6 +27,7 @@ func ExtMain(r *mux.Router) {
 	s.HandleFunc("/records/avg", GetAvgValues)
 	s.HandleFunc("/users/{id}/trends", GetUserTrends).Queries("From", "{From}", "To", "{To}")
 	s.HandleFunc("/users/sessions/summary", GetOrgSleepView).Queries("UserId", "{UserId}")
+	s.HandleFunc("/session-stats/24hour/list", Get24HourViewList).Queries("UserId", "{UserId}")
 	s.HandleFunc("/session-records/get", GetSessionRecords).Queries("UserId", "{UserId}", "From", "{From}", "To", "{To}", "Key", "{Key}")
 }
 
@@ -213,4 +216,43 @@ func GetSessionRecords(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	types.MarshalInto(result, w)
+}
+
+func marshalSqlRows(w io.Writer, rows *sql.Rows) {
+	columns, err := rows.Columns()
+	errors.Pie(err)
+	count := len(columns)
+	tableData := make([]map[string]interface{}, 0)
+	values := make([]interface{}, count)
+	valuePtrs := make([]interface{}, count)
+	for rows.Next() {
+		for i := 0; i < count; i++ {
+			valuePtrs[i] = &values[i]
+		}
+		rows.Scan(valuePtrs...)
+		entry := make(map[string]interface{})
+		for i, col := range columns {
+			var v interface{}
+			val := values[i]
+			b, ok := val.([]byte)
+			if ok {
+				v = string(b)
+			} else {
+				v = val
+			}
+			entry[col] = v
+		}
+		tableData = append(tableData, entry)
+	}
+	types.MarshalInto(tableData, w)
+}
+
+func Get24HourViewList(w http.ResponseWriter, r *http.Request) {
+	userId := mux.Vars(r)["UserId"]
+	db := datastore.GetConnection()
+	stmt, err := db.Prepare(TF_LIST_QUERY)
+	errors.Pie(err)
+	rows, err := stmt.Query(userId)
+	errors.Pie(err)
+	marshalSqlRows(w, rows)
 }
