@@ -62,7 +62,6 @@ func Marshal(v interface{}) []byte {
 func MarshalInto(v interface{}, w io.Writer) {
 	err := json.NewEncoder(w).Encode(v)
 	errors.Pie(err)
-	logger.Debugf("Successfully sent %#v", v)
 }
 
 func Unmarshal(data []byte, v interface{}) {

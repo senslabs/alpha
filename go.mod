@@ -6,6 +6,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fluent/fluent-logger-golang v1.5.0
 	github.com/google/uuid v1.1.1
+	github.com/gorilla/mux v1.7.4
 	github.com/hashicorp/go-retryablehttp v0.6.6
 	github.com/lib/pq v1.7.0
 	github.com/nats-io/nats.go v1.10.0

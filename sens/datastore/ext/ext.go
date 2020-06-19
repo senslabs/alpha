@@ -29,6 +29,7 @@ func ExtMain(r *mux.Router) {
 	s.HandleFunc("/users/sessions/summary", GetOrgSleepView).Queries("UserId", "{UserId}")
 	s.HandleFunc("/session-stats/24hour/list", Get24HourViewList).Queries("UserId", "{UserId}")
 	s.HandleFunc("/session-records/get", GetSessionRecords).Queries("UserId", "{UserId}", "From", "{From}", "To", "{To}", "Key", "{Key}")
+	s.HandleFunc("/stream-trends/get", GetStreamingTrends).Queries("UserId", "{UserId}", "From", "{From}", "To", "{To}", "Key", "{Key}")
 }
 
 func GetOrgActivites(w http.ResponseWriter, r *http.Request) {
@@ -255,4 +256,59 @@ func Get24HourViewList(w http.ResponseWriter, r *http.Request) {
 	rows, err := stmt.Query(userId)
 	errors.Pie(err)
 	marshalSqlRows(w, rows)
+}
+
+func GetStreamingTrends(w http.ResponseWriter, r *http.Request) {
+	from := r.URL.Query().Get("From")
+	to := r.URL.Query().Get("To")
+	userId := r.URL.Query().Get("UserId")
+	key := r.URL.Query()["Key"]
+	fromTime, err := time.Parse("2006-01-02", from)
+	errors.Pie(err)
+	fromTime = fromTime.Add(8 * time.Hour)
+	toTime := fromTime.Add(24 * time.Hour)
+	endTime, err := time.Parse("2006-01-02", to)
+	endTime = endTime.Add(8 * time.Hour)
+	errors.Pie(err)
+
+	values := []interface{}{userId, pq.Array(key)}
+	phi := 3
+	query := ""
+	union := ""
+	for toTime.Unix() <= endTime.Unix() {
+		query += union + fmt.Sprintf(`(select key, json_agg(timestamp)::text as timestamps, json_agg(value)::text as values
+			from
+		session_records
+			where
+		user_id = $1
+		and key = ANY($2)
+		and value != -1
+		and timestamp between $%d and $%d group by key)`, phi, phi+1)
+		values = append(values, fromTime.Unix(), toTime.Unix())
+		fromTime = toTime
+		toTime = toTime.Add(24 * time.Hour)
+		phi += 2
+		union = " UNION "
+		logger.Debugf("From: %s, To: %s", fromTime, toTime)
+	}
+
+	db := datastore.GetConnection()
+	logger.Debug(query)
+	rows, err := db.Query(query, values...)
+	errors.Pie(err)
+
+	result := []map[string]map[string]interface{}{}
+	for rows.Next() {
+		var key string
+		var timestamps string
+		var values string
+		rows.Scan(&key, &timestamps, &values)
+		row := map[string]map[string]interface{}{}
+		row[key] = map[string]interface{}{
+			"Timestamps": timestamps,
+			"Values":     values,
+		}
+		result = append(result, row)
+	}
+	types.MarshalInto(result, w)
 }
