@@ -93,6 +93,10 @@ func main() {
 	api.OrgActivityViewMain(r)
 	api.OrgActivitySummaryViewMain(r)
 	api.OrgQuarterUsageViewMain(r)
+	api.RecorderMain(r)
+	api.CollectorMain(r)
+	api.CollectorPropertieMain(r)
+	api.RecorderViewMain(r)
 
 	ext.ExtMain(r)
 

@@ -1382,3 +1382,90 @@ func GetOrgQuarterUsageViewReverseFieldMap() map[string]string {
 func GetOrgQuarterUsageViewTypeMap() map[string]string {
 	return map[string]string{"ActivityType": "*string", "Count": "*int64", "Date": "[]byte", "OrgId": "*uuid.UUID"}
 }
+
+type Recorder struct {
+	RecorderId   *uuid.UUID `db:"recorder_id" json:",omitempty"`
+	CollectorId  *uuid.UUID `db:"collector_id" json:",omitempty"`
+	RecorderName *string    `db:"recorder_name" json:",omitempty"`
+	UserId       *uuid.UUID `db:"user_id" json:",omitempty"`
+	CreatedAt    *int64     `db:"created_at" json:",omitempty"`
+	Status       *string    `db:"status" json:",omitempty"`
+	Tag          *string    `db:"tag" json:",omitempty"`
+}
+
+func GetRecorderFieldMap() map[string]string {
+	return map[string]string{"CollectorId": "collector_id", "CreatedAt": "created_at", "RecorderId": "recorder_id", "RecorderName": "recorder_name", "Status": "status", "Tag": "tag", "UserId": "user_id"}
+}
+
+func GetRecorderReverseFieldMap() map[string]string {
+	return map[string]string{"collector_id": "CollectorId", "created_at": "CreatedAt", "recorder_id": "RecorderId", "recorder_name": "RecorderName", "status": "Status", "tag": "Tag", "user_id": "UserId"}
+}
+
+func GetRecorderTypeMap() map[string]string {
+	return map[string]string{"CollectorId": "*uuid.UUID", "CreatedAt": "*int64", "RecorderId": "*uuid.UUID", "RecorderName": "*string", "Status": "*string", "Tag": "*string", "UserId": "*uuid.UUID"}
+}
+
+type Collector struct {
+	CollectorId   *uuid.UUID `db:"collector_id" json:",omitempty"`
+	CollectorName *string    `db:"collector_name" json:",omitempty"`
+	OrgId         *uuid.UUID `db:"org_id" json:",omitempty"`
+	CreatedAt     *int64     `db:"created_at" json:",omitempty"`
+	PingedAt      *int64     `db:"pinged_at" json:",omitempty"`
+	SyncedAt      *int64     `db:"synced_at" json:",omitempty"`
+	Status        *string    `db:"status" json:",omitempty"`
+}
+
+func GetCollectorFieldMap() map[string]string {
+	return map[string]string{"CollectorId": "collector_id", "CollectorName": "collector_name", "CreatedAt": "created_at", "OrgId": "org_id", "PingedAt": "pinged_at", "Status": "status", "SyncedAt": "synced_at"}
+}
+
+func GetCollectorReverseFieldMap() map[string]string {
+	return map[string]string{"collector_id": "CollectorId", "collector_name": "CollectorName", "created_at": "CreatedAt", "org_id": "OrgId", "pinged_at": "PingedAt", "status": "Status", "synced_at": "SyncedAt"}
+}
+
+func GetCollectorTypeMap() map[string]string {
+	return map[string]string{"CollectorId": "*uuid.UUID", "CollectorName": "*string", "CreatedAt": "*int64", "OrgId": "*uuid.UUID", "PingedAt": "*int64", "Status": "*string", "SyncedAt": "*int64"}
+}
+
+type CollectorPropertie struct {
+	CollectorId *uuid.UUID `db:"collector_id" json:",omitempty"`
+	Key         *string    `db:"key" json:",omitempty"`
+	Value       *string    `db:"value" json:",omitempty"`
+}
+
+func GetCollectorPropertieFieldMap() map[string]string {
+	return map[string]string{"CollectorId": "collector_id", "Key": "key", "Value": "value"}
+}
+
+func GetCollectorPropertieReverseFieldMap() map[string]string {
+	return map[string]string{"collector_id": "CollectorId", "key": "Key", "value": "Value"}
+}
+
+func GetCollectorPropertieTypeMap() map[string]string {
+	return map[string]string{"CollectorId": "*uuid.UUID", "Key": "*string", "Value": "*string"}
+}
+
+type RecorderView struct {
+	RecorderId   *uuid.UUID            `db:"recorder_id" json:",omitempty"`
+	CollectorId  *uuid.UUID            `db:"collector_id" json:",omitempty"`
+	RecorderName *string               `db:"recorder_name" json:",omitempty"`
+	UserId       *uuid.UUID            `db:"user_id" json:",omitempty"`
+	CreatedAt    *int64                `db:"created_at" json:",omitempty"`
+	Status       *string               `db:"status" json:",omitempty"`
+	Tag          *string               `db:"tag" json:",omitempty"`
+	PingedAt     *int64                `db:"pinged_at" json:",omitempty"`
+	SyncedAt     *int64                `db:"synced_at" json:",omitempty"`
+	Properties   *datastore.RawMessage `db:"properties" json:",omitempty"`
+}
+
+func GetRecorderViewFieldMap() map[string]string {
+	return map[string]string{"CollectorId": "collector_id", "CreatedAt": "created_at", "PingedAt": "pinged_at", "Properties": "properties", "RecorderId": "recorder_id", "RecorderName": "recorder_name", "Status": "status", "SyncedAt": "synced_at", "Tag": "tag", "UserId": "user_id"}
+}
+
+func GetRecorderViewReverseFieldMap() map[string]string {
+	return map[string]string{"collector_id": "CollectorId", "created_at": "CreatedAt", "pinged_at": "PingedAt", "properties": "Properties", "recorder_id": "RecorderId", "recorder_name": "RecorderName", "status": "Status", "synced_at": "SyncedAt", "tag": "Tag", "user_id": "UserId"}
+}
+
+func GetRecorderViewTypeMap() map[string]string {
+	return map[string]string{"CollectorId": "*uuid.UUID", "CreatedAt": "*int64", "PingedAt": "*int64", "Properties": "*datastore.RawMessage", "RecorderId": "*uuid.UUID", "RecorderName": "*string", "Status": "*string", "SyncedAt": "*int64", "Tag": "*string", "UserId": "*uuid.UUID"}
+}
