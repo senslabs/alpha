@@ -19,6 +19,7 @@ const (
 	) t order by wakeup_time`
 
 	SESSION_RECORD_QUERY = `select key, json_agg(timestamp) as timestamps, json_agg(value) as values from session_records sr where user_id = $1 and timestamp >= $2 and timestamp <= $3 and key = ANY($4) group by key`
+	SESSION_EVENT_QUERY  = `select key, json_agg(json_object(array('StartedAt', 'EndedAt'), array(started_at, ended_at)::text[])) as timestamps from session_events where user_id = $1 and started_at >= $2 and started_at <= $3 and key = ANY($4) group by key`
 
 	TF_LIST_QUERY = `select t.user_id as "UserId", t.key as "Key", avg(t.value) as "Value" from (
 		(select user_id, key, timestamp, value from session_records where user_id = $1 and key = 'HeartRate' and value > 0 order by timestamp desc limit 5)

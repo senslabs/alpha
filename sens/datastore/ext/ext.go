@@ -29,6 +29,7 @@ func ExtMain(r *mux.Router) {
 	s.HandleFunc("/users/sessions/summary", GetOrgSleepView).Queries("UserId", "{UserId}")
 	s.HandleFunc("/session-stats/24hour/list", Get24HourViewList).Queries("UserId", "{UserId}")
 	s.HandleFunc("/session-records/get", GetSessionRecords).Queries("UserId", "{UserId}", "From", "{From}", "To", "{To}", "Key", "{Key}")
+	s.HandleFunc("/session-events/get", GetSessionEvents).Queries("UserId", "{UserId}", "From", "{From}", "To", "{To}", "Key", "{Key}")
 	s.HandleFunc("/stream-trends/get", GetStreamingTrends).Queries("UserId", "{UserId}", "From", "{From}", "To", "{To}", "Key", "{Key}")
 }
 
@@ -214,6 +215,34 @@ func GetSessionRecords(w http.ResponseWriter, r *http.Request) {
 		result[key] = map[string]interface{}{
 			"Timestamps": timestamps,
 			"Values":     values,
+		}
+	}
+	types.MarshalInto(result, w)
+}
+
+func GetSessionEvents(w http.ResponseWriter, r *http.Request) {
+	db := datastore.GetConnection()
+	stmt, err := db.Prepare(SESSION_EVENT_QUERY)
+	errors.Pie(err)
+	userId := r.URL.Query().Get("UserId")
+	from := r.URL.Query().Get("From")
+	to := r.URL.Query().Get("To")
+	key := r.URL.Query()["Key"]
+
+	fromTime, err := strconv.ParseInt(from, 10, 64)
+	errors.Pie(err)
+	toTime, err := strconv.ParseInt(to, 10, 64)
+	errors.Pie(err)
+	rows, err := stmt.Query(userId, fromTime, toTime, pq.Array(key))
+	errors.Pie(err)
+
+	result := map[string]map[string]interface{}{}
+	for rows.Next() {
+		var key string
+		var timestamps json.RawMessage
+		rows.Scan(&key, &timestamps)
+		result[key] = map[string]interface{}{
+			"Timestamps": timestamps,
 		}
 	}
 	types.MarshalInto(result, w)
