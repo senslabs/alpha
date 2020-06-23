@@ -276,14 +276,14 @@ func GetStreamingTrends(w http.ResponseWriter, r *http.Request) {
 	query := ""
 	union := ""
 	for toTime.Unix() <= endTime.Unix() {
-		query += union + fmt.Sprintf(`(select key, json_agg(timestamp)::text as timestamps, json_agg(value)::text as values
+		query += union + fmt.Sprintf(`(select $%d::timestamp::date as date, key, min(value), max(value), avg(value), sum(value)
 			from
 		session_records
 			where
 		user_id = $1
 		and key = ANY($2)
 		and value != -1
-		and timestamp between $%d and $%d group by key)`, phi, phi+1)
+		and timestamp between $%d and $%d group by key)`, phi, phi, phi+1)
 		values = append(values, fromTime.Unix(), toTime.Unix())
 		fromTime = toTime
 		toTime = toTime.Add(24 * time.Hour)
@@ -299,14 +299,20 @@ func GetStreamingTrends(w http.ResponseWriter, r *http.Request) {
 
 	result := []map[string]map[string]interface{}{}
 	for rows.Next() {
+		var date string
 		var key string
-		var timestamps string
-		var values string
-		rows.Scan(&key, &timestamps, &values)
+		var min float64
+		var max float64
+		var avg float64
+		var sum float64
+		rows.Scan(&date, &key, &min, &max, &avg, &sum)
 		row := map[string]map[string]interface{}{}
 		row[key] = map[string]interface{}{
-			"Timestamps": timestamps,
-			"Values":     values,
+			"Date": date,
+			"Min":  min,
+			"Max":  max,
+			"Avg":  avg,
+			"Sum":  sum,
 		}
 		result = append(result, row)
 	}
