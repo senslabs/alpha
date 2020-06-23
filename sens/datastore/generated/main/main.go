@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -89,15 +88,15 @@ func main() {
 	api.MeditationSummaryViewMain(r)
 	api.LatestSleepSummaryViewMain(r)
 	api.LatestMeditationSummaryViewMain(r)
-	api.DeviceViewMain(r)
-	api.OrgActivityViewMain(r)
-	api.OrgActivitySummaryViewMain(r)
-	api.OrgQuarterUsageViewMain(r)
 	api.RecorderMain(r)
 	api.CollectorMain(r)
 	api.CollectorPropertieMain(r)
 	api.RecorderViewMain(r)
-
+	api.DeviceViewMain(r)
+	api.OrgActivityViewMain(r)
+	api.OrgQuarterUsageViewMain(r)
+	api.OrgActivitySummaryViewMain(r)
+	
 	ext.ExtMain(r)
 
 	http.Handle("/", r)
