@@ -351,9 +351,8 @@ func GetStreamingTrends(w http.ResponseWriter, r *http.Request) {
 
 func UpdateOrgLedger(w http.ResponseWriter, r *http.Request) {
 	db := datastore.GetConnection()
-
 	m := types.UnmarshalMap(r.Body)
-	orgId := m["OrgId"]
+	orgId := r.URL.Query().Get("OrgId")
 	amount := m["Amount"]
 	ledger := m["Ledger"]
 
