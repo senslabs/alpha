@@ -31,7 +31,7 @@ func ExtMain(r *mux.Router) {
 	s.HandleFunc("/session-records/get", GetSessionRecords).Queries("UserId", "{UserId}", "From", "{From}", "To", "{To}", "Key", "{Key}")
 	s.HandleFunc("/session-events/get", GetSessionEvents).Queries("UserId", "{UserId}", "From", "{From}", "To", "{To}", "Key", "{Key}")
 	s.HandleFunc("/stream-trends/get", GetStreamingTrends).Queries("UserId", "{UserId}", "From", "{From}", "To", "{To}", "Key", "{Key}")
-	s.HandleFunc("/org-ledgers/update", UpdateOrgLedger).Queries("Ledger", "{Ledger}", "Amount", "{Amount}")
+	s.HandleFunc("/org-ledgers/update", UpdateOrgLedger)
 }
 
 func GetOrgActivites(w http.ResponseWriter, r *http.Request) {
