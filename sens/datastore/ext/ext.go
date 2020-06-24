@@ -31,6 +31,7 @@ func ExtMain(r *mux.Router) {
 	s.HandleFunc("/session-records/get", GetSessionRecords).Queries("UserId", "{UserId}", "From", "{From}", "To", "{To}", "Key", "{Key}")
 	s.HandleFunc("/session-events/get", GetSessionEvents).Queries("UserId", "{UserId}", "From", "{From}", "To", "{To}", "Key", "{Key}")
 	s.HandleFunc("/stream-trends/get", GetStreamingTrends).Queries("UserId", "{UserId}", "From", "{From}", "To", "{To}", "Key", "{Key}")
+	s.HandleFunc("/org-ledgers/update", UpdateOrgLedger).Queries("Ledger", "{Ledger}", "Amount", "{Amount}")
 }
 
 func GetOrgActivites(w http.ResponseWriter, r *http.Request) {
@@ -346,4 +347,34 @@ func GetStreamingTrends(w http.ResponseWriter, r *http.Request) {
 		result = append(result, row)
 	}
 	types.MarshalInto(result, w)
+}
+
+func UpdateOrgLedger(w http.ResponseWriter, r *http.Request) {
+	db := datastore.GetConnection()
+
+	m := types.UnmarshalMap(r.Body)
+	orgId := m["OrgId"]
+	amount := m["Amount"]
+	ledger := m["Ledger"]
+
+	var err error
+	var stmt *sql.Stmt
+	if ledger == "sms" {
+		stmt, err = db.Prepare(UPDATE_SMS_LEDGER_QUERY)
+	} else if ledger == "email" {
+		stmt, err = db.Prepare(UPDATE_EMAIL_LEDGER_QUERY)
+	} else if ledger == "wh" {
+		stmt, err = db.Prepare(UPDATE_WH_LEDGER_QUERY)
+	} else {
+		err = errors.New(0, "Ledger type is not valid")
+	}
+	errors.Pie(err)
+	rows, err := stmt.Query(amount, orgId)
+	errors.Pie(err)
+
+	var balance int8
+	for rows.Next() {
+		rows.Scan(&balance)
+	}
+	fmt.Fprintf(w, fmt.Sprintf(`{"Balance":%d}`, balance))
 }

@@ -32,4 +32,8 @@ const (
 	) union (
 		select user_id, key as "Key", value as "Value" from session_records where user_id = $1 and key = 'Spo2' and value > 0 order by timestamp desc limit 1
 	)`
+
+	UPDATE_SMS_LEDGER_QUERY   = `update orgs set sms_ledger = sms_ledger + $1 where org_id = $2 returning sms_ledger as ledger`
+	UPDATE_EMAIL_LEDGER_QUERY = `update orgs set email_ledger = email_ledger + $1 where org_id = $2 returning email_ledger as ledger`
+	UPDATE_WH_LEDGER_QUERY    = `update orgs set wh_ledger = wh_ledger + $1 where org_id = $2 returning wh_ledger as ledger`
 )

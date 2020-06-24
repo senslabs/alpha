@@ -34,23 +34,26 @@ func GetAuthTypeMap() map[string]string {
 }
 
 type Org struct {
-	OrgId     *uuid.UUID `db:"org_id" json:",omitempty"`
-	AuthId    *uuid.UUID `db:"auth_id" json:",omitempty"`
-	OrgName   *string    `db:"org_name" json:",omitempty"`
-	CreatedAt *int64     `db:"created_at" json:",omitempty"`
-	UpdatedAt *int64     `db:"updated_at" json:",omitempty"`
+	OrgId       *uuid.UUID `db:"org_id" json:",omitempty"`
+	AuthId      *uuid.UUID `db:"auth_id" json:",omitempty"`
+	OrgName     *string    `db:"org_name" json:",omitempty"`
+	CreatedAt   *int64     `db:"created_at" json:",omitempty"`
+	UpdatedAt   *int64     `db:"updated_at" json:",omitempty"`
+	SmsLedger   *int64     `db:"sms_ledger" json:",omitempty"`
+	EmailLedger *int64     `db:"email_ledger" json:",omitempty"`
+	WhLedger    *int64     `db:"wh_ledger" json:",omitempty"`
 }
 
 func GetOrgFieldMap() map[string]string {
-	return map[string]string{"AuthId": "auth_id", "CreatedAt": "created_at", "OrgId": "org_id", "OrgName": "org_name", "UpdatedAt": "updated_at"}
+	return map[string]string{"AuthId": "auth_id", "CreatedAt": "created_at", "EmailLedger": "email_ledger", "OrgId": "org_id", "OrgName": "org_name", "SmsLedger": "sms_ledger", "UpdatedAt": "updated_at", "WhLedger": "wh_ledger"}
 }
 
 func GetOrgReverseFieldMap() map[string]string {
-	return map[string]string{"auth_id": "AuthId", "created_at": "CreatedAt", "org_id": "OrgId", "org_name": "OrgName", "updated_at": "UpdatedAt"}
+	return map[string]string{"auth_id": "AuthId", "created_at": "CreatedAt", "email_ledger": "EmailLedger", "org_id": "OrgId", "org_name": "OrgName", "sms_ledger": "SmsLedger", "updated_at": "UpdatedAt", "wh_ledger": "WhLedger"}
 }
 
 func GetOrgTypeMap() map[string]string {
-	return map[string]string{"AuthId": "*uuid.UUID", "CreatedAt": "*int64", "OrgId": "*uuid.UUID", "OrgName": "*string", "UpdatedAt": "*int64"}
+	return map[string]string{"AuthId": "*uuid.UUID", "CreatedAt": "*int64", "EmailLedger": "*int64", "OrgId": "*uuid.UUID", "OrgName": "*string", "SmsLedger": "*int64", "UpdatedAt": "*int64", "WhLedger": "*int64"}
 }
 
 type Op struct {
