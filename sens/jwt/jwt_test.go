@@ -7,8 +7,8 @@ import (
 )
 
 func TestGenerateAccessToken(t *testing.T) {
-	m := map[string]string{
-		"OrgId": "139284a8-5a2a-4982-a92f-e58a94dde1e1",
+	m := map[string]interface{}{
+		"IsSens": true,
 	}
 	token, _ := GenerateAccessToken(m, 365*24*time.Hour)
 
