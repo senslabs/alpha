@@ -283,7 +283,7 @@ func Get24HourViewList(w http.ResponseWriter, r *http.Request) {
 	db := datastore.GetConnection()
 	stmt, err := db.Prepare(TF_LIST_QUERY)
 	errors.Pie(err)
-	rows, err := stmt.Query(userId)
+	rows, err := stmt.Query(pq.Array(userId))
 	errors.Pie(err)
 	marshalSqlRows(w, rows)
 }
