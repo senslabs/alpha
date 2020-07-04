@@ -371,7 +371,7 @@ func UpdateOrgLedger(w http.ResponseWriter, r *http.Request) {
 	rows, err := stmt.Query(amount, orgId)
 	errors.Pie(err)
 
-	var balance int8
+	var balance int64
 	for rows.Next() {
 		rows.Scan(&balance)
 	}
