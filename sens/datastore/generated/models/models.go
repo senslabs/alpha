@@ -925,24 +925,6 @@ func GetOrgSessionViewTypeMap() map[string]string {
 	return map[string]string{"EndedAt": "*int64", "OrgId": "*uuid.UUID", "SessionId": "*uuid.UUID", "SessionName": "*string", "SessionType": "*string", "StartedAt": "*int64", "UserId": "*uuid.UUID"}
 }
 
-type UserSessionCountView struct {
-	UserId *uuid.UUID `db:"user_id" json:",omitempty"`
-	OrgId  *uuid.UUID `db:"org_id" json:",omitempty"`
-	Count  *int64     `db:"count" json:",omitempty"`
-}
-
-func GetUserSessionCountViewFieldMap() map[string]string {
-	return map[string]string{"Count": "count", "OrgId": "org_id", "UserId": "user_id"}
-}
-
-func GetUserSessionCountViewReverseFieldMap() map[string]string {
-	return map[string]string{"count": "Count", "org_id": "OrgId", "user_id": "UserId"}
-}
-
-func GetUserSessionCountViewTypeMap() map[string]string {
-	return map[string]string{"Count": "*int64", "OrgId": "*uuid.UUID", "UserId": "*uuid.UUID"}
-}
-
 type SessionDurationView struct {
 	UserId      *uuid.UUID            `db:"user_id" json:",omitempty"`
 	OrgId       *uuid.UUID            `db:"org_id" json:",omitempty"`
@@ -1471,4 +1453,23 @@ func GetOrgActivitySummaryViewReverseFieldMap() map[string]string {
 
 func GetOrgActivitySummaryViewTypeMap() map[string]string {
 	return map[string]string{"ActivityType": "*string", "Count": "*int64", "OrgId": "*uuid.UUID", "UserId": "*uuid.UUID"}
+}
+
+type UserSessionCountView struct {
+	UserId      *uuid.UUID `db:"user_id" json:",omitempty"`
+	OrgId       *uuid.UUID `db:"org_id" json:",omitempty"`
+	SessionType *string    `db:"session_type" json:",omitempty"`
+	Count       *int64     `db:"count" json:",omitempty"`
+}
+
+func GetUserSessionCountViewFieldMap() map[string]string {
+	return map[string]string{"Count": "count", "OrgId": "org_id", "SessionType": "session_type", "UserId": "user_id"}
+}
+
+func GetUserSessionCountViewReverseFieldMap() map[string]string {
+	return map[string]string{"count": "Count", "org_id": "OrgId", "session_type": "SessionType", "user_id": "UserId"}
+}
+
+func GetUserSessionCountViewTypeMap() map[string]string {
+	return map[string]string{"Count": "*int64", "OrgId": "*uuid.UUID", "SessionType": "*string", "UserId": "*uuid.UUID"}
 }

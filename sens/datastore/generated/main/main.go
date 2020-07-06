@@ -71,7 +71,6 @@ func main() {
 	api.UserSettingViewMain(r)
 	api.BaselineViewMain(r)
 	api.OrgSessionViewMain(r)
-	api.UserSessionCountViewMain(r)
 	api.SessionDurationViewMain(r)
 	api.AlertRuleMain(r)
 	api.AlertEscalationMain(r)
@@ -97,7 +96,8 @@ func main() {
 	api.OrgActivityViewMain(r)
 	api.OrgQuarterUsageViewMain(r)
 	api.OrgActivitySummaryViewMain(r)
-
+	api.UserSessionCountViewMain(r)
+	
 	ext.ExtMain(r)
 
 	http.Handle("/", r)
