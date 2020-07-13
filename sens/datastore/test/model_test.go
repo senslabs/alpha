@@ -11,7 +11,7 @@ import (
 func TestInsert(t *testing.T) {
 	logger.InitConsoleLogger()
 	os.Setenv("COCKROACH_PORT", "26256")
-	os.Setenv("LOG_LEVEL", "DEBUG")
+	os.Setenv("LOG_LEVEL", "ERROR")
 	body := `{
 			"Key": "Points",
 			"UserId": "208cf5c8-0fa9-47d6-9ed8-ef5cdd2cb5d6",
@@ -25,7 +25,7 @@ func TestInsert(t *testing.T) {
 
 func TestBatchInsert(t *testing.T) {
 	logger.InitConsoleLogger()
-	os.Setenv("LOG_LEVEL", "DEBUG")
+	os.Setenv("LOG_LEVEL", "ERROR")
 	body := `[
 		{
 			"Key": "Points",
@@ -58,7 +58,7 @@ func TestBatchInsert(t *testing.T) {
 func TestUpdate(t *testing.T) {
 	logger.InitConsoleLogger()
 	os.Setenv("COCKROACH_PORT", "26256")
-	os.Setenv("LOG_LEVEL", "DEBUG")
+	os.Setenv("LOG_LEVEL", "ERROR")
 
 	b := `{"Key":"Breath", "Properties": {"a":100, "b":200}}`
 
@@ -67,7 +67,7 @@ func TestUpdate(t *testing.T) {
 
 func TestUpdateSession(t *testing.T) {
 	logger.InitConsoleLogger()
-	os.Setenv("LOG_LEVEL", "DEBUG")
+	os.Setenv("LOG_LEVEL", "ERROR")
 	b := []byte(`{"EndedAt": 1586780694}`)
 	fn.UpdateSession("c598fc84-0e36-4399-93f7-594ca0359281", b)
 }

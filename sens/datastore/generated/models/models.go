@@ -1233,25 +1233,6 @@ func GetSleepSummaryViewTypeMap() map[string]string {
 	return map[string]string{"Properties": "*datastore.RawMessage", "SessionId": "*uuid.UUID", "SessionType": "*string", "UserId": "*uuid.UUID"}
 }
 
-type MeditationSummaryView struct {
-	UserId      *uuid.UUID            `db:"user_id" json:",omitempty"`
-	SessionId   *uuid.UUID            `db:"session_id" json:",omitempty"`
-	SessionType *string               `db:"session_type" json:",omitempty"`
-	Properties  *datastore.RawMessage `db:"properties" json:",omitempty"`
-}
-
-func GetMeditationSummaryViewFieldMap() map[string]string {
-	return map[string]string{"Properties": "properties", "SessionId": "session_id", "SessionType": "session_type", "UserId": "user_id"}
-}
-
-func GetMeditationSummaryViewReverseFieldMap() map[string]string {
-	return map[string]string{"properties": "Properties", "session_id": "SessionId", "session_type": "SessionType", "user_id": "UserId"}
-}
-
-func GetMeditationSummaryViewTypeMap() map[string]string {
-	return map[string]string{"Properties": "*datastore.RawMessage", "SessionId": "*uuid.UUID", "SessionType": "*string", "UserId": "*uuid.UUID"}
-}
-
 type LatestSleepSummaryView struct {
 	UserId     *uuid.UUID            `db:"user_id" json:",omitempty"`
 	SessionId  *uuid.UUID            `db:"session_id" json:",omitempty"`
@@ -1472,4 +1453,25 @@ func GetUserSessionCountViewReverseFieldMap() map[string]string {
 
 func GetUserSessionCountViewTypeMap() map[string]string {
 	return map[string]string{"Count": "*int64", "OrgId": "*uuid.UUID", "SessionType": "*string", "UserId": "*uuid.UUID"}
+}
+
+type MeditationSummaryView struct {
+	UserId      *uuid.UUID            `db:"user_id" json:",omitempty"`
+	SessionId   *uuid.UUID            `db:"session_id" json:",omitempty"`
+	SessionType *string               `db:"session_type" json:",omitempty"`
+	StartedAt   *int64                `db:"started_at" json:",omitempty"`
+	EndedAt     *int64                `db:"ended_at" json:",omitempty"`
+	Properties  *datastore.RawMessage `db:"properties" json:",omitempty"`
+}
+
+func GetMeditationSummaryViewFieldMap() map[string]string {
+	return map[string]string{"EndedAt": "ended_at", "Properties": "properties", "SessionId": "session_id", "SessionType": "session_type", "StartedAt": "started_at", "UserId": "user_id"}
+}
+
+func GetMeditationSummaryViewReverseFieldMap() map[string]string {
+	return map[string]string{"ended_at": "EndedAt", "properties": "Properties", "session_id": "SessionId", "session_type": "SessionType", "started_at": "StartedAt", "user_id": "UserId"}
+}
+
+func GetMeditationSummaryViewTypeMap() map[string]string {
+	return map[string]string{"EndedAt": "*int64", "Properties": "*datastore.RawMessage", "SessionId": "*uuid.UUID", "SessionType": "*string", "StartedAt": "*int64", "UserId": "*uuid.UUID"}
 }

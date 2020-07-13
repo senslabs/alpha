@@ -85,7 +85,6 @@ func main() {
 	api.UserBaselineViewMain(r)
 	api.ResourceMain(r)
 	api.SleepSummaryViewMain(r)
-	api.MeditationSummaryViewMain(r)
 	api.LatestSleepSummaryViewMain(r)
 	api.LatestMeditationSummaryViewMain(r)
 	api.RecorderMain(r)
@@ -97,6 +96,7 @@ func main() {
 	api.OrgQuarterUsageViewMain(r)
 	api.OrgActivitySummaryViewMain(r)
 	api.UserSessionCountViewMain(r)
+	api.MeditationSummaryViewMain(r)
 	
 	ext.ExtMain(r)
 
