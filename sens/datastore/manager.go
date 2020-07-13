@@ -14,7 +14,6 @@ import (
 	"github.com/senslabs/alpha/sens/errors"
 	"github.com/senslabs/alpha/sens/logger"
 	"github.com/senslabs/alpha/sens/types"
-	"github.com/senslabs/sqlx"
 
 	_ "github.com/lib/pq"
 )
@@ -23,30 +22,30 @@ var err error
 var once sync.Once
 var r *ring.Ring
 
-type Connection struct {
-	serial int
-	db     *sqlx.DB
-	err    error
-}
+// type Connection struct {
+// 	serial int
+// 	db     *sqlx.DB
+// 	err    error
+// }
 
-func getNextConnection() *sqlx.DB {
-	n := r.Len()
-	for i := 0; i < n; i++ {
-		r = r.Next()
-		conn := r.Next().Value.(Connection)
-		if conn.err == nil {
-			logger.Debugf("Returning connection: %d", conn.serial)
-			err := conn.db.Ping()
-			if err != nil {
-				logger.Errorf("Connection: %d failed", i)
-				continue
-			}
-			return conn.db
-		}
-	}
-	logger.Error("No db connections available")
-	return nil
-}
+// func getNextConnection() *sqlx.DB {
+// 	n := r.Len()
+// 	for i := 0; i < n; i++ {
+// 		r = r.Next()
+// 		conn := r.Next().Value.(Connection)
+// 		if conn.err == nil {
+// 			logger.Debugf("Returning connection: %d", conn.serial)
+// 			err := conn.db.Ping()
+// 			if err != nil {
+// 				logger.Errorf("Connection: %d failed", i)
+// 				continue
+// 			}
+// 			return conn.db
+// 		}
+// 	}
+// 	logger.Error("No db connections available")
+// 	return nil
+// }
 
 func GetCockroachHost() string {
 	host := os.Getenv("COCKROACH_HOST")
