@@ -97,6 +97,7 @@ func main() {
 	api.OrgActivitySummaryViewMain(r)
 	api.UserSessionCountViewMain(r)
 	api.MeditationSummaryViewMain(r)
+	api.NoteMain(r)
 	
 	ext.ExtMain(r)
 

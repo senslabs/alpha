@@ -1475,3 +1475,23 @@ func GetMeditationSummaryViewReverseFieldMap() map[string]string {
 func GetMeditationSummaryViewTypeMap() map[string]string {
 	return map[string]string{"EndedAt": "*int64", "Properties": "*datastore.RawMessage", "SessionId": "*uuid.UUID", "SessionType": "*string", "StartedAt": "*int64", "UserId": "*uuid.UUID"}
 }
+
+type Note struct {
+	UserId     *uuid.UUID            `db:"user_id" json:",omitempty"`
+	OpId       *uuid.UUID            `db:"op_id" json:",omitempty"`
+	CreatedAt  *int64                `db:"created_at" json:",omitempty"`
+	Notes      *string               `db:"notes" json:",omitempty"`
+	Attachment *datastore.RawMessage `db:"attachment" json:",omitempty"`
+}
+
+func GetNoteFieldMap() map[string]string {
+	return map[string]string{"Attachment": "attachment", "CreatedAt": "created_at", "Notes": "notes", "OpId": "op_id", "UserId": "user_id"}
+}
+
+func GetNoteReverseFieldMap() map[string]string {
+	return map[string]string{"attachment": "Attachment", "created_at": "CreatedAt", "notes": "Notes", "op_id": "OpId", "user_id": "UserId"}
+}
+
+func GetNoteTypeMap() map[string]string {
+	return map[string]string{"Attachment": "*datastore.RawMessage", "CreatedAt": "*int64", "Notes": "*string", "OpId": "*uuid.UUID", "UserId": "*uuid.UUID"}
+}
