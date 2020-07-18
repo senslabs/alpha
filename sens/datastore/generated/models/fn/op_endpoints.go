@@ -15,6 +15,9 @@ import (
 
 func InsertOpEndpoint(data []byte) string {
 	j := types.UnmarshalMap(data)
+	if len (j) == 0 {
+		errors.Pie(errors.New(0, "NO DATA"))
+	}
 
 	phi := 1
 	comma := ""
@@ -55,6 +58,9 @@ func InsertOpEndpoint(data []byte) string {
 func BatchInsertOpEndpoint(data []byte) {
 	var j []map[string]interface{}
 	types.Unmarshal(data, &j)
+	if len(j) == 0 {
+		return
+	}
 
 	comma := ""
 	var keys []string
