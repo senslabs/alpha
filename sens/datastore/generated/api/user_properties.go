@@ -34,6 +34,7 @@ func CreateUserPropertie(w http.ResponseWriter, r *http.Request) {
 	defer UserPropertieRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.InsertUserPropertie(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -43,6 +44,7 @@ func BatchCreateUserPropertie(w http.ResponseWriter, r *http.Request) {
 	defer UserPropertieRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsertUserPropertie(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -58,6 +60,7 @@ func UpdateUserPropertieWhere(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateUserPropertieWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)

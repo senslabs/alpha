@@ -37,6 +37,7 @@ func CreateApiKey(w http.ResponseWriter, r *http.Request) {
 	defer ApiKeyRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.InsertApiKey(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -46,6 +47,7 @@ func BatchCreateApiKey(w http.ResponseWriter, r *http.Request) {
 	defer ApiKeyRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsertApiKey(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -56,6 +58,7 @@ func UpdateApiKey(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateApiKey(id, data)
 	w.WriteHeader(http.StatusOK)
@@ -79,6 +82,7 @@ func UpdateApiKeyWhere(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateApiKeyWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)

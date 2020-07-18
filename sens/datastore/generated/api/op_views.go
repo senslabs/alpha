@@ -34,6 +34,7 @@ func CreateOpView(w http.ResponseWriter, r *http.Request) {
 	defer OpViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.InsertOpView(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -43,6 +44,7 @@ func BatchCreateOpView(w http.ResponseWriter, r *http.Request) {
 	defer OpViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsertOpView(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -58,6 +60,7 @@ func UpdateOpViewWhere(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateOpViewWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)

@@ -37,6 +37,7 @@ func CreateOrg(w http.ResponseWriter, r *http.Request) {
 	defer OrgRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.InsertOrg(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -46,6 +47,7 @@ func BatchCreateOrg(w http.ResponseWriter, r *http.Request) {
 	defer OrgRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsertOrg(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -56,6 +58,7 @@ func UpdateOrg(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateOrg(id, data)
 	w.WriteHeader(http.StatusOK)
@@ -79,6 +82,7 @@ func UpdateOrgWhere(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateOrgWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)

@@ -34,6 +34,7 @@ func CreateSessionDurationView(w http.ResponseWriter, r *http.Request) {
 	defer SessionDurationViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.InsertSessionDurationView(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -43,6 +44,7 @@ func BatchCreateSessionDurationView(w http.ResponseWriter, r *http.Request) {
 	defer SessionDurationViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsertSessionDurationView(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -58,6 +60,7 @@ func UpdateSessionDurationViewWhere(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateSessionDurationViewWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)

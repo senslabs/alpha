@@ -34,6 +34,7 @@ func CreateOpEndpointAccessGroup(w http.ResponseWriter, r *http.Request) {
 	defer OpEndpointAccessGroupRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.InsertOpEndpointAccessGroup(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -43,6 +44,7 @@ func BatchCreateOpEndpointAccessGroup(w http.ResponseWriter, r *http.Request) {
 	defer OpEndpointAccessGroupRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsertOpEndpointAccessGroup(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -58,6 +60,7 @@ func UpdateOpEndpointAccessGroupWhere(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateOpEndpointAccessGroupWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)

@@ -34,6 +34,7 @@ func CreateOrgSessionInfoView(w http.ResponseWriter, r *http.Request) {
 	defer OrgSessionInfoViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.InsertOrgSessionInfoView(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -43,6 +44,7 @@ func BatchCreateOrgSessionInfoView(w http.ResponseWriter, r *http.Request) {
 	defer OrgSessionInfoViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsertOrgSessionInfoView(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -58,6 +60,7 @@ func UpdateOrgSessionInfoViewWhere(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateOrgSessionInfoViewWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)

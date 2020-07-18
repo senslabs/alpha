@@ -37,6 +37,7 @@ func CreateOp(w http.ResponseWriter, r *http.Request) {
 	defer OpRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.InsertOp(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -46,6 +47,7 @@ func BatchCreateOp(w http.ResponseWriter, r *http.Request) {
 	defer OpRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsertOp(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -56,6 +58,7 @@ func UpdateOp(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateOp(id, data)
 	w.WriteHeader(http.StatusOK)
@@ -79,6 +82,7 @@ func UpdateOpWhere(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateOpWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)

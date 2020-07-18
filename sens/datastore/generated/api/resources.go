@@ -37,6 +37,7 @@ func CreateResource(w http.ResponseWriter, r *http.Request) {
 	defer ResourceRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.InsertResource(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -46,6 +47,7 @@ func BatchCreateResource(w http.ResponseWriter, r *http.Request) {
 	defer ResourceRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsertResource(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -56,6 +58,7 @@ func UpdateResource(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateResource(id, data)
 	w.WriteHeader(http.StatusOK)
@@ -79,6 +82,7 @@ func UpdateResourceWhere(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateResourceWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)

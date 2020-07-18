@@ -34,6 +34,7 @@ func CreateOrgQuarterUsageView(w http.ResponseWriter, r *http.Request) {
 	defer OrgQuarterUsageViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.InsertOrgQuarterUsageView(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -43,6 +44,7 @@ func BatchCreateOrgQuarterUsageView(w http.ResponseWriter, r *http.Request) {
 	defer OrgQuarterUsageViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsertOrgQuarterUsageView(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -58,6 +60,7 @@ func UpdateOrgQuarterUsageViewWhere(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateOrgQuarterUsageViewWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)

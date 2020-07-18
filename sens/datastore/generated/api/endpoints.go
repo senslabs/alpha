@@ -37,6 +37,7 @@ func CreateEndpoint(w http.ResponseWriter, r *http.Request) {
 	defer EndpointRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.InsertEndpoint(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -46,6 +47,7 @@ func BatchCreateEndpoint(w http.ResponseWriter, r *http.Request) {
 	defer EndpointRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsertEndpoint(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -56,6 +58,7 @@ func UpdateEndpoint(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateEndpoint(id, data)
 	w.WriteHeader(http.StatusOK)
@@ -79,6 +82,7 @@ func UpdateEndpointWhere(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateEndpointWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)

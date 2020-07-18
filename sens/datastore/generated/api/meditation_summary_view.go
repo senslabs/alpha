@@ -34,6 +34,7 @@ func CreateMeditationSummaryView(w http.ResponseWriter, r *http.Request) {
 	defer MeditationSummaryViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.InsertMeditationSummaryView(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -43,6 +44,7 @@ func BatchCreateMeditationSummaryView(w http.ResponseWriter, r *http.Request) {
 	defer MeditationSummaryViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsertMeditationSummaryView(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -58,6 +60,7 @@ func UpdateMeditationSummaryViewWhere(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateMeditationSummaryViewWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)

@@ -34,6 +34,7 @@ func CreateOpPropertie(w http.ResponseWriter, r *http.Request) {
 	defer OpPropertieRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.InsertOpPropertie(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -43,6 +44,7 @@ func BatchCreateOpPropertie(w http.ResponseWriter, r *http.Request) {
 	defer OpPropertieRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsertOpPropertie(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -58,6 +60,7 @@ func UpdateOpPropertieWhere(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateOpPropertieWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)

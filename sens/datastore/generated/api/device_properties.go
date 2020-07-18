@@ -34,6 +34,7 @@ func CreateDevicePropertie(w http.ResponseWriter, r *http.Request) {
 	defer DevicePropertieRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.InsertDevicePropertie(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -43,6 +44,7 @@ func BatchCreateDevicePropertie(w http.ResponseWriter, r *http.Request) {
 	defer DevicePropertieRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsertDevicePropertie(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -58,6 +60,7 @@ func UpdateDevicePropertieWhere(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateDevicePropertieWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)

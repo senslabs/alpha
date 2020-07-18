@@ -34,6 +34,7 @@ func CreateOrgActivitySummaryView(w http.ResponseWriter, r *http.Request) {
 	defer OrgActivitySummaryViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.InsertOrgActivitySummaryView(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -43,6 +44,7 @@ func BatchCreateOrgActivitySummaryView(w http.ResponseWriter, r *http.Request) {
 	defer OrgActivitySummaryViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsertOrgActivitySummaryView(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -58,6 +60,7 @@ func UpdateOrgActivitySummaryViewWhere(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateOrgActivitySummaryViewWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)

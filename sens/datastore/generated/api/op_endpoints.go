@@ -34,6 +34,7 @@ func CreateOpEndpoint(w http.ResponseWriter, r *http.Request) {
 	defer OpEndpointRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.InsertOpEndpoint(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -43,6 +44,7 @@ func BatchCreateOpEndpoint(w http.ResponseWriter, r *http.Request) {
 	defer OpEndpointRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsertOpEndpoint(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -58,6 +60,7 @@ func UpdateOpEndpointWhere(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateOpEndpointWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)

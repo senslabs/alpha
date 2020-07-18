@@ -34,6 +34,7 @@ func CreateOrgEndpoint(w http.ResponseWriter, r *http.Request) {
 	defer OrgEndpointRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.InsertOrgEndpoint(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -43,6 +44,7 @@ func BatchCreateOrgEndpoint(w http.ResponseWriter, r *http.Request) {
 	defer OrgEndpointRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsertOrgEndpoint(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -58,6 +60,7 @@ func UpdateOrgEndpointWhere(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateOrgEndpointWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)

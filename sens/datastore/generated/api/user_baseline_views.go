@@ -34,6 +34,7 @@ func CreateUserBaselineView(w http.ResponseWriter, r *http.Request) {
 	defer UserBaselineViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.InsertUserBaselineView(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -43,6 +44,7 @@ func BatchCreateUserBaselineView(w http.ResponseWriter, r *http.Request) {
 	defer UserBaselineViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsertUserBaselineView(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -58,6 +60,7 @@ func UpdateUserBaselineViewWhere(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateUserBaselineViewWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)

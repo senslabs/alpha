@@ -34,6 +34,7 @@ func CreateUserSettingView(w http.ResponseWriter, r *http.Request) {
 	defer UserSettingViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.InsertUserSettingView(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -43,6 +44,7 @@ func BatchCreateUserSettingView(w http.ResponseWriter, r *http.Request) {
 	defer UserSettingViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsertUserSettingView(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -58,6 +60,7 @@ func UpdateUserSettingViewWhere(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateUserSettingViewWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)

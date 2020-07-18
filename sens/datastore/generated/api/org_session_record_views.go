@@ -34,6 +34,7 @@ func CreateOrgSessionRecordView(w http.ResponseWriter, r *http.Request) {
 	defer OrgSessionRecordViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.InsertOrgSessionRecordView(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -43,6 +44,7 @@ func BatchCreateOrgSessionRecordView(w http.ResponseWriter, r *http.Request) {
 	defer OrgSessionRecordViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsertOrgSessionRecordView(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -58,6 +60,7 @@ func UpdateOrgSessionRecordViewWhere(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateOrgSessionRecordViewWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)

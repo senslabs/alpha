@@ -34,6 +34,7 @@ func CreateDeviceActivitie(w http.ResponseWriter, r *http.Request) {
 	defer DeviceActivitieRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.InsertDeviceActivitie(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -43,6 +44,7 @@ func BatchCreateDeviceActivitie(w http.ResponseWriter, r *http.Request) {
 	defer DeviceActivitieRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsertDeviceActivitie(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -58,6 +60,7 @@ func UpdateDeviceActivitieWhere(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateDeviceActivitieWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)

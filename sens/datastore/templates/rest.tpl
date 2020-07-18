@@ -37,6 +37,7 @@ func Create{{.Model}}(w http.ResponseWriter, r *http.Request) {
 	defer {{.Model}}Recovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.Insert{{.Model}}(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -46,6 +47,7 @@ func BatchCreate{{.Model}}(w http.ResponseWriter, r *http.Request) {
 	defer {{.Model}}Recovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsert{{.Model}}(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -56,6 +58,7 @@ func Update{{.Model}}(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.Update{{.Model}}(id, data)
 	w.WriteHeader(http.StatusOK)
@@ -79,6 +82,7 @@ func Update{{.Model}}Where(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.Update{{.Model}}Where(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)

@@ -34,6 +34,7 @@ func CreateLongestSleepTrendView(w http.ResponseWriter, r *http.Request) {
 	defer LongestSleepTrendViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.InsertLongestSleepTrendView(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -43,6 +44,7 @@ func BatchCreateLongestSleepTrendView(w http.ResponseWriter, r *http.Request) {
 	defer LongestSleepTrendViewRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsertLongestSleepTrendView(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -58,6 +60,7 @@ func UpdateLongestSleepTrendViewWhere(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateLongestSleepTrendViewWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)

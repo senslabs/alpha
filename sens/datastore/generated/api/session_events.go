@@ -34,6 +34,7 @@ func CreateSessionEvent(w http.ResponseWriter, r *http.Request) {
 	defer SessionEventRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	id := fn.InsertSessionEvent(data)
 	errors.Pie(err)
 	fmt.Fprint(w, id)
@@ -43,6 +44,7 @@ func BatchCreateSessionEvent(w http.ResponseWriter, r *http.Request) {
 	defer SessionEventRecovery(w)
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
+	defer r.Body.Close()
 	fn.BatchInsertSessionEvent(data)
 	w.WriteHeader(http.StatusOK)
 }
@@ -58,6 +60,7 @@ func UpdateSessionEventWhere(w http.ResponseWriter, r *http.Request) {
 	in := values.Get("in")
 
 	data, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	errors.Pie(err)
 	fn.UpdateSessionEventWhere(or, and, in, span, data)
 	w.WriteHeader(http.StatusOK)
