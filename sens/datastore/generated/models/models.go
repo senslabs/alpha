@@ -401,18 +401,20 @@ type Alert struct {
 	Valid       *bool      `db:"valid" json:",omitempty"`
 	AlertRuleId *uuid.UUID `db:"alert_rule_id" json:",omitempty"`
 	UpdatedAt   *int64     `db:"updated_at" json:",omitempty"`
+	SnoozedBy   *string    `db:"snoozed_by" json:",omitempty"`
+	SnoozedAt   *string    `db:"snoozed_at" json:",omitempty"`
 }
 
 func GetAlertFieldMap() map[string]string {
-	return map[string]string{"AlertId": "alert_id", "AlertName": "alert_name", "AlertRuleId": "alert_rule_id", "CreatedAt": "created_at", "Remarks": "remarks", "Status": "status", "UpdatedAt": "updated_at", "UserId": "user_id", "Valid": "valid"}
+	return map[string]string{"AlertId": "alert_id", "AlertName": "alert_name", "AlertRuleId": "alert_rule_id", "CreatedAt": "created_at", "Remarks": "remarks", "SnoozedAt": "snoozed_at", "SnoozedBy": "snoozed_by", "Status": "status", "UpdatedAt": "updated_at", "UserId": "user_id", "Valid": "valid"}
 }
 
 func GetAlertReverseFieldMap() map[string]string {
-	return map[string]string{"alert_id": "AlertId", "alert_name": "AlertName", "alert_rule_id": "AlertRuleId", "created_at": "CreatedAt", "remarks": "Remarks", "status": "Status", "updated_at": "UpdatedAt", "user_id": "UserId", "valid": "Valid"}
+	return map[string]string{"alert_id": "AlertId", "alert_name": "AlertName", "alert_rule_id": "AlertRuleId", "created_at": "CreatedAt", "remarks": "Remarks", "snoozed_at": "SnoozedAt", "snoozed_by": "SnoozedBy", "status": "Status", "updated_at": "UpdatedAt", "user_id": "UserId", "valid": "Valid"}
 }
 
 func GetAlertTypeMap() map[string]string {
-	return map[string]string{"AlertId": "*uuid.UUID", "AlertName": "*string", "AlertRuleId": "*uuid.UUID", "CreatedAt": "*int64", "Remarks": "*string", "Status": "*string", "UpdatedAt": "*int64", "UserId": "*uuid.UUID", "Valid": "*bool"}
+	return map[string]string{"AlertId": "*uuid.UUID", "AlertName": "*string", "AlertRuleId": "*uuid.UUID", "CreatedAt": "*int64", "Remarks": "*string", "SnoozedAt": "*string", "SnoozedBy": "*string", "Status": "*string", "UpdatedAt": "*int64", "UserId": "*uuid.UUID", "Valid": "*bool"}
 }
 
 type Session struct {
@@ -797,51 +799,6 @@ func GetOpPropertieReverseFieldMap() map[string]string {
 
 func GetOpPropertieTypeMap() map[string]string {
 	return map[string]string{"Key": "*string", "OpId": "*uuid.UUID", "Value": "*string"}
-}
-
-type OrgAlertView struct {
-	UserId    *uuid.UUID `db:"user_id" json:",omitempty"`
-	OrgId     *uuid.UUID `db:"org_id" json:",omitempty"`
-	AlertId   *uuid.UUID `db:"alert_id" json:",omitempty"`
-	FirstName *string    `db:"first_name" json:",omitempty"`
-	LastName  *string    `db:"last_name" json:",omitempty"`
-	CreatedAt *int64     `db:"created_at" json:",omitempty"`
-	AlertName *string    `db:"alert_name" json:",omitempty"`
-	Status    *string    `db:"status" json:",omitempty"`
-	Remarks   *string    `db:"remarks" json:",omitempty"`
-}
-
-func GetOrgAlertViewFieldMap() map[string]string {
-	return map[string]string{"AlertId": "alert_id", "AlertName": "alert_name", "CreatedAt": "created_at", "FirstName": "first_name", "LastName": "last_name", "OrgId": "org_id", "Remarks": "remarks", "Status": "status", "UserId": "user_id"}
-}
-
-func GetOrgAlertViewReverseFieldMap() map[string]string {
-	return map[string]string{"alert_id": "AlertId", "alert_name": "AlertName", "created_at": "CreatedAt", "first_name": "FirstName", "last_name": "LastName", "org_id": "OrgId", "remarks": "Remarks", "status": "Status", "user_id": "UserId"}
-}
-
-func GetOrgAlertViewTypeMap() map[string]string {
-	return map[string]string{"AlertId": "*uuid.UUID", "AlertName": "*string", "CreatedAt": "*int64", "FirstName": "*string", "LastName": "*string", "OrgId": "*uuid.UUID", "Remarks": "*string", "Status": "*string", "UserId": "*uuid.UUID"}
-}
-
-type OrgLatestAlertView struct {
-	UserId    *uuid.UUID            `db:"user_id" json:",omitempty"`
-	OrgId     *uuid.UUID            `db:"org_id" json:",omitempty"`
-	FirstName *string               `db:"first_name" json:",omitempty"`
-	LastName  *string               `db:"last_name" json:",omitempty"`
-	Timestamp *int64                `db:"timestamp" json:",omitempty"`
-	Alerts    *datastore.RawMessage `db:"alerts" json:",omitempty"`
-}
-
-func GetOrgLatestAlertViewFieldMap() map[string]string {
-	return map[string]string{"Alerts": "alerts", "FirstName": "first_name", "LastName": "last_name", "OrgId": "org_id", "Timestamp": "timestamp", "UserId": "user_id"}
-}
-
-func GetOrgLatestAlertViewReverseFieldMap() map[string]string {
-	return map[string]string{"alerts": "Alerts", "first_name": "FirstName", "last_name": "LastName", "org_id": "OrgId", "timestamp": "Timestamp", "user_id": "UserId"}
-}
-
-func GetOrgLatestAlertViewTypeMap() map[string]string {
-	return map[string]string{"Alerts": "*datastore.RawMessage", "FirstName": "*string", "LastName": "*string", "OrgId": "*uuid.UUID", "Timestamp": "*int64", "UserId": "*uuid.UUID"}
 }
 
 type OrgSetting struct {
@@ -1494,4 +1451,116 @@ func GetNoteReverseFieldMap() map[string]string {
 
 func GetNoteTypeMap() map[string]string {
 	return map[string]string{"Attachment": "*datastore.RawMessage", "CreatedAt": "*int64", "Notes": "*string", "OpId": "*uuid.UUID", "UserId": "*uuid.UUID"}
+}
+
+type AlertView struct {
+	AlertId        *uuid.UUID `db:"alert_id" json:",omitempty"`
+	UserId         *uuid.UUID `db:"user_id" json:",omitempty"`
+	CreatedAt      *int64     `db:"created_at" json:",omitempty"`
+	AlertName      *string    `db:"alert_name" json:",omitempty"`
+	Status         *string    `db:"status" json:",omitempty"`
+	Remarks        *string    `db:"remarks" json:",omitempty"`
+	Valid          *bool      `db:"valid" json:",omitempty"`
+	AlertRuleId    *uuid.UUID `db:"alert_rule_id" json:",omitempty"`
+	UpdatedAt      *int64     `db:"updated_at" json:",omitempty"`
+	AlertSnoozedBy *string    `db:"alert_snoozed_by" json:",omitempty"`
+	AlertSnoozedAt *string    `db:"alert_snoozed_at" json:",omitempty"`
+	OrgId          *uuid.UUID `db:"org_id" json:",omitempty"`
+	AlertRuleName  *string    `db:"alert_rule_name" json:",omitempty"`
+	Key            *string    `db:"key" json:",omitempty"`
+	Duration       *int64     `db:"duration" json:",omitempty"`
+	Enabled        *bool      `db:"enabled" json:",omitempty"`
+	UpperLimit     *float64   `db:"upper_limit" json:",omitempty"`
+	LowerLimit     *float64   `db:"lower_limit" json:",omitempty"`
+	ValidFrom      *string    `db:"valid_from" json:",omitempty"`
+	ValidTill      *string    `db:"valid_till" json:",omitempty"`
+	SnoozedAt      *int64     `db:"snoozed_at" json:",omitempty"`
+	SnoozedFor     *int64     `db:"snoozed_for" json:",omitempty"`
+	DefaultSnooze  *int64     `db:"default_snooze" json:",omitempty"`
+}
+
+func GetAlertViewFieldMap() map[string]string {
+	return map[string]string{"AlertId": "alert_id", "AlertName": "alert_name", "AlertRuleId": "alert_rule_id", "AlertRuleName": "alert_rule_name", "AlertSnoozedAt": "alert_snoozed_at", "AlertSnoozedBy": "alert_snoozed_by", "CreatedAt": "created_at", "DefaultSnooze": "default_snooze", "Duration": "duration", "Enabled": "enabled", "Key": "key", "LowerLimit": "lower_limit", "OrgId": "org_id", "Remarks": "remarks", "SnoozedAt": "snoozed_at", "SnoozedFor": "snoozed_for", "Status": "status", "UpdatedAt": "updated_at", "UpperLimit": "upper_limit", "UserId": "user_id", "Valid": "valid", "ValidFrom": "valid_from", "ValidTill": "valid_till"}
+}
+
+func GetAlertViewReverseFieldMap() map[string]string {
+	return map[string]string{"alert_id": "AlertId", "alert_name": "AlertName", "alert_rule_id": "AlertRuleId", "alert_rule_name": "AlertRuleName", "alert_snoozed_at": "AlertSnoozedAt", "alert_snoozed_by": "AlertSnoozedBy", "created_at": "CreatedAt", "default_snooze": "DefaultSnooze", "duration": "Duration", "enabled": "Enabled", "key": "Key", "lower_limit": "LowerLimit", "org_id": "OrgId", "remarks": "Remarks", "snoozed_at": "SnoozedAt", "snoozed_for": "SnoozedFor", "status": "Status", "updated_at": "UpdatedAt", "upper_limit": "UpperLimit", "user_id": "UserId", "valid": "Valid", "valid_from": "ValidFrom", "valid_till": "ValidTill"}
+}
+
+func GetAlertViewTypeMap() map[string]string {
+	return map[string]string{"AlertId": "*uuid.UUID", "AlertName": "*string", "AlertRuleId": "*uuid.UUID", "AlertRuleName": "*string", "AlertSnoozedAt": "*string", "AlertSnoozedBy": "*string", "CreatedAt": "*int64", "DefaultSnooze": "*int64", "Duration": "*int64", "Enabled": "*bool", "Key": "*string", "LowerLimit": "*float64", "OrgId": "*uuid.UUID", "Remarks": "*string", "SnoozedAt": "*int64", "SnoozedFor": "*int64", "Status": "*string", "UpdatedAt": "*int64", "UpperLimit": "*float64", "UserId": "*uuid.UUID", "Valid": "*bool", "ValidFrom": "*string", "ValidTill": "*string"}
+}
+
+type OrgAlertView struct {
+	UserId         *uuid.UUID `db:"user_id" json:",omitempty"`
+	OrgId          *uuid.UUID `db:"org_id" json:",omitempty"`
+	AlertId        *uuid.UUID `db:"alert_id" json:",omitempty"`
+	AlertRuleId    *uuid.UUID `db:"alert_rule_id" json:",omitempty"`
+	FirstName      *string    `db:"first_name" json:",omitempty"`
+	LastName       *string    `db:"last_name" json:",omitempty"`
+	AlertSnoozedBy *string    `db:"alert_snoozed_by" json:",omitempty"`
+	AlertSnoozedAt *string    `db:"alert_snoozed_at" json:",omitempty"`
+	CreatedAt      *int64     `db:"created_at" json:",omitempty"`
+	AlertName      *string    `db:"alert_name" json:",omitempty"`
+	Status         *string    `db:"status" json:",omitempty"`
+	Remarks        *string    `db:"remarks" json:",omitempty"`
+	AlertRuleName  *string    `db:"alert_rule_name" json:",omitempty"`
+	Key            *string    `db:"key" json:",omitempty"`
+	Duration       *int64     `db:"duration" json:",omitempty"`
+	Enabled        *bool      `db:"enabled" json:",omitempty"`
+	UpperLimit     *float64   `db:"upper_limit" json:",omitempty"`
+	LowerLimit     *float64   `db:"lower_limit" json:",omitempty"`
+	ValidFrom      *string    `db:"valid_from" json:",omitempty"`
+	ValidTill      *string    `db:"valid_till" json:",omitempty"`
+	SnoozedAt      *int64     `db:"snoozed_at" json:",omitempty"`
+	SnoozedFor     *int64     `db:"snoozed_for" json:",omitempty"`
+	DefaultSnooze  *int64     `db:"default_snooze" json:",omitempty"`
+}
+
+func GetOrgAlertViewFieldMap() map[string]string {
+	return map[string]string{"AlertId": "alert_id", "AlertName": "alert_name", "AlertRuleId": "alert_rule_id", "AlertRuleName": "alert_rule_name", "AlertSnoozedAt": "alert_snoozed_at", "AlertSnoozedBy": "alert_snoozed_by", "CreatedAt": "created_at", "DefaultSnooze": "default_snooze", "Duration": "duration", "Enabled": "enabled", "FirstName": "first_name", "Key": "key", "LastName": "last_name", "LowerLimit": "lower_limit", "OrgId": "org_id", "Remarks": "remarks", "SnoozedAt": "snoozed_at", "SnoozedFor": "snoozed_for", "Status": "status", "UpperLimit": "upper_limit", "UserId": "user_id", "ValidFrom": "valid_from", "ValidTill": "valid_till"}
+}
+
+func GetOrgAlertViewReverseFieldMap() map[string]string {
+	return map[string]string{"alert_id": "AlertId", "alert_name": "AlertName", "alert_rule_id": "AlertRuleId", "alert_rule_name": "AlertRuleName", "alert_snoozed_at": "AlertSnoozedAt", "alert_snoozed_by": "AlertSnoozedBy", "created_at": "CreatedAt", "default_snooze": "DefaultSnooze", "duration": "Duration", "enabled": "Enabled", "first_name": "FirstName", "key": "Key", "last_name": "LastName", "lower_limit": "LowerLimit", "org_id": "OrgId", "remarks": "Remarks", "snoozed_at": "SnoozedAt", "snoozed_for": "SnoozedFor", "status": "Status", "upper_limit": "UpperLimit", "user_id": "UserId", "valid_from": "ValidFrom", "valid_till": "ValidTill"}
+}
+
+func GetOrgAlertViewTypeMap() map[string]string {
+	return map[string]string{"AlertId": "*uuid.UUID", "AlertName": "*string", "AlertRuleId": "*uuid.UUID", "AlertRuleName": "*string", "AlertSnoozedAt": "*string", "AlertSnoozedBy": "*string", "CreatedAt": "*int64", "DefaultSnooze": "*int64", "Duration": "*int64", "Enabled": "*bool", "FirstName": "*string", "Key": "*string", "LastName": "*string", "LowerLimit": "*float64", "OrgId": "*uuid.UUID", "Remarks": "*string", "SnoozedAt": "*int64", "SnoozedFor": "*int64", "Status": "*string", "UpperLimit": "*float64", "UserId": "*uuid.UUID", "ValidFrom": "*string", "ValidTill": "*string"}
+}
+
+type OrgLatestAlertView struct {
+	UserId         *uuid.UUID            `db:"user_id" json:",omitempty"`
+	OrgId          *uuid.UUID            `db:"org_id" json:",omitempty"`
+	FirstName      *string               `db:"first_name" json:",omitempty"`
+	LastName       *string               `db:"last_name" json:",omitempty"`
+	AlertSnoozedBy *string               `db:"alert_snoozed_by" json:",omitempty"`
+	AlertSnoozedAt *string               `db:"alert_snoozed_at" json:",omitempty"`
+	Status         *string               `db:"status" json:",omitempty"`
+	Remarks        *string               `db:"remarks" json:",omitempty"`
+	AlertRuleName  *string               `db:"alert_rule_name" json:",omitempty"`
+	Key            *string               `db:"key" json:",omitempty"`
+	Duration       *int64                `db:"duration" json:",omitempty"`
+	Enabled        *bool                 `db:"enabled" json:",omitempty"`
+	UpperLimit     *float64              `db:"upper_limit" json:",omitempty"`
+	LowerLimit     *float64              `db:"lower_limit" json:",omitempty"`
+	ValidFrom      *string               `db:"valid_from" json:",omitempty"`
+	ValidTill      *string               `db:"valid_till" json:",omitempty"`
+	SnoozedAt      *int64                `db:"snoozed_at" json:",omitempty"`
+	SnoozedFor     *int64                `db:"snoozed_for" json:",omitempty"`
+	DefaultSnooze  *int64                `db:"default_snooze" json:",omitempty"`
+	Timestamp      *int64                `db:"timestamp" json:",omitempty"`
+	Alerts         *datastore.RawMessage `db:"alerts" json:",omitempty"`
+}
+
+func GetOrgLatestAlertViewFieldMap() map[string]string {
+	return map[string]string{"AlertRuleName": "alert_rule_name", "AlertSnoozedAt": "alert_snoozed_at", "AlertSnoozedBy": "alert_snoozed_by", "Alerts": "alerts", "DefaultSnooze": "default_snooze", "Duration": "duration", "Enabled": "enabled", "FirstName": "first_name", "Key": "key", "LastName": "last_name", "LowerLimit": "lower_limit", "OrgId": "org_id", "Remarks": "remarks", "SnoozedAt": "snoozed_at", "SnoozedFor": "snoozed_for", "Status": "status", "Timestamp": "timestamp", "UpperLimit": "upper_limit", "UserId": "user_id", "ValidFrom": "valid_from", "ValidTill": "valid_till"}
+}
+
+func GetOrgLatestAlertViewReverseFieldMap() map[string]string {
+	return map[string]string{"alert_rule_name": "AlertRuleName", "alert_snoozed_at": "AlertSnoozedAt", "alert_snoozed_by": "AlertSnoozedBy", "alerts": "Alerts", "default_snooze": "DefaultSnooze", "duration": "Duration", "enabled": "Enabled", "first_name": "FirstName", "key": "Key", "last_name": "LastName", "lower_limit": "LowerLimit", "org_id": "OrgId", "remarks": "Remarks", "snoozed_at": "SnoozedAt", "snoozed_for": "SnoozedFor", "status": "Status", "timestamp": "Timestamp", "upper_limit": "UpperLimit", "user_id": "UserId", "valid_from": "ValidFrom", "valid_till": "ValidTill"}
+}
+
+func GetOrgLatestAlertViewTypeMap() map[string]string {
+	return map[string]string{"AlertRuleName": "*string", "AlertSnoozedAt": "*string", "AlertSnoozedBy": "*string", "Alerts": "*datastore.RawMessage", "DefaultSnooze": "*int64", "Duration": "*int64", "Enabled": "*bool", "FirstName": "*string", "Key": "*string", "LastName": "*string", "LowerLimit": "*float64", "OrgId": "*uuid.UUID", "Remarks": "*string", "SnoozedAt": "*int64", "SnoozedFor": "*int64", "Status": "*string", "Timestamp": "*int64", "UpperLimit": "*float64", "UserId": "*uuid.UUID", "ValidFrom": "*string", "ValidTill": "*string"}
 }

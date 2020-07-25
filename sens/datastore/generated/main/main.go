@@ -65,8 +65,6 @@ func main() {
 	api.OrgPropertieMain(r)
 	api.OpSettingMain(r)
 	api.OpPropertieMain(r)
-	api.OrgAlertViewMain(r)
-	api.OrgLatestAlertViewMain(r)
 	api.OrgSettingMain(r)
 	api.UserSettingViewMain(r)
 	api.BaselineViewMain(r)
@@ -98,6 +96,9 @@ func main() {
 	api.UserSessionCountViewMain(r)
 	api.MeditationSummaryViewMain(r)
 	api.NoteMain(r)
+	api.AlertViewMain(r)
+	api.OrgAlertViewMain(r)
+	api.OrgLatestAlertViewMain(r)
 	
 	ext.ExtMain(r)
 
