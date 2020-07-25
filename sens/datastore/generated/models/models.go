@@ -1564,3 +1564,22 @@ func GetOrgLatestAlertViewReverseFieldMap() map[string]string {
 func GetOrgLatestAlertViewTypeMap() map[string]string {
 	return map[string]string{"AlertRuleName": "*string", "AlertSnoozedAt": "*string", "AlertSnoozedBy": "*string", "Alerts": "*datastore.RawMessage", "DefaultSnooze": "*int64", "Duration": "*int64", "Enabled": "*bool", "FirstName": "*string", "Key": "*string", "LastName": "*string", "LowerLimit": "*float64", "OrgId": "*uuid.UUID", "Remarks": "*string", "SnoozedAt": "*int64", "SnoozedFor": "*int64", "Status": "*string", "Timestamp": "*int64", "UpperLimit": "*float64", "UserId": "*uuid.UUID", "ValidFrom": "*string", "ValidTill": "*string"}
 }
+
+type UserTag struct {
+	UserTagId *uuid.UUID `db:"user_tag_id" json:",omitempty"`
+	UserId    *uuid.UUID `db:"user_id" json:",omitempty"`
+	Key       *string    `db:"key" json:",omitempty"`
+	Value     *string    `db:"value" json:",omitempty"`
+}
+
+func GetUserTagFieldMap() map[string]string {
+	return map[string]string{"Key": "key", "UserId": "user_id", "UserTagId": "user_tag_id", "Value": "value"}
+}
+
+func GetUserTagReverseFieldMap() map[string]string {
+	return map[string]string{"key": "Key", "user_id": "UserId", "user_tag_id": "UserTagId", "value": "Value"}
+}
+
+func GetUserTagTypeMap() map[string]string {
+	return map[string]string{"Key": "*string", "UserId": "*uuid.UUID", "UserTagId": "*uuid.UUID", "Value": "*string"}
+}

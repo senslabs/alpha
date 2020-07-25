@@ -99,6 +99,7 @@ func main() {
 	api.AlertViewMain(r)
 	api.OrgAlertViewMain(r)
 	api.OrgLatestAlertViewMain(r)
+	api.UserTagMain(r)
 	
 	ext.ExtMain(r)
 

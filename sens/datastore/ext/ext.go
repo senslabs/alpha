@@ -279,11 +279,24 @@ func marshalSqlRows(w io.Writer, rows *sql.Rows) {
 }
 
 func Get24HourViewList(w http.ResponseWriter, r *http.Request) {
-	userId := r.URL.Query()["UserId"]
+	userIds := r.URL.Query()["UserId"]
 	db := datastore.GetConnection()
+
+	query := ""
+	union := ""
+	for i := range userIds {
+		query += union + fmt.Sprintf(TF_LIST_QUERY, i+1, i+1, i+1, i+1, i+1, i+1)
+		union = " UNION "
+	}
+
+	var in []interface{}
+	for _, u := range in {
+		in = append(in, u)
+	}
+
 	stmt, err := db.Prepare(TF_LIST_QUERY)
 	errors.Pie(err)
-	rows, err := stmt.Query(pq.Array(userId))
+	rows, err := stmt.Query(in...)
 	errors.Pie(err)
 	marshalSqlRows(w, rows)
 }
