@@ -402,7 +402,7 @@ type Alert struct {
 	AlertRuleId *uuid.UUID `db:"alert_rule_id" json:",omitempty"`
 	UpdatedAt   *int64     `db:"updated_at" json:",omitempty"`
 	SnoozedBy   *string    `db:"snoozed_by" json:",omitempty"`
-	SnoozedAt   *string    `db:"snoozed_at" json:",omitempty"`
+	SnoozedAt   *int64     `db:"snoozed_at" json:",omitempty"`
 }
 
 func GetAlertFieldMap() map[string]string {
@@ -414,7 +414,7 @@ func GetAlertReverseFieldMap() map[string]string {
 }
 
 func GetAlertTypeMap() map[string]string {
-	return map[string]string{"AlertId": "*uuid.UUID", "AlertName": "*string", "AlertRuleId": "*uuid.UUID", "CreatedAt": "*int64", "Remarks": "*string", "SnoozedAt": "*string", "SnoozedBy": "*string", "Status": "*string", "UpdatedAt": "*int64", "UserId": "*uuid.UUID", "Valid": "*bool"}
+	return map[string]string{"AlertId": "*uuid.UUID", "AlertName": "*string", "AlertRuleId": "*uuid.UUID", "CreatedAt": "*int64", "Remarks": "*string", "SnoozedAt": "*int64", "SnoozedBy": "*string", "Status": "*string", "UpdatedAt": "*int64", "UserId": "*uuid.UUID", "Valid": "*bool"}
 }
 
 type Session struct {
@@ -1453,42 +1453,23 @@ func GetNoteTypeMap() map[string]string {
 	return map[string]string{"Attachment": "*datastore.RawMessage", "CreatedAt": "*int64", "Notes": "*string", "OpId": "*uuid.UUID", "UserId": "*uuid.UUID"}
 }
 
-type AlertView struct {
-	AlertId        *uuid.UUID `db:"alert_id" json:",omitempty"`
-	UserId         *uuid.UUID `db:"user_id" json:",omitempty"`
-	CreatedAt      *int64     `db:"created_at" json:",omitempty"`
-	AlertName      *string    `db:"alert_name" json:",omitempty"`
-	Status         *string    `db:"status" json:",omitempty"`
-	Remarks        *string    `db:"remarks" json:",omitempty"`
-	Valid          *bool      `db:"valid" json:",omitempty"`
-	AlertRuleId    *uuid.UUID `db:"alert_rule_id" json:",omitempty"`
-	UpdatedAt      *int64     `db:"updated_at" json:",omitempty"`
-	AlertSnoozedBy *string    `db:"alert_snoozed_by" json:",omitempty"`
-	AlertSnoozedAt *string    `db:"alert_snoozed_at" json:",omitempty"`
-	OrgId          *uuid.UUID `db:"org_id" json:",omitempty"`
-	AlertRuleName  *string    `db:"alert_rule_name" json:",omitempty"`
-	Key            *string    `db:"key" json:",omitempty"`
-	Duration       *int64     `db:"duration" json:",omitempty"`
-	Enabled        *bool      `db:"enabled" json:",omitempty"`
-	UpperLimit     *float64   `db:"upper_limit" json:",omitempty"`
-	LowerLimit     *float64   `db:"lower_limit" json:",omitempty"`
-	ValidFrom      *string    `db:"valid_from" json:",omitempty"`
-	ValidTill      *string    `db:"valid_till" json:",omitempty"`
-	SnoozedAt      *int64     `db:"snoozed_at" json:",omitempty"`
-	SnoozedFor     *int64     `db:"snoozed_for" json:",omitempty"`
-	DefaultSnooze  *int64     `db:"default_snooze" json:",omitempty"`
+type UserTag struct {
+	UserTagId *uuid.UUID `db:"user_tag_id" json:",omitempty"`
+	UserId    *uuid.UUID `db:"user_id" json:",omitempty"`
+	Key       *string    `db:"key" json:",omitempty"`
+	Value     *string    `db:"value" json:",omitempty"`
 }
 
-func GetAlertViewFieldMap() map[string]string {
-	return map[string]string{"AlertId": "alert_id", "AlertName": "alert_name", "AlertRuleId": "alert_rule_id", "AlertRuleName": "alert_rule_name", "AlertSnoozedAt": "alert_snoozed_at", "AlertSnoozedBy": "alert_snoozed_by", "CreatedAt": "created_at", "DefaultSnooze": "default_snooze", "Duration": "duration", "Enabled": "enabled", "Key": "key", "LowerLimit": "lower_limit", "OrgId": "org_id", "Remarks": "remarks", "SnoozedAt": "snoozed_at", "SnoozedFor": "snoozed_for", "Status": "status", "UpdatedAt": "updated_at", "UpperLimit": "upper_limit", "UserId": "user_id", "Valid": "valid", "ValidFrom": "valid_from", "ValidTill": "valid_till"}
+func GetUserTagFieldMap() map[string]string {
+	return map[string]string{"Key": "key", "UserId": "user_id", "UserTagId": "user_tag_id", "Value": "value"}
 }
 
-func GetAlertViewReverseFieldMap() map[string]string {
-	return map[string]string{"alert_id": "AlertId", "alert_name": "AlertName", "alert_rule_id": "AlertRuleId", "alert_rule_name": "AlertRuleName", "alert_snoozed_at": "AlertSnoozedAt", "alert_snoozed_by": "AlertSnoozedBy", "created_at": "CreatedAt", "default_snooze": "DefaultSnooze", "duration": "Duration", "enabled": "Enabled", "key": "Key", "lower_limit": "LowerLimit", "org_id": "OrgId", "remarks": "Remarks", "snoozed_at": "SnoozedAt", "snoozed_for": "SnoozedFor", "status": "Status", "updated_at": "UpdatedAt", "upper_limit": "UpperLimit", "user_id": "UserId", "valid": "Valid", "valid_from": "ValidFrom", "valid_till": "ValidTill"}
+func GetUserTagReverseFieldMap() map[string]string {
+	return map[string]string{"key": "Key", "user_id": "UserId", "user_tag_id": "UserTagId", "value": "Value"}
 }
 
-func GetAlertViewTypeMap() map[string]string {
-	return map[string]string{"AlertId": "*uuid.UUID", "AlertName": "*string", "AlertRuleId": "*uuid.UUID", "AlertRuleName": "*string", "AlertSnoozedAt": "*string", "AlertSnoozedBy": "*string", "CreatedAt": "*int64", "DefaultSnooze": "*int64", "Duration": "*int64", "Enabled": "*bool", "Key": "*string", "LowerLimit": "*float64", "OrgId": "*uuid.UUID", "Remarks": "*string", "SnoozedAt": "*int64", "SnoozedFor": "*int64", "Status": "*string", "UpdatedAt": "*int64", "UpperLimit": "*float64", "UserId": "*uuid.UUID", "Valid": "*bool", "ValidFrom": "*string", "ValidTill": "*string"}
+func GetUserTagTypeMap() map[string]string {
+	return map[string]string{"Key": "*string", "UserId": "*uuid.UUID", "UserTagId": "*uuid.UUID", "Value": "*string"}
 }
 
 type OrgAlertView struct {
@@ -1499,7 +1480,7 @@ type OrgAlertView struct {
 	FirstName      *string    `db:"first_name" json:",omitempty"`
 	LastName       *string    `db:"last_name" json:",omitempty"`
 	AlertSnoozedBy *string    `db:"alert_snoozed_by" json:",omitempty"`
-	AlertSnoozedAt *string    `db:"alert_snoozed_at" json:",omitempty"`
+	AlertSnoozedAt *int64     `db:"alert_snoozed_at" json:",omitempty"`
 	CreatedAt      *int64     `db:"created_at" json:",omitempty"`
 	AlertName      *string    `db:"alert_name" json:",omitempty"`
 	Status         *string    `db:"status" json:",omitempty"`
@@ -1526,16 +1507,18 @@ func GetOrgAlertViewReverseFieldMap() map[string]string {
 }
 
 func GetOrgAlertViewTypeMap() map[string]string {
-	return map[string]string{"AlertId": "*uuid.UUID", "AlertName": "*string", "AlertRuleId": "*uuid.UUID", "AlertRuleName": "*string", "AlertSnoozedAt": "*string", "AlertSnoozedBy": "*string", "CreatedAt": "*int64", "DefaultSnooze": "*int64", "Duration": "*int64", "Enabled": "*bool", "FirstName": "*string", "Key": "*string", "LastName": "*string", "LowerLimit": "*float64", "OrgId": "*uuid.UUID", "Remarks": "*string", "SnoozedAt": "*int64", "SnoozedFor": "*int64", "Status": "*string", "UpperLimit": "*float64", "UserId": "*uuid.UUID", "ValidFrom": "*string", "ValidTill": "*string"}
+	return map[string]string{"AlertId": "*uuid.UUID", "AlertName": "*string", "AlertRuleId": "*uuid.UUID", "AlertRuleName": "*string", "AlertSnoozedAt": "*int64", "AlertSnoozedBy": "*string", "CreatedAt": "*int64", "DefaultSnooze": "*int64", "Duration": "*int64", "Enabled": "*bool", "FirstName": "*string", "Key": "*string", "LastName": "*string", "LowerLimit": "*float64", "OrgId": "*uuid.UUID", "Remarks": "*string", "SnoozedAt": "*int64", "SnoozedFor": "*int64", "Status": "*string", "UpperLimit": "*float64", "UserId": "*uuid.UUID", "ValidFrom": "*string", "ValidTill": "*string"}
 }
 
 type OrgLatestAlertView struct {
 	UserId         *uuid.UUID            `db:"user_id" json:",omitempty"`
 	OrgId          *uuid.UUID            `db:"org_id" json:",omitempty"`
+	AlertId        *uuid.UUID            `db:"alert_id" json:",omitempty"`
+	AlertRuleId    *uuid.UUID            `db:"alert_rule_id" json:",omitempty"`
 	FirstName      *string               `db:"first_name" json:",omitempty"`
 	LastName       *string               `db:"last_name" json:",omitempty"`
 	AlertSnoozedBy *string               `db:"alert_snoozed_by" json:",omitempty"`
-	AlertSnoozedAt *string               `db:"alert_snoozed_at" json:",omitempty"`
+	AlertSnoozedAt *int64                `db:"alert_snoozed_at" json:",omitempty"`
 	Status         *string               `db:"status" json:",omitempty"`
 	Remarks        *string               `db:"remarks" json:",omitempty"`
 	AlertRuleName  *string               `db:"alert_rule_name" json:",omitempty"`
@@ -1554,32 +1537,13 @@ type OrgLatestAlertView struct {
 }
 
 func GetOrgLatestAlertViewFieldMap() map[string]string {
-	return map[string]string{"AlertRuleName": "alert_rule_name", "AlertSnoozedAt": "alert_snoozed_at", "AlertSnoozedBy": "alert_snoozed_by", "Alerts": "alerts", "DefaultSnooze": "default_snooze", "Duration": "duration", "Enabled": "enabled", "FirstName": "first_name", "Key": "key", "LastName": "last_name", "LowerLimit": "lower_limit", "OrgId": "org_id", "Remarks": "remarks", "SnoozedAt": "snoozed_at", "SnoozedFor": "snoozed_for", "Status": "status", "Timestamp": "timestamp", "UpperLimit": "upper_limit", "UserId": "user_id", "ValidFrom": "valid_from", "ValidTill": "valid_till"}
+	return map[string]string{"AlertId": "alert_id", "AlertRuleId": "alert_rule_id", "AlertRuleName": "alert_rule_name", "AlertSnoozedAt": "alert_snoozed_at", "AlertSnoozedBy": "alert_snoozed_by", "Alerts": "alerts", "DefaultSnooze": "default_snooze", "Duration": "duration", "Enabled": "enabled", "FirstName": "first_name", "Key": "key", "LastName": "last_name", "LowerLimit": "lower_limit", "OrgId": "org_id", "Remarks": "remarks", "SnoozedAt": "snoozed_at", "SnoozedFor": "snoozed_for", "Status": "status", "Timestamp": "timestamp", "UpperLimit": "upper_limit", "UserId": "user_id", "ValidFrom": "valid_from", "ValidTill": "valid_till"}
 }
 
 func GetOrgLatestAlertViewReverseFieldMap() map[string]string {
-	return map[string]string{"alert_rule_name": "AlertRuleName", "alert_snoozed_at": "AlertSnoozedAt", "alert_snoozed_by": "AlertSnoozedBy", "alerts": "Alerts", "default_snooze": "DefaultSnooze", "duration": "Duration", "enabled": "Enabled", "first_name": "FirstName", "key": "Key", "last_name": "LastName", "lower_limit": "LowerLimit", "org_id": "OrgId", "remarks": "Remarks", "snoozed_at": "SnoozedAt", "snoozed_for": "SnoozedFor", "status": "Status", "timestamp": "Timestamp", "upper_limit": "UpperLimit", "user_id": "UserId", "valid_from": "ValidFrom", "valid_till": "ValidTill"}
+	return map[string]string{"alert_id": "AlertId", "alert_rule_id": "AlertRuleId", "alert_rule_name": "AlertRuleName", "alert_snoozed_at": "AlertSnoozedAt", "alert_snoozed_by": "AlertSnoozedBy", "alerts": "Alerts", "default_snooze": "DefaultSnooze", "duration": "Duration", "enabled": "Enabled", "first_name": "FirstName", "key": "Key", "last_name": "LastName", "lower_limit": "LowerLimit", "org_id": "OrgId", "remarks": "Remarks", "snoozed_at": "SnoozedAt", "snoozed_for": "SnoozedFor", "status": "Status", "timestamp": "Timestamp", "upper_limit": "UpperLimit", "user_id": "UserId", "valid_from": "ValidFrom", "valid_till": "ValidTill"}
 }
 
 func GetOrgLatestAlertViewTypeMap() map[string]string {
-	return map[string]string{"AlertRuleName": "*string", "AlertSnoozedAt": "*string", "AlertSnoozedBy": "*string", "Alerts": "*datastore.RawMessage", "DefaultSnooze": "*int64", "Duration": "*int64", "Enabled": "*bool", "FirstName": "*string", "Key": "*string", "LastName": "*string", "LowerLimit": "*float64", "OrgId": "*uuid.UUID", "Remarks": "*string", "SnoozedAt": "*int64", "SnoozedFor": "*int64", "Status": "*string", "Timestamp": "*int64", "UpperLimit": "*float64", "UserId": "*uuid.UUID", "ValidFrom": "*string", "ValidTill": "*string"}
-}
-
-type UserTag struct {
-	UserTagId *uuid.UUID `db:"user_tag_id" json:",omitempty"`
-	UserId    *uuid.UUID `db:"user_id" json:",omitempty"`
-	Key       *string    `db:"key" json:",omitempty"`
-	Value     *string    `db:"value" json:",omitempty"`
-}
-
-func GetUserTagFieldMap() map[string]string {
-	return map[string]string{"Key": "key", "UserId": "user_id", "UserTagId": "user_tag_id", "Value": "value"}
-}
-
-func GetUserTagReverseFieldMap() map[string]string {
-	return map[string]string{"key": "Key", "user_id": "UserId", "user_tag_id": "UserTagId", "value": "Value"}
-}
-
-func GetUserTagTypeMap() map[string]string {
-	return map[string]string{"Key": "*string", "UserId": "*uuid.UUID", "UserTagId": "*uuid.UUID", "Value": "*string"}
+	return map[string]string{"AlertId": "*uuid.UUID", "AlertRuleId": "*uuid.UUID", "AlertRuleName": "*string", "AlertSnoozedAt": "*int64", "AlertSnoozedBy": "*string", "Alerts": "*datastore.RawMessage", "DefaultSnooze": "*int64", "Duration": "*int64", "Enabled": "*bool", "FirstName": "*string", "Key": "*string", "LastName": "*string", "LowerLimit": "*float64", "OrgId": "*uuid.UUID", "Remarks": "*string", "SnoozedAt": "*int64", "SnoozedFor": "*int64", "Status": "*string", "Timestamp": "*int64", "UpperLimit": "*float64", "UserId": "*uuid.UUID", "ValidFrom": "*string", "ValidTill": "*string"}
 }

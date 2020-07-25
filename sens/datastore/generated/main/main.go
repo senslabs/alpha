@@ -96,10 +96,9 @@ func main() {
 	api.UserSessionCountViewMain(r)
 	api.MeditationSummaryViewMain(r)
 	api.NoteMain(r)
-	api.AlertViewMain(r)
+	api.UserTagMain(r)
 	api.OrgAlertViewMain(r)
 	api.OrgLatestAlertViewMain(r)
-	api.UserTagMain(r)
 	
 	ext.ExtMain(r)
 
