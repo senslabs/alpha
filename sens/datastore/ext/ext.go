@@ -290,11 +290,13 @@ func Get24HourViewList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var in []interface{}
-	for _, u := range in {
+	for _, u := range userIds {
 		in = append(in, u)
 	}
 
-	stmt, err := db.Prepare(TF_LIST_QUERY)
+	logger.Debugf("%#v", in)
+
+	stmt, err := db.Prepare(query)
 	errors.Pie(err)
 	rows, err := stmt.Query(in...)
 	errors.Pie(err)
