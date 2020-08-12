@@ -1173,25 +1173,6 @@ func GetResourceTypeMap() map[string]string {
 	return map[string]string{"CreatedAt": "*int64", "Key": "*string", "Object": "*string", "ObjectType": "*string", "Properties": "*datastore.RawMessage", "ResourceId": "*uuid.UUID", "Value": "*string"}
 }
 
-type SleepSummaryView struct {
-	UserId      *uuid.UUID            `db:"user_id" json:",omitempty"`
-	SessionId   *uuid.UUID            `db:"session_id" json:",omitempty"`
-	SessionType *string               `db:"session_type" json:",omitempty"`
-	Properties  *datastore.RawMessage `db:"properties" json:",omitempty"`
-}
-
-func GetSleepSummaryViewFieldMap() map[string]string {
-	return map[string]string{"Properties": "properties", "SessionId": "session_id", "SessionType": "session_type", "UserId": "user_id"}
-}
-
-func GetSleepSummaryViewReverseFieldMap() map[string]string {
-	return map[string]string{"properties": "Properties", "session_id": "SessionId", "session_type": "SessionType", "user_id": "UserId"}
-}
-
-func GetSleepSummaryViewTypeMap() map[string]string {
-	return map[string]string{"Properties": "*datastore.RawMessage", "SessionId": "*uuid.UUID", "SessionType": "*string", "UserId": "*uuid.UUID"}
-}
-
 type LatestSleepSummaryView struct {
 	UserId     *uuid.UUID            `db:"user_id" json:",omitempty"`
 	SessionId  *uuid.UUID            `db:"session_id" json:",omitempty"`
@@ -1552,4 +1533,24 @@ func GetOrgLatestAlertViewReverseFieldMap() map[string]string {
 
 func GetOrgLatestAlertViewTypeMap() map[string]string {
 	return map[string]string{"AlertId": "*uuid.UUID", "AlertRuleId": "*uuid.UUID", "AlertRuleName": "*string", "AlertSnoozeDuration": "*int64", "AlertSnoozedAt": "*int64", "AlertSnoozedBy": "*string", "Alerts": "*datastore.RawMessage", "DefaultSnooze": "*int64", "Duration": "*int64", "Enabled": "*bool", "FirstName": "*string", "Key": "*string", "LastName": "*string", "LowerLimit": "*float64", "OrgId": "*uuid.UUID", "Remarks": "*string", "SnoozeDuration": "*int64", "SnoozedAt": "*int64", "SnoozedFor": "*int64", "Status": "*string", "Timestamp": "*int64", "UpperLimit": "*float64", "UserId": "*uuid.UUID", "ValidFrom": "*string", "ValidTill": "*string"}
+}
+
+type SleepSummaryView struct {
+	UserId      *uuid.UUID            `db:"user_id" json:",omitempty"`
+	SessionId   *uuid.UUID            `db:"session_id" json:",omitempty"`
+	SessionType *string               `db:"session_type" json:",omitempty"`
+	Properties  *datastore.RawMessage `db:"properties" json:",omitempty"`
+	WakeupTime  *int64                `db:"wakeup_time" json:",omitempty"`
+}
+
+func GetSleepSummaryViewFieldMap() map[string]string {
+	return map[string]string{"Properties": "properties", "SessionId": "session_id", "SessionType": "session_type", "UserId": "user_id", "WakeupTime": "wakeup_time"}
+}
+
+func GetSleepSummaryViewReverseFieldMap() map[string]string {
+	return map[string]string{"properties": "Properties", "session_id": "SessionId", "session_type": "SessionType", "user_id": "UserId", "wakeup_time": "WakeupTime"}
+}
+
+func GetSleepSummaryViewTypeMap() map[string]string {
+	return map[string]string{"Properties": "*datastore.RawMessage", "SessionId": "*uuid.UUID", "SessionType": "*string", "UserId": "*uuid.UUID", "WakeupTime": "*int64"}
 }

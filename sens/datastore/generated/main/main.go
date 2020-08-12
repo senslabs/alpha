@@ -82,7 +82,6 @@ func main() {
 	api.SessionViewMain(r)
 	api.UserBaselineViewMain(r)
 	api.ResourceMain(r)
-	api.SleepSummaryViewMain(r)
 	api.LatestSleepSummaryViewMain(r)
 	api.LatestMeditationSummaryViewMain(r)
 	api.RecorderMain(r)
@@ -99,6 +98,7 @@ func main() {
 	api.UserTagMain(r)
 	api.OrgAlertViewMain(r)
 	api.OrgLatestAlertViewMain(r)
+	api.SleepSummaryViewMain(r)
 	
 	ext.ExtMain(r)
 
