@@ -45,7 +45,7 @@ func BatchCreateOrgActivityView(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
 	defer r.Body.Close()
-	fn.BatchInsertOrgActivityView(data)
+	fn.BatchUpsertOrgActivityView(data)
 	w.WriteHeader(http.StatusOK)
 }
 

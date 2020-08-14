@@ -45,7 +45,7 @@ func BatchCreateReportView(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
 	defer r.Body.Close()
-	fn.BatchInsertReportView(data)
+	fn.BatchUpsertReportView(data)
 	w.WriteHeader(http.StatusOK)
 }
 

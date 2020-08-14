@@ -45,7 +45,7 @@ func BatchCreateDevice(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
 	defer r.Body.Close()
-	fn.BatchInsertDevice(data)
+	fn.BatchUpsertDevice(data)
 	w.WriteHeader(http.StatusOK)
 }
 

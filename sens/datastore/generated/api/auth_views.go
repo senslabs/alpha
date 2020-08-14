@@ -45,7 +45,7 @@ func BatchCreateAuthView(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
 	defer r.Body.Close()
-	fn.BatchInsertAuthView(data)
+	fn.BatchUpsertAuthView(data)
 	w.WriteHeader(http.StatusOK)
 }
 

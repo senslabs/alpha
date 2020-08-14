@@ -45,7 +45,7 @@ func BatchCreateOpPropertie(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
 	defer r.Body.Close()
-	fn.BatchInsertOpPropertie(data)
+	fn.BatchUpsertOpPropertie(data)
 	w.WriteHeader(http.StatusOK)
 }
 

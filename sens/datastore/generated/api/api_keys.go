@@ -48,7 +48,7 @@ func BatchCreateApiKey(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
 	defer r.Body.Close()
-	fn.BatchInsertApiKey(data)
+	fn.BatchUpsertApiKey(data)
 	w.WriteHeader(http.StatusOK)
 }
 

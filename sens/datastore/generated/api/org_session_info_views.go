@@ -45,7 +45,7 @@ func BatchCreateOrgSessionInfoView(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
 	defer r.Body.Close()
-	fn.BatchInsertOrgSessionInfoView(data)
+	fn.BatchUpsertOrgSessionInfoView(data)
 	w.WriteHeader(http.StatusOK)
 }
 

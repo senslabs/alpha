@@ -48,7 +48,7 @@ func BatchCreate{{.Model}}(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
 	defer r.Body.Close()
-	fn.BatchInsert{{.Model}}(data)
+	fn.BatchUpsert{{.Model}}(data)
 	w.WriteHeader(http.StatusOK)
 }
 

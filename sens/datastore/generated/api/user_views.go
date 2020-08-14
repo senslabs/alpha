@@ -45,7 +45,7 @@ func BatchCreateUserView(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
 	defer r.Body.Close()
-	fn.BatchInsertUserView(data)
+	fn.BatchUpsertUserView(data)
 	w.WriteHeader(http.StatusOK)
 }
 

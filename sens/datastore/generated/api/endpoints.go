@@ -48,7 +48,7 @@ func BatchCreateEndpoint(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
 	defer r.Body.Close()
-	fn.BatchInsertEndpoint(data)
+	fn.BatchUpsertEndpoint(data)
 	w.WriteHeader(http.StatusOK)
 }
 

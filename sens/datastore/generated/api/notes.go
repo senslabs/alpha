@@ -45,7 +45,7 @@ func BatchCreateNote(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
 	defer r.Body.Close()
-	fn.BatchInsertNote(data)
+	fn.BatchUpsertNote(data)
 	w.WriteHeader(http.StatusOK)
 }
 

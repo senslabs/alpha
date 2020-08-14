@@ -45,7 +45,7 @@ func BatchCreateOpUserAccessGroup(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
 	defer r.Body.Close()
-	fn.BatchInsertOpUserAccessGroup(data)
+	fn.BatchUpsertOpUserAccessGroup(data)
 	w.WriteHeader(http.StatusOK)
 }
 

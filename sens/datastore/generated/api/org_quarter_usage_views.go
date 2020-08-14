@@ -45,7 +45,7 @@ func BatchCreateOrgQuarterUsageView(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
 	defer r.Body.Close()
-	fn.BatchInsertOrgQuarterUsageView(data)
+	fn.BatchUpsertOrgQuarterUsageView(data)
 	w.WriteHeader(http.StatusOK)
 }
 

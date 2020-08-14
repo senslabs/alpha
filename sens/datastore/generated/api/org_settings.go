@@ -48,7 +48,7 @@ func BatchCreateOrgSetting(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
 	defer r.Body.Close()
-	fn.BatchInsertOrgSetting(data)
+	fn.BatchUpsertOrgSetting(data)
 	w.WriteHeader(http.StatusOK)
 }
 

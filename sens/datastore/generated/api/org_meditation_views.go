@@ -45,7 +45,7 @@ func BatchCreateOrgMeditationView(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
 	defer r.Body.Close()
-	fn.BatchInsertOrgMeditationView(data)
+	fn.BatchUpsertOrgMeditationView(data)
 	w.WriteHeader(http.StatusOK)
 }
 

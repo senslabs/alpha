@@ -48,7 +48,7 @@ func BatchCreateResource(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
 	defer r.Body.Close()
-	fn.BatchInsertResource(data)
+	fn.BatchUpsertResource(data)
 	w.WriteHeader(http.StatusOK)
 }
 

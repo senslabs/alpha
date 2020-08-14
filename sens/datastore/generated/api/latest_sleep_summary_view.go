@@ -45,7 +45,7 @@ func BatchCreateLatestSleepSummaryView(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
 	defer r.Body.Close()
-	fn.BatchInsertLatestSleepSummaryView(data)
+	fn.BatchUpsertLatestSleepSummaryView(data)
 	w.WriteHeader(http.StatusOK)
 }
 

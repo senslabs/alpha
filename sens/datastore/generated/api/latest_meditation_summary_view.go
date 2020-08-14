@@ -45,7 +45,7 @@ func BatchCreateLatestMeditationSummaryView(w http.ResponseWriter, r *http.Reque
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
 	defer r.Body.Close()
-	fn.BatchInsertLatestMeditationSummaryView(data)
+	fn.BatchUpsertLatestMeditationSummaryView(data)
 	w.WriteHeader(http.StatusOK)
 }
 

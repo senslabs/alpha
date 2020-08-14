@@ -48,7 +48,7 @@ func BatchCreateAlert(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
 	defer r.Body.Close()
-	fn.BatchInsertAlert(data)
+	fn.BatchUpsertAlert(data)
 	w.WriteHeader(http.StatusOK)
 }
 

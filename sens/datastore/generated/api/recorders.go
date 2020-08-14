@@ -45,7 +45,7 @@ func BatchCreateRecorder(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
 	defer r.Body.Close()
-	fn.BatchInsertRecorder(data)
+	fn.BatchUpsertRecorder(data)
 	w.WriteHeader(http.StatusOK)
 }
 

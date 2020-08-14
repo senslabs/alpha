@@ -48,7 +48,7 @@ func BatchCreateAuth(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
 	defer r.Body.Close()
-	fn.BatchInsertAuth(data)
+	fn.BatchUpsertAuth(data)
 	w.WriteHeader(http.StatusOK)
 }
 

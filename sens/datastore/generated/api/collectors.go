@@ -45,7 +45,7 @@ func BatchCreateCollector(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	errors.Pie(err)
 	defer r.Body.Close()
-	fn.BatchInsertCollector(data)
+	fn.BatchUpsertCollector(data)
 	w.WriteHeader(http.StatusOK)
 }
 
