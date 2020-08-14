@@ -110,6 +110,57 @@ func BatchInsertReport(data []byte) {
 	errors.Pie(err)
 }
 
+func BatchUpsertReport(data []byte) {
+	var j []map[string]interface{}
+	types.Unmarshal(data, &j)
+	if len(j) == 0 {
+		return
+	}
+
+	comma := ""
+	var keys []string
+	var fields []string
+	fieldMap := models.GetReportFieldMap()
+	typeMap := models.GetReportTypeMap()
+	insert := bytes.NewBufferString("UPSERT INTO reports(")
+	for k, _ := range j[0] {
+		if f, ok := fieldMap[k]; ok {
+			fmt.Fprint(insert, comma, f)
+			keys = append(keys, k)
+			fields = append(fields, f)
+			comma = ", "
+		}
+	}
+
+	phi := 1
+	comma = ""
+	var values []interface{}
+	fmt.Fprint(insert, ") VALUES ")
+	for _, kv := range j {
+		fmt.Fprint(insert, comma, "(")
+		comma = ""
+		for _, k := range keys {
+			values = append(values, datastore.ConvertFieldValue(k, kv[k], typeMap))
+			fmt.Fprint(insert, comma, "$", phi)
+			comma = ", "
+			phi++
+		}
+		fmt.Fprint(insert, ")")
+	}
+
+	//fmt.Fprint(insert, " ON CONFLICT(report_id) DO UPDATE SET (", strings.Join(fields, ", "), ") = (EXCLUDED.", strings.Join(fields, ", EXCLUDED."), ")")
+
+	logger.Debug(insert.String())
+
+	db := datastore.GetConnection()
+	stmt, err := db.Prepare(insert.String())
+	defer stmt.Close()
+	errors.Pie(err)
+
+	_, err = stmt.Exec(values...)
+	errors.Pie(err)
+}
+
 
 
 func UpdateReport(id string, data []byte) {

@@ -310,10 +310,10 @@ func GetStreamingTrends(w http.ResponseWriter, r *http.Request) {
 	key := r.URL.Query()["Key"]
 	fromTime, err := time.Parse("2006-01-02", from)
 	errors.Pie(err)
-	fromTime = fromTime.Add(8 * time.Hour)
+	// fromTime = fromTime.Add(8 * time.Hour)
 	toTime := fromTime.Add(24 * time.Hour)
 	endTime, err := time.Parse("2006-01-02", to)
-	endTime = endTime.Add(8 * time.Hour)
+	// endTime = endTime.Add(8 * time.Hour)
 	errors.Pie(err)
 
 	values := []interface{}{userId, pq.Array(key)}
