@@ -103,7 +103,7 @@ func GetAvgValues(w http.ResponseWriter, r *http.Request) {
 
 func DeleteUserAuth(w http.ResponseWriter, r *http.Request) {
 	db := datastore.GetConnection()
-	stmt, err := db.Prepare(ACTIVITY_DASHBOARD_QUERY)
+	stmt, err := db.Prepare(DELETE_USER_QUERY)
 	errors.Pie(err)
 	userId := mux.Vars(r)["id"]
 	_, err = stmt.Exec(userId)
