@@ -303,6 +303,7 @@ func Get24HourViewList(w http.ResponseWriter, r *http.Request) {
 	marshalSqlRows(w, rows)
 }
 
+// This also is seen in APP
 func GetStreamingTrends(w http.ResponseWriter, r *http.Request) {
 	from := r.URL.Query().Get("From")
 	to := r.URL.Query().Get("To")
