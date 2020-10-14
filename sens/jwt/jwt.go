@@ -35,7 +35,7 @@ func GenerateAccessToken(subject interface{}, expiry time.Duration) (string, err
 }
 
 func GenerateRefreshToken(subject interface{}) (string, error) {
-	return generateToken(subject, 90*24*time.Hour, jwt.SigningMethodHS512, refreshSigningKey)
+	return generateToken(subject, 365*24*time.Hour, jwt.SigningMethodHS512, refreshSigningKey)
 }
 
 func GenerateTemporaryToken(subject interface{}) (string, error) {
