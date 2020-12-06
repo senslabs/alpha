@@ -52,9 +52,10 @@ func InitFluentLogger(name string) {
 	fL, err := fluent.New(fluent.Config{
 		FluentHost: os.Getenv("FLUENTD_HOST"),
 		FluentPort: 24224,
-		RequestAck: true,
+		RequestAck: false,
 		RetryWait:  32,
 		MaxRetry:   3,
+		Async: true,
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -164,7 +165,7 @@ func InitLogger(arg interface{}) {
 	if logStore == "file" {
 		InitFileLogger(arg.(string))
 	} else if logStore == "fluentd" {
-		InitConsoleLogger()
+		InitFluentLogger(arg.(string))
 	} else {
 		InitConsoleLogger()
 	}
